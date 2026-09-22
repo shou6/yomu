@@ -3,6 +3,12 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.1]
+
+### Fixed
+
+- Text diagrams drawn with box-drawing characters (─ │ ┌ ▶ ▼) no longer break apart in code blocks. The default code font is now a Latin monospace font (Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono), and only Japanese falls back to the editor font. Japanese monospace fonts such as HackGen draw these characters 1.5 to 2 cells wide.
+
 ## [0.1.0]
 
 First release (MVP).

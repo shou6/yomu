@@ -18,7 +18,7 @@ export interface ReaderSettings {
   padding: number;
   /** CSS の font-family の値 */
   fontFamily: string;
-  /** コードの font-family。空なら VS Code の editor.fontFamily に従う */
+  /** コードの font-family。空なら欧文の等幅フォント、和文は VS Code の editor.fontFamily */
   codeFontFamily: string;
   /** 本文の文字の大きさ（px） */
   fontSize: number;
@@ -46,8 +46,13 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   customCss: '',
 };
 
-/** コードのフォントを指定しない時の値。VS Code のエディタのフォントに従う */
-const CODE_FONT_FALLBACK = 'var(--vscode-editor-font-family, Consolas, monospace)';
+/**
+ * コードのフォントを指定しない時の値。欧文の等幅フォントを先に置き、和文だけエディタのフォントで描く。
+ * 罫線（─ │ ┌）や三角（▶ ▼）は東アジアの文字幅が曖昧な文字で、和文の等幅フォント（HackGen など）は
+ * 1.5〜2 文字幅で描くため、半角前提で書かれたテキストの図がずれる。欧文の等幅フォントなら ASCII と同じ幅になる
+ */
+const CODE_FONT_FALLBACK =
+  "'Cascadia Mono', Consolas, Menlo, 'DejaVu Sans Mono', 'Liberation Mono', var(--vscode-editor-font-family, monospace), monospace";
 
 function oneOf<T extends string>(value: unknown, choices: readonly T[], fallback: T): T {
   return typeof value === 'string' && (choices as readonly string[]).includes(value)
