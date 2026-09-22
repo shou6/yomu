@@ -4,16 +4,23 @@
 
 [日本語](README.ja.md)
 
-<!-- One or two sentences on what this extension does and who it is for. -->
+Yomu opens a Markdown file in a dedicated reader tab, typeset for reading Japanese text.
+It is a viewer, not an editor: when you want to edit, open the file in the regular text editor.
 
 ## Features
 
-- **Hello World**: shows a greeting with the name of the open folder.
+- **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the Command Palette or "Reopen Editor With...".
+- **Japanese typography**: fixed line length (about 38 full-width characters), separate fonts for Japanese and Latin text, wider line height, and tighter spacing around Japanese punctuation. No web fonts are bundled; system fonts are used.
+- **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, heading anchors, local and remote images. Raw HTML is disabled.
+- **Follows your theme**: light, dark and high-contrast themes are supported and update without reopening the tab.
+- **Live update**: editing and saving the file in the text editor updates the reader tab.
 
 ## Usage
 
-1. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`).
-2. Run **Yomu - Markdown Reader with Japanese Typography: Hello World**.
+1. Open a `.md` file.
+2. Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run **Yomu: Open in Reader**.
+   You can also use **Reopen Editor With...** and choose **Yomu Reader**.
+3. To edit, use **Reopen Editor With...** and choose **Text Editor**.
 
 ## Requirements
 

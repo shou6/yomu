@@ -24,21 +24,42 @@ suite('checkPackageFiles', () => {
   test('main と l10n があれば、エントリポイントと翻訳ファイルを入れてよく、エントリポイントは必須', () => {
     const manifest = { main: './dist/extension.js', l10n: './l10n' };
     assert.deepStrictEqual(
-      checkPackageFiles([...COMMON, 'dist/extension.js', 'l10n/bundle.l10n.ja.json'], manifest),
+      checkPackageFiles(
+        [...COMMON, 'dist/extension.js', 'dist/webview.js', 'l10n/bundle.l10n.ja.json'],
+        manifest
+      ),
       { unexpected: [], missing: [] }
     );
     assert.deepStrictEqual(checkPackageFiles(COMMON, manifest), {
       unexpected: [],
-      missing: ['dist/extension.js'],
+      missing: ['dist/extension.js', 'dist/webview.js'],
+    });
+  });
+
+  test('main があれば、Webview のスクリプトも必須で、media の CSS は入れてよい', () => {
+    const manifest = { main: './dist/extension.js' };
+    assert.deepStrictEqual(
+      checkPackageFiles(
+        [...COMMON, 'dist/extension.js', 'dist/webview.js', 'media/reader.css', 'media/theme.css'],
+        manifest
+      ),
+      { unexpected: [], missing: [] }
+    );
+    assert.deepStrictEqual(checkPackageFiles([...COMMON, 'dist/extension.js'], manifest), {
+      unexpected: [],
+      missing: ['dist/webview.js'],
     });
   });
 
   test('main が無い（宣言だけの拡張機能）なら、エントリポイントを求めず、入っていたら意図しないもの', () => {
     assert.deepStrictEqual(checkPackageFiles(COMMON, {}), { unexpected: [], missing: [] });
-    assert.deepStrictEqual(checkPackageFiles([...COMMON, 'dist/extension.js'], {}), {
-      unexpected: ['dist/extension.js'],
-      missing: [],
-    });
+    assert.deepStrictEqual(
+      checkPackageFiles(
+        [...COMMON, 'dist/extension.js', 'dist/webview.js', 'media/reader.css'],
+        {}
+      ),
+      { unexpected: ['dist/extension.js', 'dist/webview.js', 'media/reader.css'], missing: [] }
+    );
   });
 
   test('l10n が無ければ、翻訳ファイルは意図しないもの', () => {

@@ -6,7 +6,10 @@
     "types": ["node", "mocha"],
     "sourceMap": true,
     "rootDir": "src",
-    "strict": true /* enable all strict type-checking options */
+    "strict": true /* enable all strict type-checking options */,
+    // markdown-it 15 の CommonJS 用の型定義は ESM の型を import しており、Node16 の解決では TS1542 になる。
+    // node_modules の型定義は検査しない（自分のソースは strict のまま）
+    "skipLibCheck": true
     /* Additional Checks */
     // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
     // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */

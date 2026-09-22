@@ -23,28 +23,44 @@ const esbuildProblemMatcherPlugin = {
   },
 };
 
-async function main() {
-  const ctx = await esbuild.context({
+/** @type {import('esbuild').BuildOptions} */
+const common = {
+  bundle: true,
+  minify: production,
+  sourcemap: !production,
+  sourcesContent: false,
+  logLevel: 'silent',
+  plugins: [esbuildProblemMatcherPlugin],
+};
+
+/** 拡張本体（Node 向け）と Webview 側のスクリプト（ブラウザ向け）は実行環境が違うので、別々にバンドルする */
+const builds = [
+  {
+    ...common,
     entryPoints: ['src/extension.ts'],
-    bundle: true,
     format: 'cjs',
-    minify: production,
-    sourcemap: !production,
-    sourcesContent: false,
     platform: 'node',
     outfile: 'dist/extension.js',
     external: ['vscode'],
-    logLevel: 'silent',
-    plugins: [
-      /* add to the end of plugins array */
-      esbuildProblemMatcherPlugin,
-    ],
-  });
+  },
+  {
+    ...common,
+    entryPoints: ['src/webview/main.ts'],
+    format: 'iife',
+    platform: 'browser',
+    outfile: 'dist/webview.js',
+  },
+];
+
+async function main() {
+  const contexts = await Promise.all(builds.map((options) => esbuild.context(options)));
   if (watch) {
-    await ctx.watch();
+    await Promise.all(contexts.map((ctx) => ctx.watch()));
   } else {
-    await ctx.rebuild();
-    await ctx.dispose();
+    for (const ctx of contexts) {
+      await ctx.rebuild();
+      await ctx.dispose();
+    }
   }
 }
 

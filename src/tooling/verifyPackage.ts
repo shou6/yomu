@@ -1,6 +1,6 @@
 /**
  * 公開パッケージ（VSIX）に入るファイルが、意図したものだけかを判定する（scripts/verify-package.js が使う）。
- * 入ってよいファイルは package.json の main と l10n の有無で変わる。宣言だけの拡張機能は main を持たない。
+ * 入ってよいファイルは package.json の main と l10n の有無で変わる。main があれば Webview のスクリプトも必須。
  */
 
 export interface PackageManifest {
@@ -46,8 +46,13 @@ export function checkPackageFiles(
   const required = [...ALWAYS_REQUIRED];
   if (manifest.main) {
     const main = normalize(manifest.main);
-    allowed.push(new RegExp('^' + escapeRegExp(main) + '$'));
-    required.push(main);
+    // 拡張本体に加えて、Webview 側のスクリプトと組版の CSS も配る
+    allowed.push(
+      new RegExp('^' + escapeRegExp(main) + '$'),
+      /^dist\/webview\.js$/,
+      /^media\/[\w.-]+\.css$/
+    );
+    required.push(main, 'dist/webview.js');
   }
   if (manifest.l10n) {
     const dir = normalize(manifest.l10n).replace(/\/$/, '');

@@ -31,6 +31,8 @@
   "l10n": "./l10n",
   "files": [
     "dist/extension.js",
+    "dist/webview.js",
+    "media/**",
     "resources/**",
     "l10n/**",
     "package.nls.json",
@@ -39,15 +41,6 @@
     "CHANGELOG.md",
     "LICENSE"
   ],
-  "contributes": {
-    "commands": [
-      {
-        "command": "yomu.helloWorld",
-        "title": "%command.helloWorld%",
-        "category": "Yomu"
-      }
-    ]
-  },
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "npm run check-types && npm run lint && node esbuild.js",
@@ -70,6 +63,12 @@
     "lint:md": "markdownlint-cli2 \"**/*.md\"",
     "verify:package": "npm run compile-tests && node scripts/verify-package.js",
     "icon": "node scripts/generate-icon.js"
+  },
+  "dependencies": {
+    "highlight.js": "^11.12.0",
+    "markdown-it": "^15.0.2",
+    "markdown-it-anchor": "^10.0.0",
+    "markdown-it-task-lists": "^2.1.1"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

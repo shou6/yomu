@@ -1,4 +1,3 @@
 {
-  "description": "A Visual Studio Code extension.",
-  "command.helloWorld": "Hello World"
+  "description": "Read Markdown in a dedicated reader tab with Japanese typography: fixed line length, Japanese and Latin font pairing, comfortable line height, and punctuation spacing."
 }
