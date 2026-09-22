@@ -3,7 +3,11 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [0.1.1]
+## [0.2.0]
+
+### Added
+
+- Mermaid diagrams: code blocks with the `mermaid` language are drawn as diagrams (flowcharts, sequence, class, state, Gantt, pie and more). Colors follow the reader theme, and a syntax error shows the message with the source instead of a blank area. mermaid.js is loaded only for documents that contain a Mermaid block.
 
 ### Fixed
 

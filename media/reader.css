@@ -280,3 +280,26 @@ img {
   margin: 0;
   white-space: pre-wrap;
 }
+
+/* Mermaid の図。描くまでと、描けなかった時はソースを pre で見せる */
+.yomu-mermaid {
+  margin: 1em 0;
+  text-align: center;
+  overflow-x: auto;
+}
+
+.yomu-mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.yomu-mermaid-source {
+  text-align: left;
+}
+
+.yomu-mermaid-error {
+  margin: 0 0 0.4em;
+  text-align: left;
+  font-size: 0.88em;
+  color: var(--yomu-code-fg);
+}

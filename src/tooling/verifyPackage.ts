@@ -50,12 +50,13 @@ export function checkPackageFiles(
     allowed.push(
       new RegExp('^' + escapeRegExp(main) + '$'),
       /^dist\/webview\.js$/,
+      /^dist\/mermaid\.min\.js$/,
       /^media\/(themes\/)?[\w.-]+\.css$/,
       // 同梱フォントとそのライセンス
       /^fonts\/[\w.-]+\.woff2$/,
       /^fonts\/OFL-[\w.-]+\.txt$/
     );
-    required.push(main, 'dist/webview.js');
+    required.push(main, 'dist/webview.js', 'dist/mermaid.min.js');
   }
   if (manifest.l10n) {
     const dir = normalize(manifest.l10n).replace(/\/$/, '');

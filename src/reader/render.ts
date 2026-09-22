@@ -43,10 +43,15 @@ function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
   // ラベルは横スクロールする pre の中ではなく、スクロールしない枠に置く
   const renderFence = md.renderer.rules.fence;
   md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
+    const lang = tokens[idx].info.trim().split(/\s+/)[0] ?? '';
+    if (lang.toLowerCase() === 'mermaid') {
+      // 図は Webview で mermaid.js が描く。描くまでと、描けなかった時はソースを見せる
+      const source = md.utils.escapeHtml(tokens[idx].content);
+      return `<div class="yomu-mermaid"><pre class="yomu-mermaid-source">${source}</pre></div>\n`;
+    }
     const html = renderFence
       ? renderFence(tokens, idx, opts, env, self)
       : self.renderToken(tokens, idx, opts);
-    const lang = tokens[idx].info.trim().split(/\s+/)[0] ?? '';
     return lang === ''
       ? html
       : `<div class="yomu-code" data-lang="${md.utils.escapeHtml(lang)}">${html.trimEnd()}</div>\n`;

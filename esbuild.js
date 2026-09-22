@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const esbuild = require('esbuild');
 
 const production = process.argv.includes('--production');
@@ -52,7 +54,17 @@ const builds = [
   },
 ];
 
+/** mermaid.js はバンドルせず、配布物をそのまま dist に写す。Mermaid のブロックがある時だけ Webview が読み込む */
+function copyMermaid() {
+  fs.mkdirSync('dist', { recursive: true });
+  fs.copyFileSync(
+    path.join(__dirname, 'node_modules', 'mermaid', 'dist', 'mermaid.min.js'),
+    path.join(__dirname, 'dist', 'mermaid.min.js')
+  );
+}
+
 async function main() {
+  copyMermaid();
   const contexts = await Promise.all(builds.map((options) => esbuild.context(options)));
   if (watch) {
     await Promise.all(contexts.map((ctx) => ctx.watch()));

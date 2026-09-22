@@ -50,6 +50,7 @@ suite('checkPackageFiles', () => {
           ...COMMON,
           'dist/extension.js',
           'dist/webview.js',
+          'dist/mermaid.min.js',
           'media/reader.css',
           'media/themes/paper.css',
         ],
@@ -69,6 +70,7 @@ suite('checkPackageFiles', () => {
       ...COMMON,
       'dist/extension.js',
       'dist/webview.js',
+      'dist/mermaid.min.js',
       'fonts/A-Regular.woff2',
       'fonts/OFL-A.txt',
     ];

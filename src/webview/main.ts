@@ -4,6 +4,9 @@
  */
 import { classifyLink } from '../reader/links';
 import type { FromWebview, ToWebview } from '../reader/messages';
+import { mermaidTheme } from '../reader/mermaidTheme';
+import type { Theme } from '../reader/readerSettings';
+import { renderMermaid, resetMermaid } from './mermaid';
 
 interface ReaderState {
   scrollY: number;
@@ -19,6 +22,12 @@ declare function acquireVsCodeApi(): VsCodeApi;
 
 const vscode = acquireVsCodeApi();
 const content = requireContent();
+/** このスクリプトの nonce。mermaid.js を後から読み込む時に同じ値を付ける（currentScript は読み込み中しか取れない） */
+const nonce = (document.currentScript as HTMLScriptElement | null)?.nonce ?? '';
+/** 今のテーマ。settings が来るまでは既定の paper */
+let theme: Theme = 'paper';
+/** 開いた直後に復元したいスクロール位置。図を描いて本文が伸びた後に、もう一度合わせる */
+let restoreScrollY: number | undefined;
 
 function requireContent(): HTMLElement {
   const element = document.getElementById('content');
@@ -37,13 +46,38 @@ function scrollToId(id: string): void {
   document.getElementById(id)?.scrollIntoView();
 }
 
+function currentMermaidTheme(): ReturnType<typeof mermaidTheme> {
+  const dark =
+    document.body.classList.contains('vscode-dark') ||
+    document.body.classList.contains('vscode-high-contrast');
+  return mermaidTheme(theme, dark);
+}
+
+/** Mermaid の図を描く。開いた直後なら、図で本文が伸びた後にスクロール位置を合わせ直す */
+function drawMermaid(): void {
+  const src = document.body.dataset.mermaidSrc;
+  if (src === undefined || content.querySelector('.yomu-mermaid') === null) {
+    return;
+  }
+  void renderMermaid(content, { src, nonce, theme: currentMermaidTheme() }).then(() => {
+    if (restoreScrollY !== undefined) {
+      window.scrollTo(0, restoreScrollY);
+      restoreScrollY = undefined;
+    }
+  });
+}
+
 function applyUpdate(html: string): void {
   // 再描画でスクロール位置が失われないよう、差し替えの前後で位置を保つ
-  const scrollY =
-    content.childElementCount === 0 ? (vscode.getState()?.scrollY ?? 0) : window.scrollY;
+  const opening = content.childElementCount === 0;
+  const scrollY = opening ? (vscode.getState()?.scrollY ?? 0) : window.scrollY;
   content.innerHTML = html;
   window.scrollTo(0, scrollY);
+  if (opening && scrollY > 0) {
+    restoreScrollY = scrollY;
+  }
   saveScroll();
+  drawMermaid();
 }
 
 /** カスタム CSS。テーマの後（head の末尾）に <link> を置き、どのスタイルも上書きできるようにする */
@@ -72,6 +106,8 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
   }
   document.body.dataset.theme = message.theme;
   applyCustomCss(message.customCssUri);
+  // 図の配色の描き直しは、data-theme の変化を見ている MutationObserver が行う
+  theme = message.theme;
 }
 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
@@ -84,6 +120,17 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
 });
 
 window.addEventListener('scroll', saveScroll, { passive: true });
+
+// VS Code のカラーテーマを変えると body のクラスが変わる。vscode テーマの時は図の配色が変わるので描き直す
+let lastMermaidTheme = currentMermaidTheme();
+new MutationObserver(() => {
+  const next = currentMermaidTheme();
+  if (next !== lastMermaidTheme) {
+    lastMermaidTheme = next;
+    resetMermaid(content);
+    drawMermaid();
+  }
+}).observe(document.body, { attributes: true, attributeFilter: ['class', 'data-theme'] });
 
 // 設定と本文は ready を受けた拡張機能が送ってくる。タブを隠して戻すと Webview は作り直されるので、その時も送る
 vscode.postMessage({ type: 'ready' });

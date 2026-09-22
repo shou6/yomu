@@ -115,6 +115,9 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       scriptUri: webview
         .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview.js'))
         .toString(),
+      mermaidUri: webview
+        .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'mermaid.min.js'))
+        .toString(),
     });
 
     const resolveImageSrc = (src: string): string =>
