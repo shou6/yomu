@@ -23,6 +23,12 @@ interface YomuApi {
   outlineIds(): string[];
   /** 目次のビューが開いて見えているか */
   outlineVisible(): boolean;
+  /** 読書の記録（新しい順） */
+  readingHistory(): { uri: string; title: string; progress: number }[];
+  /** 読書の記録を書き換える（テスト用） */
+  recordProgress(uri: vscode.Uri, progress: number): Promise<void>;
+  /** ステータスバーに出している文字。出していなければ undefined */
+  statusBarText(): string | undefined;
 }
 
 async function api(): Promise<YomuApi> {
@@ -421,5 +427,44 @@ suite('Reader', () => {
     } finally {
       await config.update('outline.revealOnOpen', undefined, vscode.ConfigurationTarget.Global);
     }
+  });
+
+  test('Yomu の中に、目次と並べて読書の記録のビューがある', () => {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    const ids = (manifest.contributes.views.yomu ?? []).map((v) => v.id);
+    assert.deepStrictEqual(ids, ['yomu.outline', 'yomu.history']);
+    assert.ok(manifest.contributes.viewsWelcome?.some((w) => w.view === 'yomu.history'));
+  });
+
+  test('リーダーで開くと、読書の記録に残り、ステータスバーに割合が出る', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    const uri = fixture('sample.md').toString();
+    for (let i = 0; i < 50 && !yomu.readingHistory().some((r) => r.uri === uri); i++) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    const record = yomu.readingHistory().find((r) => r.uri === uri);
+    assert.ok(record, '記録に残っていない');
+    assert.strictEqual(record.title, 'sample.md');
+    assert.match(yomu.statusBarText() ?? '', /\d+%/);
+  });
+
+  test('リーダーでない時は、ステータスバーに割合を出さない', async () => {
+    const yomu = await api();
+    await vscode.window.showTextDocument(fixture('plain.txt'));
+    assert.strictEqual(yomu.statusBarText(), undefined);
+  });
+
+  test('記録のある文書を新しく開くと、その割合の位置から再開するよう Webview に伝える', async () => {
+    const yomu = await api();
+    await yomu.recordProgress(fixture('with-image.md'), 0.5);
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('with-image.md'), VIEW_TYPE);
+    const message = await opened;
+    assert.strictEqual(message.resume, 0.5);
   });
 });
