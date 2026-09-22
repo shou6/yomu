@@ -81,6 +81,10 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
   /** アクティブなリーダーが変わった、またはその文書が編集された（目次を作り直す） */
   readonly onDidChangeActiveReader: vscode.Event<void> = this.activeChangeEmitter.event;
 
+  private readonly openEmitter = new vscode.EventEmitter<void>();
+  /** リーダーのタブを新しく開いた（タブの切り替えでは起きない） */
+  readonly onDidOpenReader: vscode.Event<void> = this.openEmitter.event;
+
   private readonly positionEmitter = new vscode.EventEmitter<string | null>();
   /** アクティブなリーダーで、今読んでいる見出しの id が変わった */
   readonly onDidChangePosition: vscode.Event<string | null> = this.positionEmitter.event;
@@ -102,6 +106,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       }),
       provider.postMessageEmitter,
       provider.activeChangeEmitter,
+      provider.openEmitter,
       provider.positionEmitter,
       { dispose: () => provider.customCssWatcher?.watcher.dispose() }
     );
@@ -194,6 +199,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       this.activeChanged();
     });
     this.activeChanged();
+    this.openEmitter.fire();
   }
 
   /** アクティブなリーダーの文書。リーダーがアクティブでなければ undefined */

@@ -22,6 +22,8 @@
   "command.enableFocusMode": "集中モードをオンにする",
   "command.disableFocusMode": "集中モードをオフにする",
   "command.openInTextEditor": "標準エディタで開く",
-  "view.outline": "Yomu 目次",
-  "command.revealHeading": "見出しへ移動"
+  "view.outline": "目次",
+  "command.revealHeading": "見出しへ移動",
+  "viewsWelcome.outline": "Yomu のリーダーで Markdown を開くと、ここに見出しが出ます。\n[リーダーで開く](command:yomu.openInReader)",
+  "config.outline.revealOnOpen": "リーダーのタブを開いた時に、Yomu の目次のビューを開いて見せます。キーボードの操作先はリーダーのままです。サイドバーの表示が切り替わるので、既定はオフです。"
 }

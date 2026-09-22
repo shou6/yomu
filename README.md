@@ -15,7 +15,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 - **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Two Japanese fonts are bundled, so the text looks the same on every OS.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, Mermaid diagrams, heading anchors, local and remote images. Raw HTML is disabled.
 - **Themes**: `paper` (white page), `sepia`, `dark`, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
-- **Outline**: the **Yomu Outline** view in the Explorer shows the headings of the document you are reading. Click to jump; the current heading follows your scrolling.
+- **Outline**: click the Yomu (book) icon in the activity bar to see the headings of the document you are reading. Click to jump; the current heading follows your scrolling.
 - **Print and PDF**: run **Yomu: Open in Browser to Print** (or use the reader tab's `...` menu). The document opens in your browser with print styles, ready to print or save as PDF.
 - **Folding long code**: code blocks longer than 20 lines are folded, with a button to show the rest. Change the limit with `yomu.code.foldLines`.
 - **Focus mode**: dims everything except the block you are reading. Toggle it with **Yomu: Toggle Focus Mode** or `yomu.focusMode`.
@@ -55,6 +55,7 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | `yomu.font.lineHeight` | `1.8` | Line height as a multiple of the font size. |
 | `yomu.code.foldLines` | `20` | Fold code blocks longer than this many lines. `0` never folds. |
 | `yomu.focusMode` | `false` | Dim everything except the block you are reading. Also toggled by **Yomu: Toggle Focus Mode**. |
+| `yomu.outline.revealOnOpen` | `false` | Open the Outline view automatically when you open a reader tab. |
 | `yomu.customCss` | (empty) | Path to a CSS file loaded after the theme. Absolute, or starting with `${workspaceFolder}`. Saved changes apply immediately. |
 
 ![Yomu settings in the VS Code settings editor](images/settings.png)

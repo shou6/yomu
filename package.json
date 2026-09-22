@@ -158,6 +158,30 @@
         }
       ]
     },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "yomu",
+          "title": "Yomu",
+          "icon": "resources/activitybar.svg"
+        }
+      ]
+    },
+    "views": {
+      "yomu": [
+        {
+          "id": "yomu.outline",
+          "name": "%view.outline%"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "yomu.outline",
+        "contents": "%viewsWelcome.outline%",
+        "when": "!yomu.readerActive"
+      }
+    ],
     "configuration": {
       "title": "Yomu",
       "properties": {
@@ -242,17 +266,13 @@
           "type": "boolean",
           "default": false,
           "description": "%config.focusMode%"
+        },
+        "yomu.outline.revealOnOpen": {
+          "type": "boolean",
+          "default": false,
+          "description": "%config.outline.revealOnOpen%"
         }
       }
-    },
-    "views": {
-      "explorer": [
-        {
-          "id": "yomu.outline",
-          "name": "%view.outline%",
-          "when": "yomu.readerActive"
-        }
-      ]
     }
   },
   "scripts": {

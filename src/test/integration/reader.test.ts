@@ -152,7 +152,6 @@ suite('Reader', () => {
       'yomu.code.foldLines',
       'yomu.customCss',
       'yomu.focusMode',
-      'yomu.outline.revealOnOpen',
       'yomu.font.codeFamily',
       'yomu.font.family',
       'yomu.font.lineHeight',
@@ -160,6 +159,7 @@ suite('Reader', () => {
       'yomu.layout.align',
       'yomu.layout.maxWidth',
       'yomu.layout.padding',
+      'yomu.outline.revealOnOpen',
       'yomu.theme',
     ]);
   });

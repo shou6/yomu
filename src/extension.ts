@@ -11,6 +11,8 @@ export interface YomuApi {
   exportForPrint(): Promise<string | undefined>;
   /** 目次のビューに出している、一番上の階層の見出しの ID */
   outlineIds(): string[];
+  /** 目次のビューが開いて見えているか */
+  outlineVisible(): boolean;
 }
 
 /** エントリポイント。登録だけを行い、ロジックは各モジュールに置く */
@@ -76,6 +78,7 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
     onDidPostMessage: provider.onDidPostMessage,
     exportForPrint: () => provider.exportForPrint(),
     outlineIds: () => outline.roots().map((node) => node.heading.id),
+    outlineVisible: () => outline.visible(),
   };
 }
 

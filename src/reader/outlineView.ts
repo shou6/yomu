@@ -1,5 +1,5 @@
 /**
- * エクスプローラーの「Yomu 目次」のビュー（vscode 依存。統合テストで検証する）。
+ * アクティビティバーの Yomu の中の「目次」のビュー（vscode 依存。統合テストで検証する）。
  * アクティブなリーダーの見出しをツリーで出し、クリックでその見出しへ移動する。
  * リーダーをスクロールすると、今読んでいる見出しを選んだ状態にする。
  */
@@ -24,6 +24,7 @@ export class OutlineView implements vscode.TreeDataProvider<OutlineNode> {
       outline.changeEmitter,
       reader.onDidChangeActiveReader(() => outline.changeEmitter.fire()),
       reader.onDidChangePosition((id) => outline.select(id)),
+      reader.onDidOpenReader(() => outline.revealOnOpen()),
       vscode.commands.registerCommand('yomu.revealHeading', (id: string) =>
         reader.revealHeading(id)
       )
@@ -73,6 +74,27 @@ export class OutlineView implements vscode.TreeDataProvider<OutlineNode> {
       arguments: [node.heading.id],
     };
     return item;
+  }
+
+  /** 目次のビューが開いて見えているか */
+  visible(): boolean {
+    return this.view?.visible === true;
+  }
+
+  /**
+   * 設定 yomu.outline.revealOnOpen がオンなら、リーダーのタブを開いた時に目次のビューを開いて見せる。
+   * 操作先（フォーカス）はリーダーに残す。既定はオフ（開くたびにファイル一覧から切り替わると煩わしいため）。
+   * タブの切り替えでは開き直さない
+   */
+  private revealOnOpen(): void {
+    const enabled = vscode.workspace
+      .getConfiguration('yomu')
+      .get<boolean>('outline.revealOnOpen', false);
+    const first = this.roots()[0];
+    if (!enabled || first === undefined || this.view === undefined || this.view.visible) {
+      return;
+    }
+    void this.view.reveal(first, { select: false, focus: false, expand: true });
   }
 
   /** 今読んでいる見出しを選んだ状態にする。ビューが見えていない時は何もしない */

@@ -22,6 +22,8 @@
   "command.enableFocusMode": "Turn On Focus Mode",
   "command.disableFocusMode": "Turn Off Focus Mode",
   "command.openInTextEditor": "Open in Text Editor",
-  "view.outline": "Yomu Outline",
-  "command.revealHeading": "Go to Heading"
+  "view.outline": "Outline",
+  "command.revealHeading": "Go to Heading",
+  "viewsWelcome.outline": "Open a Markdown file in the Yomu reader to see its headings here.\n[Open in Reader](command:yomu.openInReader)",
+  "config.outline.revealOnOpen": "Open the Yomu Outline view when you open a reader tab. The reader keeps the keyboard focus. Off by default, because it switches the side bar away from what you were looking at."
 }
