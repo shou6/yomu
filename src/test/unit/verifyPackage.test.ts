@@ -57,6 +57,21 @@ suite('checkPackageFiles', () => {
     });
   });
 
+  test('同梱フォント（woff2）とそのライセンスは入れてよい。それ以外の形式は意図しないもの', () => {
+    const manifest = { main: './dist/extension.js' };
+    const ok = [
+      ...COMMON,
+      'dist/extension.js',
+      'dist/webview.js',
+      'fonts/A-Regular.woff2',
+      'fonts/OFL-A.txt',
+    ];
+    assert.deepStrictEqual(checkPackageFiles(ok, manifest), { unexpected: [], missing: [] });
+    assert.deepStrictEqual(checkPackageFiles([...ok, 'fonts/A-Regular.ttf'], manifest).unexpected, [
+      'fonts/A-Regular.ttf',
+    ]);
+  });
+
   test('main が無い（宣言だけの拡張機能）なら、エントリポイントを求めず、入っていたら意図しないもの', () => {
     assert.deepStrictEqual(checkPackageFiles(COMMON, {}), { unexpected: [], missing: [] });
     assert.deepStrictEqual(
