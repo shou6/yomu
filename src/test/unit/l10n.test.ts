@@ -73,6 +73,7 @@ suite('日本語の翻訳', () => {
   test('ソース中の翻訳対象の文字列すべてに、日本語訳がある', () => {
     const bundle = readJson('l10n/bundle.l10n.ja.json');
     const strings = [...new Set(sources.flatMap(extractL10nStrings))];
+    assert.ok(strings.length > 0, '翻訳対象の文字列を 1 つも抽出できない');
     const missing = strings.filter((s) => typeof bundle[s] !== 'string' || bundle[s] === '');
     assert.deepStrictEqual(missing, []);
   });

@@ -33,6 +33,7 @@ suite('Extension', () => {
     await vscode.extensions.getExtension(extensionId())?.activate();
     const registered = await vscode.commands.getCommands(true);
     const declared = (readManifest().contributes?.commands ?? []).map((c) => c.command);
+    assert.ok(declared.length > 0, 'package.json にコマンドが無い');
     assert.deepStrictEqual(
       declared.filter((command) => !registered.includes(command)),
       [],
