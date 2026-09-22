@@ -19,6 +19,8 @@ interface YomuApi {
   exportForPrint(): Promise<string | undefined>;
   /** 目次のビューに出している、一番上の階層の見出しの ID */
   outlineIds(): string[];
+  /** 目次のビューが開いて見えているか */
+  outlineVisible(): boolean;
 }
 
 async function api(): Promise<YomuApi> {
@@ -148,6 +150,7 @@ suite('Reader', () => {
       'yomu.code.foldLines',
       'yomu.customCss',
       'yomu.focusMode',
+      'yomu.outline.revealOnOpen',
       'yomu.font.codeFamily',
       'yomu.font.family',
       'yomu.font.lineHeight',
@@ -380,5 +383,27 @@ suite('Reader', () => {
     );
     await vscode.commands.executeCommand('yomu.revealHeading', 'サンプル');
     await received;
+  });
+
+  test('目次のビューは、既定で開いた状態にする設定がある', () => {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    const property = manifest.contributes.configuration.properties['yomu.outline.revealOnOpen'];
+    assert.strictEqual(property?.default, true);
+  });
+
+  test('リーダーを開くと、目次のビューが開いて見える', async () => {
+    const yomu = await api();
+    await vscode.commands.executeCommand('workbench.action.closeSidebar');
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    for (let i = 0; i < 50 && !yomu.outlineVisible(); i++) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    assert.strictEqual(yomu.outlineVisible(), true);
+    // 操作先はリーダーのまま
+    assert.strictEqual(activeCustomViewType(), VIEW_TYPE);
   });
 });
