@@ -1,1 +1,4 @@
-{}
+{
+  "No editor is active. Open a .md file first.": "アクティブなエディタがありません。先に .md ファイルを開いてください。",
+  "Yomu reads Markdown files. The active editor is not a .md file.": "Yomu は Markdown を読む拡張機能です。アクティブなエディタは .md ファイルではありません。"
+}

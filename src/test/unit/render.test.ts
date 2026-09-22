@@ -68,9 +68,11 @@ suite('render: 見出しの ID', () => {
     assert.ok(out.includes('id="手順-2"'), out);
   });
 
-  test('文書内リンクの href はそのまま残る', () => {
+  test('文書内リンクの href は、デコードすると見出しの ID と一致する', () => {
+    // markdown-it は href をパーセントエンコードする。ブラウザはフラグメントをデコードして id と照合する
     const out = html('[go](#はじめに)\n');
-    assert.ok(out.includes('href="#はじめに"'), out);
+    const href = out.match(/href="([^"]*)"/)?.[1] ?? '';
+    assert.strictEqual(decodeURIComponent(href), '#はじめに', out);
   });
 });
 

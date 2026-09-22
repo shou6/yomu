@@ -5,6 +5,8 @@
     "lib": ["ES2022"],
     "types": ["node", "mocha"],
     "sourceMap": true,
+    // markdown-it と highlight.js は export = の形なので、default import に必要
+    "esModuleInterop": true,
     "rootDir": "src",
     "strict": true /* enable all strict type-checking options */,
     // markdown-it 15 の CommonJS 用の型定義は ESM の型を import しており、Node16 の解決では TS1542 になる。
