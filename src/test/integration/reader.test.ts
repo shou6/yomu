@@ -331,4 +331,21 @@ suite('Reader', () => {
     assert.ok(input instanceof vscode.TabInputText, 'テキストエディタで開いていない');
     assert.strictEqual(input.uri.fsPath, fixture('sample.md').fsPath);
   });
+
+  test('コマンドの $(name) のアイコンは、VS Code に実在するもの', () => {
+    // 存在しない名前（例: print）を書くと、タイトルバーに空白の四角が出る
+    const workbench = fs.readFileSync(
+      path.join(vscode.env.appRoot, 'out', 'vs', 'workbench', 'workbench.desktop.main.js'),
+      'utf8'
+    );
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    const icons = manifest.contributes.commands
+      .map((c) => (typeof c.icon === 'string' ? /^\$\(([\w-]+)\)$/.exec(c.icon)?.[1] : undefined))
+      .filter((name): name is string => name !== undefined);
+    assert.ok(icons.length > 0);
+    const missing = icons.filter((name) => !workbench.includes(`("${name}",`));
+    assert.deepStrictEqual(missing, [], 'VS Code に無いアイコン');
+  });
 });
