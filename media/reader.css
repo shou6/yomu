@@ -159,6 +159,27 @@ pre {
   overflow-wrap: normal;
 }
 
+/* 言語名のラベル。render が付けた data-lang を右上に出す */
+pre[data-lang] {
+  position: relative;
+}
+
+pre[data-lang]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.15em 0.7em;
+  border-radius: 0 6px 0 6px;
+  font-family: var(--yomu-font-family, sans-serif);
+  font-size: 0.8em;
+  line-height: 1.6;
+  color: var(--yomu-code-label-fg);
+  background: var(--yomu-code-label-bg);
+  pointer-events: none;
+  user-select: none;
+}
+
 pre code {
   background: transparent;
   padding: 0;

@@ -95,7 +95,12 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       timer = setTimeout(update, UPDATE_DELAY);
     });
     const messageSubscription = webview.onDidReceiveMessage((message: FromWebview) => {
-      if (message.type === 'openLink') {
+      if (message.type === 'ready') {
+        // 本文より先に見た目を決めておく。本文が出た後に幅やフォントが変わって見えるのを避ける。
+        // retainContextWhenHidden を使わないので、タブを隠して戻すたびに Webview が作り直されてここに来る
+        this.sendSettings(panel);
+        update();
+      } else if (message.type === 'openLink') {
         void openLink(message.href, documentDir);
       }
     });
@@ -106,10 +111,6 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       messageSubscription.dispose();
       this.panels.delete(panel);
     });
-
-    // 本文より先に見た目を決めておく。本文が出た後に幅やフォントが変わって見えるのを避ける
-    this.sendSettings(panel);
-    update();
   }
 
   /** 設定を読み、検査して返す */

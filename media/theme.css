@@ -27,6 +27,8 @@ body {
   --yomu-pre-border: #dce3ea;
   --yomu-code-bg: #eef2f6;
   --yomu-code-fg: #c7254e;
+  --yomu-code-label-fg: #6b7a8a;
+  --yomu-code-label-bg: #e6ebf1;
 
   --yomu-quote-border: #5b9bd5;
   --yomu-quote-bg: #f0f6fc;
@@ -68,6 +70,8 @@ body.vscode-high-contrast-light {
   --yomu-pre-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
   --yomu-code-bg: transparent;
   --yomu-code-fg: var(--vscode-textPreformat-foreground, var(--vscode-editor-foreground));
+  --yomu-code-label-fg: var(--vscode-editor-foreground);
+  --yomu-code-label-bg: transparent;
   --yomu-quote-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
   --yomu-quote-bg: transparent;
   --yomu-quote-fg: var(--vscode-editor-foreground);

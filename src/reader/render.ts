@@ -2,7 +2,7 @@
  * Markdown を HTML に変換する（純粋関数）。
  * 生の HTML は無効にし、相対パスの画像だけを Webview 用の URI に書き換える。
  */
-import hljs from 'highlight.js/lib/common';
+import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 import taskLists from 'markdown-it-task-lists';
@@ -38,6 +38,18 @@ function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
   const md = new MarkdownIt({ html: false, linkify: false, typographer: false, highlight });
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
+
+  // 言語指定のあるコードブロックに data-lang を付け、CSS でラベルを出す
+  const renderFence = md.renderer.rules.fence;
+  md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
+    const html = renderFence
+      ? renderFence(tokens, idx, opts, env, self)
+      : self.renderToken(tokens, idx, opts);
+    const lang = tokens[idx].info.trim().split(/\s+/)[0] ?? '';
+    return lang === ''
+      ? html
+      : html.replace(/^<pre>/, `<pre data-lang="${md.utils.escapeHtml(lang)}">`);
+  };
 
   const renderImage = md.renderer.rules.image;
   md.renderer.rules.image = (tokens, idx, opts, env, self) => {

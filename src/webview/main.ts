@@ -66,6 +66,9 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
 
 window.addEventListener('scroll', saveScroll, { passive: true });
 
+// 設定と本文は ready を受けた拡張機能が送ってくる。タブを隠して戻すと Webview は作り直されるので、その時も送る
+vscode.postMessage({ type: 'ready' });
+
 document.addEventListener('click', (event) => {
   const anchor = (event.target as Element | null)?.closest('a[href]');
   const href = anchor?.getAttribute('href');

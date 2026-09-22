@@ -10,4 +10,6 @@ export type ToWebview =
   | { type: 'settings'; theme: Theme; cssVariables: Record<string, string>; customCssUri?: string };
 
 /** Webview → 拡張機能 */
-export type FromWebview = { type: 'openLink'; href: string };
+export type FromWebview =
+  /** スクリプトの読み込みが終わった。タブを隠して戻した時にも Webview が作り直されて再び送られる */
+  { type: 'ready' } | { type: 'openLink'; href: string };
