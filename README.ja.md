@@ -82,7 +82,7 @@ body {
 - ハイライト（1）：`--yomu-hl-keyword` `--yomu-hl-string` `--yomu-hl-number` `--yomu-hl-comment`
 - ハイライト（2）：`--yomu-hl-function` `--yomu-hl-type` `--yomu-hl-variable` `--yomu-hl-attr` `--yomu-hl-meta`
 
-それ以外の規則も書けます。本文は `<main id="content">` の中にあり、言語指定のあるコードブロックは `<pre>` に `data-lang` が付きます。
+それ以外の規則も書けます。本文は `<main id="content">` の中にあり、言語指定のあるコードブロックは `<div class="yomu-code" data-lang="…">` で包まれます。
 
 ## 動作環境
 

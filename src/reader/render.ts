@@ -39,7 +39,8 @@ function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
 
-  // 言語指定のあるコードブロックに data-lang を付け、CSS でラベルを出す
+  // 言語指定のあるコードブロックを data-lang 付きの枠で包み、CSS でラベルを出す。
+  // ラベルは横スクロールする pre の中ではなく、スクロールしない枠に置く
   const renderFence = md.renderer.rules.fence;
   md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
     const html = renderFence
@@ -48,7 +49,7 @@ function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
     const lang = tokens[idx].info.trim().split(/\s+/)[0] ?? '';
     return lang === ''
       ? html
-      : html.replace(/^<pre>/, `<pre data-lang="${md.utils.escapeHtml(lang)}">`);
+      : `<div class="yomu-code" data-lang="${md.utils.escapeHtml(lang)}">${html.trimEnd()}</div>\n`;
   };
 
   const renderImage = md.renderer.rules.image;

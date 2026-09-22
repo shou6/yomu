@@ -164,12 +164,20 @@ pre {
   overflow-wrap: normal;
 }
 
-/* 言語名のラベル。render が付けた data-lang を右上に出す */
-pre[data-lang] {
+/*
+ * 言語名のラベル。render が付けた枠（.yomu-code）の data-lang を右上に出す。
+ * 枠は横スクロールしないので、横に長いコードをスクロールしてもラベルは動かない
+ */
+.yomu-code {
   position: relative;
+  margin: 1em 0;
 }
 
-pre[data-lang]::before {
+.yomu-code > pre {
+  margin: 0;
+}
+
+.yomu-code::before {
   content: attr(data-lang);
   position: absolute;
   top: 0;

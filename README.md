@@ -81,7 +81,7 @@ Variables:
 - Quotes: `--yomu-quote-border` `--yomu-quote-bg` `--yomu-quote-fg`
 - Syntax highlighting: `--yomu-hl-keyword` `--yomu-hl-string` `--yomu-hl-number` `--yomu-hl-comment` `--yomu-hl-function` `--yomu-hl-type` `--yomu-hl-variable` `--yomu-hl-attr` `--yomu-hl-meta`
 
-Any other rule works too. The text lives in `<main id="content">`, and code blocks with a language carry `data-lang` on the `<pre>`.
+Any other rule works too. The text lives in `<main id="content">`, and code blocks with a language are wrapped in `<div class="yomu-code" data-lang="…">`.
 
 ## Requirements
 
