@@ -387,3 +387,33 @@ img {
 .yomu-focus-mode #content > ol > li.yomu-focused {
   opacity: 1;
 }
+
+/*
+ * 長いコードブロックの折りたたみ。畳んだ時は設定の行数の高さにし、下端をぼかす。
+ * 高さは行数 × 行の高さ（pre の line-height 1.65）＋ 上下の余白（1em ずつ）。
+ * --fold-lines はスクリプト（webview/fold.ts）が要素ごとに付ける。テーマで上書きするものではないので --yomu- を付けない
+ */
+pre.yomu-foldable.yomu-folded,
+.yomu-foldable.yomu-folded > pre {
+  max-height: calc(var(--fold-lines) * 1.65em + 2em);
+  overflow-y: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, #000 70%, transparent);
+}
+
+.yomu-fold-button {
+  display: block;
+  margin: -0.6em auto 1em;
+  padding: 0.25em 1em;
+  border: 1px solid var(--yomu-pre-border);
+  border-radius: 999px;
+  font-family: var(--yomu-font-family, sans-serif);
+  font-size: 0.85em;
+  color: var(--yomu-link);
+  background: var(--yomu-bg);
+  cursor: pointer;
+}
+
+.yomu-fold-button:hover {
+  background: var(--yomu-pre-bg);
+}

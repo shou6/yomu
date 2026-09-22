@@ -169,6 +169,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       lineHeight: config.get('font.lineHeight'),
       customCss: config.get('customCss'),
       focusMode: config.get('focusMode'),
+      foldLines: config.get('code.foldLines'),
     };
     return normalizeSettings(raw);
   }
@@ -181,6 +182,12 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       theme: settings.theme,
       cssVariables: cssVariables(settings),
       focusMode: settings.focusMode,
+      foldLines: settings.foldLines,
+      // Webview の中では l10n が使えないので、翻訳した文言を渡す
+      foldLabels: {
+        expand: vscode.l10n.t('Show all {0} lines'),
+        collapse: vscode.l10n.t('Collapse'),
+      },
       ...(customCss === undefined ? {} : { customCssUri: customCss }),
     });
   }

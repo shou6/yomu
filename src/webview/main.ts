@@ -9,6 +9,7 @@ import type { Theme } from '../reader/readerSettings';
 import { renderMermaid, resetMermaid } from './mermaid';
 import { openZoom, zoomTarget } from './zoom';
 import { setFocusMode, updateFocus, watchFocus } from './focus';
+import { applyFolding } from './fold';
 
 interface ReaderState {
   scrollY: number;
@@ -82,6 +83,8 @@ function applyUpdate(html: string): void {
   if (opening && scrollY > 0) {
     restoreScrollY = scrollY;
   }
+  applyFolding(content);
+  window.scrollTo(0, scrollY);
   saveScroll();
   drawMermaid();
   updateFocus(content);
@@ -116,6 +119,7 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
   // 図の配色の描き直しは、data-theme の変化を見ている MutationObserver が行う
   theme = message.theme;
   setFocusMode(content, message.focusMode);
+  applyFolding(content, { foldLines: message.foldLines, labels: message.foldLabels });
 }
 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {

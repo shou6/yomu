@@ -14,6 +14,10 @@ export type ToWebview =
       customCssUri?: string;
       /** 集中モード */
       focusMode: boolean;
+      /** これより長いコードブロックを畳む（行）。0 なら畳まない */
+      foldLines: number;
+      /** 折りたたみのボタンの文言（翻訳済み）。expand の {0} は行数 */
+      foldLabels: { expand: string; collapse: string };
     };
 
 /** Webview → 拡張機能 */

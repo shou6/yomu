@@ -27,6 +27,8 @@ export interface ReaderSettings {
   customCss: string;
   /** 集中モード。読んでいるブロック以外を薄く表示する */
   focusMode: boolean;
+  /** これより長いコードブロックを畳む（行）。0 なら畳まない */
+  foldLines: number;
 }
 
 /** 設定から読んだままの値。型は信用しない */
@@ -47,6 +49,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   lineHeight: 1.8,
   customCss: '',
   focusMode: false,
+  foldLines: 20,
 };
 
 /**
@@ -92,6 +95,10 @@ export function normalizeSettings(raw: RawSettings): ReaderSettings {
     lineHeight: numberIn(raw.lineHeight, 1, 3, DEFAULT_SETTINGS.lineHeight),
     customCss: typeof raw.customCss === 'string' ? raw.customCss.trim() : '',
     focusMode: raw.focusMode === true,
+    foldLines:
+      typeof raw.foldLines === 'number' && Number.isInteger(raw.foldLines)
+        ? numberIn(raw.foldLines, 0, 10000, DEFAULT_SETTINGS.foldLines)
+        : DEFAULT_SETTINGS.foldLines,
   };
 }
 

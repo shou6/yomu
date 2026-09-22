@@ -3,5 +3,7 @@
   "Yomu reads Markdown files. The active editor is not a .md file.": "Yomu は Markdown を読む拡張機能です。アクティブなエディタは .md ファイルではありません。",
   "Yomu: ${workspaceFolder} in the custom CSS path needs an open workspace: {0}": "Yomu: カスタム CSS のパスの ${workspaceFolder} は、ワークスペースを開いている時だけ使えます: {0}",
   "Yomu: the custom CSS path must be absolute or start with ${workspaceFolder}: {0}": "Yomu: カスタム CSS のパスは絶対パスか、${workspaceFolder} から始めてください: {0}",
-  "Yomu: the custom CSS file was not found: {0}": "Yomu: カスタム CSS のファイルが見つかりません: {0}"
+  "Yomu: the custom CSS file was not found: {0}": "Yomu: カスタム CSS のファイルが見つかりません: {0}",
+  "Show all {0} lines": "全 {0} 行を表示",
+  "Collapse": "折りたたむ"
 }
