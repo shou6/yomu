@@ -14,6 +14,8 @@ interface Manifest {
 /** activate が返す API（テスト用の観測点） */
 interface YomuApi {
   onDidPostMessage: vscode.Event<{ type: string; [key: string]: unknown }>;
+  /** アクティブなリーダーの本文を印刷用の HTML に書き出し、そのパスを返す（ブラウザは開かない） */
+  exportForPrint(): Promise<string | undefined>;
 }
 
 async function api(): Promise<YomuApi> {
@@ -255,5 +257,25 @@ suite('Reader', () => {
     const labels = message.foldLabels as { expand: string; collapse: string };
     assert.ok(labels.expand.includes('{0}'), labels.expand);
     assert.ok(labels.collapse.length > 0);
+  });
+
+  test('印刷用の HTML を一時フォルダに書き出す。題名、本文、paper テーマ、印刷の CSS が入る', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    const file = await yomu.exportForPrint();
+    assert.ok(file, '書き出せなかった');
+    const html = fs.readFileSync(file, 'utf8');
+    assert.ok(html.includes('<title>sample.md</title>'), html.slice(0, 300));
+    assert.ok(html.includes('サンプル'), '本文が無い');
+    assert.ok(html.includes('<body data-theme="paper">'));
+    assert.ok(html.includes('@media print'));
+  });
+
+  test('印刷のコマンドが登録されていて、リーダーが無い時に実行しても例外にならない', async () => {
+    const registered = await vscode.commands.getCommands(true);
+    assert.ok(registered.includes('yomu.openInBrowser'));
+    await vscode.commands.executeCommand('yomu.openInBrowser');
   });
 });
