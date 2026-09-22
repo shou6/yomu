@@ -59,4 +59,27 @@ suite('同梱フォント', () => {
     };
     assert.ok(pkg.files.includes('fonts/**'));
   });
+
+  test('Yomu Symbols は、欧文の等幅フォントの罫線と図形を、ちょうど半角（0.5em）の幅に縮める', () => {
+    // 各フォントの ASCII と罫線の字幅（em）。fontTools で hmtx の値を unitsPerEm で割って測った
+    const advances: Record<string, { local: string; advance: number }> = {
+      'Yomu Symbols Cascadia': { local: 'CascadiaMono-Regular', advance: 1200 / 2048 },
+      'Yomu Symbols Consolas': { local: 'Consolas', advance: 1126 / 2048 },
+      'Yomu Symbols Menlo': { local: 'Menlo-Regular', advance: 1233 / 2048 },
+      'Yomu Symbols DejaVu': { local: 'DejaVuSansMono', advance: 1233 / 2048 },
+      'Yomu Symbols Liberation': { local: 'LiberationMono-Regular', advance: 1229 / 2048 },
+    };
+    const faces = fontsCss().match(/@font-face\s*{[^}]*}/g) ?? [];
+    for (const [family, { local, advance }] of Object.entries(advances)) {
+      const face = faces.find((f) => f.includes(`font-family: '${family}'`));
+      assert.ok(face, family + ' の @font-face が無い');
+      assert.ok(face.includes(`local('${local}')`), family + ' に ' + local + ' が無い');
+      assert.ok(!face.includes('url('), family + ' はフォントを同梱しない');
+      const sizeAdjust = Number(face.match(/size-adjust:\s*([\d.]+)%/)?.[1]);
+      assert.ok(Math.abs((advance * sizeAdjust) / 100 - 0.5) < 0.0001, family + ': ' + sizeAdjust);
+      for (const range of ['U+2190-21FF', 'U+2500-257F', 'U+2580-259F', 'U+25A0-25FF']) {
+        assert.ok(face.includes(range), family + ' の unicode-range に ' + range + ' が無い');
+      }
+    }
+  });
 });
