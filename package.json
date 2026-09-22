@@ -25,7 +25,13 @@
   "categories": [
     "Other"
   ],
-  "keywords": [],
+  "keywords": [
+    "markdown",
+    "reader",
+    "japanese",
+    "typography",
+    "viewer"
+  ],
   "activationEvents": [],
   "main": "./dist/extension.js",
   "l10n": "./l10n",

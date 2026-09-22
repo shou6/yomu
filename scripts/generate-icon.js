@@ -1,11 +1,12 @@
-// 拡張機能の仮アイコン（resources/icon.png）を生成する。
+// 拡張機能のアイコン（resources/icon.png）を生成する。
 // 使い方: npm run icon
 //
 // Marketplace のアイコンは 128px 以上の PNG でなければならない（SVG は受け付けられない）。
 // 画像ライブラリに依存せず、Node 標準の zlib だけで PNG を書き出す。
-// 図案は角丸の四角を 2 つ重ねただけの仮のもの。公開前に本来のアイコンへ差し替えるか、
-// 下の色と colorAt() を書き換えて作り直す。描画の部品（符号付き距離の図形、三角形、影、
-// グラデーション用の mix、層の重ね合わせ）はそのまま使える。
+//
+// 図案: 紺の角丸の背景に、開いた本。左右のページに本文を表す線を置く。
+// エディタのタイトルバーに出す「リーダーで開く」のアイコン（resources/reader-*.svg）と同じ図案で、
+// 「読むための Markdown リーダー」という役割を表す。色は既定のテーマ paper の見出しの色に合わせている。
 // VS Code のロゴはブランドガイドラインで拡張機能のアイコンへの使用が禁じられているので使わない。
 const fs = require('fs');
 const path = require('path');
@@ -17,8 +18,19 @@ const SS = 4;
 /** 図形の座標は 1024 x 1024 の下書きの値で書き、SIZE に縮める */
 const UNIT = SIZE / 1024;
 
-const BACKGROUND = [0x1f, 0x29, 0x37];
-const FOREGROUND = [0x60, 0xa5, 0xfa];
+/** 背景。上が明るく下が暗い紺のグラデーション（paper テーマの h2 と h1 の色） */
+const BACKGROUND_TOP = [0x2c, 0x5f, 0x8a];
+const BACKGROUND_BOTTOM = [0x1a, 0x35, 0x50];
+/** 表紙。ページの下から少しはみ出す */
+const COVER = [0x5b, 0x9b, 0xd5];
+/** ページ（paper テーマの紙の色に近い生成り） */
+const PAGE = [0xfb, 0xf8, 0xf1];
+/** 背に近い側のページの影 */
+const PAGE_SHADE = [0xe3, 0xdc, 0xcc];
+/** 本文の線 */
+const TEXT_LINE = [0x8a, 0xa4, 0xbf];
+/** 影 */
+const SHADOW = [0x0a, 0x16, 0x24];
 
 /** 角丸の四角までの符号付き距離（内側が負）。座標は下書きの単位 */
 function roundedRectDistance(x, y, [left, top, right, bottom], radius) {
@@ -69,14 +81,48 @@ function colorAt(x, y) {
   };
 
   // 背景
-  if (roundedRectDistance(x, y, [0, 0, 1024, 1024], 224) > 0) {
+  const background = roundedRectDistance(x, y, [0, 0, 1024, 1024], 224);
+  if (background > 0) {
     return [0, 0, 0, 0];
   }
-  paint(BACKGROUND);
+  paint(mix(BACKGROUND_TOP, BACKGROUND_BOTTOM, y / 1024));
 
-  // 中央の四角
-  if (roundedRectDistance(x, y, [256, 256, 768, 768], 96) <= 0) {
-    paint(FOREGROUND);
+  // 本全体の影。表紙の縁から下へ落とす
+  const coverBox = [150, 262, 874, 792];
+  paint(SHADOW, shadowAlpha(roundedRectDistance(x, y - 28, coverBox, 56), 48, 0.45));
+
+  // 表紙
+  if (roundedRectDistance(x, y, coverBox, 56) <= 0) {
+    paint(COVER);
+  }
+
+  // ページ。左右 2 枚。背（中央）に近いほど少し暗くして、開いた本の丸みを出す
+  const pages = [
+    [188, 296, 500, 756],
+    [524, 296, 836, 756],
+  ];
+  for (const box of pages) {
+    if (roundedRectDistance(x, y, box, 28) <= 0) {
+      const spine = 512;
+      const toward = 1 - Math.min(Math.abs(x - spine) / 120, 1);
+      paint(mix(PAGE, PAGE_SHADE, toward * toward));
+    }
+  }
+
+  // 本文の線。各ページ 3 本。1 本目は見出しのつもりで少し短く太い
+  const lines = [
+    // [left, top, right, bottom]
+    [244, 372, 428, 408],
+    [244, 462, 452, 486],
+    [244, 540, 452, 564],
+    [572, 372, 756, 408],
+    [572, 462, 780, 486],
+    [572, 540, 780, 564],
+  ];
+  for (const box of lines) {
+    if (roundedRectDistance(x, y, box, 12) <= 0) {
+      paint(TEXT_LINE);
+    }
   }
 
   return [...color, alpha];
