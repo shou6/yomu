@@ -1,3 +1,5 @@
 {
-  "description": "Markdown を専用のリーダータブで読む拡張機能。行長の固定、和欧フォントの出し分け、日本語向けの行間、約物のアキ詰めで日本語の組版を整える。"
+  "description": "Markdown を専用のリーダータブで読む拡張機能。行長の固定、和欧フォントの出し分け、日本語向けの行間、約物のアキ詰めで日本語の組版を整える。",
+  "customEditor.displayName": "Yomu Reader",
+  "command.openInReader": "リーダーで開く"
 }

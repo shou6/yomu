@@ -1,3 +1,5 @@
 {
-  "description": "Read Markdown in a dedicated reader tab with Japanese typography: fixed line length, Japanese and Latin font pairing, comfortable line height, and punctuation spacing."
+  "description": "Read Markdown in a dedicated reader tab with Japanese typography: fixed line length, Japanese and Latin font pairing, comfortable line height, and punctuation spacing.",
+  "customEditor.displayName": "Yomu Reader",
+  "command.openInReader": "Open in Reader"
 }
