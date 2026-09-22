@@ -43,6 +43,20 @@ suite('normalizeSettings', () => {
     });
   });
 
+  test('追加のテーマ（Solarized、GitHub、Nord、Catppuccin）も受け付ける', () => {
+    for (const theme of [
+      'solarized-light',
+      'solarized-dark',
+      'github-light',
+      'github-dark',
+      'nord',
+      'catppuccin-latte',
+      'catppuccin-mocha',
+    ]) {
+      assert.strictEqual(normalizeSettings({ theme }).theme, theme);
+    }
+  });
+
   test('列挙に無い値は既定値に戻す', () => {
     assert.strictEqual(normalizeSettings({ theme: 'neon' }).theme, 'paper');
     assert.strictEqual(normalizeSettings({ align: 'middle' }).align, 'center');

@@ -8,6 +8,15 @@ suite('mermaidTheme', () => {
     assert.strictEqual(mermaidTheme('dark', false), 'dark');
   });
 
+  test('追加のテーマは、ダーク系なら dark、ライト系なら default', () => {
+    for (const theme of ['solarized-dark', 'github-dark', 'nord', 'catppuccin-mocha'] as const) {
+      assert.strictEqual(mermaidTheme(theme, false), 'dark', theme);
+    }
+    for (const theme of ['solarized-light', 'github-light', 'catppuccin-latte'] as const) {
+      assert.strictEqual(mermaidTheme(theme, true), 'default', theme);
+    }
+  });
+
   test('vscode テーマは、カラーテーマの明暗に従う', () => {
     assert.strictEqual(mermaidTheme('vscode', false), 'default');
     assert.strictEqual(mermaidTheme('vscode', true), 'dark');

@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
 import { THEMES } from '../../reader/readerSettings';
+import { STYLE_FILES } from '../../reader/styles';
 
 // out/test/unit から見たプロジェクトルート
 const ROOT = path.resolve(__dirname, '../../..');
@@ -64,6 +65,25 @@ suite('テーマの CSS', () => {
       const missing = [...used].filter((name) => !defined.has(name) && !fromSettings.has(name));
       assert.deepStrictEqual(missing, [], file + ' が参照する変数がテーマに無い');
     }
+  });
+
+  test('package.json の yomu.theme の選択肢は THEMES と一致し、それぞれに英日の説明がある', () => {
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as {
+      contributes: {
+        configuration: {
+          properties: Record<string, { enum?: string[]; enumDescriptions?: string[] }>;
+        };
+      };
+    };
+    const property = pkg.contributes.configuration.properties['yomu.theme'];
+    assert.deepStrictEqual(property.enum, [...THEMES]);
+    assert.strictEqual(property.enumDescriptions?.length, THEMES.length);
+  });
+
+  test('Webview に読み込む CSS に、すべてのテーマが入り、vscode は最後（ハイコントラストの上書きのため）', () => {
+    const themes = STYLE_FILES.filter((file) => file.startsWith('themes/'));
+    assert.deepStrictEqual([...themes].sort(), THEMES.map((theme) => `themes/${theme}.css`).sort());
+    assert.strictEqual(STYLE_FILES[STYLE_FILES.length - 1], 'themes/vscode.css');
   });
 
   test('古い theme.css は残っていない（themes/ に分けた）', () => {
