@@ -10,6 +10,8 @@ export type ToWebview =
       html: string;
       /** 新しく開いた時に、この割合（0〜1）の位置から再開する。読書の記録が無ければ付けない */
       resume?: number;
+      /** 新しく開いた時に、この見出しへ移動する（見出し付きのリンクで開いた時）。resume より優先 */
+      anchor?: string;
     }
   /** 印刷用に、描いた Mermaid の SVG を返してほしい */
   | { type: 'export' }

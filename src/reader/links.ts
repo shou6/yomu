@@ -40,3 +40,8 @@ export function classifyLink(href: string): LinkKind {
   const fragment = hash === -1 ? undefined : decode(href.slice(hash + 1));
   return { kind: 'relative', path: decode(path), fragment };
 }
+
+/** リーダーで開く Markdown のファイルか（.md と .markdown。大文字小文字は問わない） */
+export function isMarkdownPath(path: string): boolean {
+  return /\.(md|markdown)$/i.test(path);
+}

@@ -78,19 +78,26 @@ function drawMermaid(): void {
   });
 }
 
-function applyUpdate(html: string, resume: number | undefined): void {
+function applyUpdate(html: string, resume: number | undefined, anchor: string | undefined): void {
   // 再描画でスクロール位置が失われないよう、差し替えの前後で位置を保つ。
   // 開いた直後は、タブを隠して戻した時の位置を優先し、無ければ読書の記録の割合から再開する
   const opening = content.childElementCount === 0;
   const saved = vscode.getState()?.scrollY;
   content.innerHTML = html;
+  // 見出し付きのリンクで開いた時は、その見出しを一番に優先する
+  const anchorTop =
+    opening && anchor !== undefined
+      ? document.getElementById(anchor)?.getBoundingClientRect().top
+      : undefined;
   const scrollY = !opening
     ? window.scrollY
-    : saved !== undefined
-      ? saved
-      : resume !== undefined
-        ? resumeScrollY(resume, document.documentElement.scrollHeight, window.innerHeight)
-        : 0;
+    : anchorTop !== undefined
+      ? anchorTop
+      : saved !== undefined
+        ? saved
+        : resume !== undefined
+          ? resumeScrollY(resume, document.documentElement.scrollHeight, window.innerHeight)
+          : 0;
   window.scrollTo(0, scrollY);
   if (opening && scrollY > 0) {
     restoreScrollY = scrollY;
@@ -137,7 +144,7 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
   const message = event.data;
   if (message.type === 'update') {
-    applyUpdate(message.html, message.resume);
+    applyUpdate(message.html, message.resume, message.anchor);
     checkProgress();
   } else if (message.type === 'settings') {
     applySettings(message);

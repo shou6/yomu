@@ -16,6 +16,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, Mermaid diagrams, heading anchors, local and remote images. Raw HTML is disabled.
 - **Themes**: `paper` (white page), `sepia`, `dark`, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
 - **Outline**: click the Yomu (book) icon in the activity bar to see the headings of the document you are reading. Click to jump; the current heading follows your scrolling.
+- **Links between documents**: relative links to other Markdown files open in the reader (with `#heading` support). Go back with **Alt+Left**.
 - **Reading progress**: the status bar shows how far you have read. Yomu remembers where you stopped and continues from there next time. The **Reading History** view in the Yomu side bar lists recent documents with their progress.
 - **Print and PDF**: run **Yomu: Open in Browser to Print** (or use the reader tab's `...` menu). The document opens in your browser with print styles, ready to print or save as PDF.
 - **Folding long code**: code blocks longer than 20 lines are folded, with a button to show the rest. Change the limit with `yomu.code.foldLines`.

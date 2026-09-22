@@ -57,6 +57,9 @@
         "selector": [
           {
             "filenamePattern": "*.md"
+          },
+          {
+            "filenamePattern": "*.markdown"
           }
         ],
         "priority": "option"

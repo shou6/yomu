@@ -9,7 +9,7 @@ import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { resolveCustomCss } from './customCss';
-import { classifyLink } from './links';
+import { classifyLink, isMarkdownPath } from './links';
 import type { FromWebview, ToWebview } from './messages';
 import {
   cssVariables,
@@ -56,6 +56,8 @@ const EXPORT_TIMEOUT = 5000;
 interface Entry {
   panel: vscode.WebviewPanel;
   document: vscode.TextDocument;
+  /** Webview の準備ができて、本文を送ったことがある */
+  ready?: boolean;
   /** 読んでいる行を尋ねた時の、Webview の返事の受け口 */
   onLine?: (line: number) => void;
   /** 読んだ位置の割合。Webview から知らされるまでは undefined */
@@ -81,6 +83,9 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
 
   /** 同じ問題を何度も通知しないための記録 */
   private readonly notified = new Set<string>();
+
+  /** 見出し付きのリンクで開いた文書の、開いた後に移動する見出し（URI ごと） */
+  private readonly pendingAnchors = new Map<string, string>();
 
   private readonly activeChangeEmitter = new vscode.EventEmitter<void>();
   /** アクティブなリーダーが変わった、またはその文書が編集された（目次を作り直す） */
@@ -169,11 +174,12 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
 
     const resolveImageSrc = (src: string): string =>
       webview.asWebviewUri(vscode.Uri.joinPath(documentDir, decodePath(src))).toString();
-    const update = (resume?: number): void => {
+    const update = (resume?: number, anchor?: string): void => {
       this.post(panel, {
         type: 'update',
         html: renderSafely(document.getText(), { resolveImageSrc }),
         ...(resume === undefined ? {} : { resume }),
+        ...(anchor === undefined ? {} : { anchor }),
       });
     };
 
@@ -194,9 +200,14 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         // retainContextWhenHidden を使わないので、タブを隠して戻すたびに Webview が作り直されてここに来る
         // 読書の記録があれば、その位置から再開するよう伝える。
         // タブを隠して戻した時は Webview が自分の覚えた位置を優先する
-        void this.sendSettings(entry).then(() => update(this.history.get(document.uri)?.progress));
+        const anchor = this.pendingAnchors.get(document.uri.toString());
+        this.pendingAnchors.delete(document.uri.toString());
+        void this.sendSettings(entry).then(() => {
+          update(this.history.get(document.uri)?.progress, anchor);
+          entry.ready = true;
+        });
       } else if (message.type === 'openLink') {
-        void openLink(message.href, documentDir);
+        void this.followLink(document.uri, message.href);
       } else if (message.type === 'exported') {
         entry.onExported?.(message.mermaid);
       } else if (message.type === 'position' && panel.active) {
@@ -260,6 +271,41 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       };
       this.post(entry.panel, { type: 'requestLine' });
     });
+  }
+
+  /**
+   * リーダーでクリックされたリンクを開く（要件定義 4.6 節）。
+   * 外部は既定のブラウザ。相対パスの .md はリーダーで開き、見出し付きならその見出しへ移動する。
+   * それ以外のファイルは標準エディタで開く。戻る・進むは VS Code 標準の「戻る」「進む」に任せる。
+   * 文書内の移動（#見出し）は Webview 側で済ませている
+   */
+  async followLink(from: vscode.Uri, href: string): Promise<void> {
+    const link = classifyLink(href);
+    if (link.kind === 'external') {
+      await vscode.env.openExternal(vscode.Uri.parse(link.href));
+      return;
+    }
+    if (link.kind !== 'relative' || link.path === '') {
+      return;
+    }
+    const target = vscode.Uri.joinPath(from, '..', link.path);
+    if (!isMarkdownPath(link.path)) {
+      await vscode.commands.executeCommand('vscode.open', target);
+      return;
+    }
+    const key = target.toString();
+    const opened = [...this.entries].find(
+      (entry) => entry.document.uri.toString() === key && entry.ready === true
+    );
+    if (link.fragment !== undefined && opened === undefined) {
+      // 新しく開くリーダーには、本文と一緒に見出しを渡す
+      this.pendingAnchors.set(key, link.fragment);
+    }
+    await vscode.commands.executeCommand('vscode.openWith', target, ReaderProvider.viewType);
+    if (link.fragment !== undefined && opened !== undefined) {
+      // 既に開いているリーダーは、そのタブへ移ってから見出しへ移動させる
+      this.post(opened.panel, { type: 'scrollTo', id: link.fragment });
+    }
   }
 
   /** アクティブなリーダーを、その見出しまでスクロールさせる */
@@ -464,22 +510,6 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       documentDir.fsPath,
       folders.map((uri) => uri.fsPath)
     ).map((fsPath) => byPath.get(fsPath) ?? vscode.Uri.file(fsPath));
-  }
-}
-
-/**
- * Webview でクリックされたリンクを開く。
- * 外部は既定のブラウザ、相対パスは標準エディタ（要件定義 4.6 節）。文書内の移動は Webview 側で済ませている
- */
-async function openLink(href: string, documentDir: vscode.Uri): Promise<void> {
-  const link = classifyLink(href);
-  if (link.kind === 'external') {
-    await vscode.env.openExternal(vscode.Uri.parse(link.href));
-  } else if (link.kind === 'relative' && link.path !== '') {
-    await vscode.commands.executeCommand(
-      'vscode.open',
-      vscode.Uri.joinPath(documentDir, link.path)
-    );
   }
 }
 

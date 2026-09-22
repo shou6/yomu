@@ -22,6 +22,8 @@ export interface YomuApi {
   recordProgress(uri: vscode.Uri, progress: number): Promise<void>;
   /** ステータスバーに出している文字。出していなければ undefined */
   statusBarText(): string | undefined;
+  /** リーダーでリンクをクリックした時と同じ処理（テスト用） */
+  followLink(from: vscode.Uri, href: string): Promise<void>;
 }
 
 /** エントリポイント。登録だけを行い、ロジックは各モジュールに置く */
@@ -108,6 +110,7 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
     recordProgress: (uri, progress) =>
       history.record(uri, uri.path.split('/').pop() ?? '', progress),
     statusBarText: () => status.text(),
+    followLink: (from, href) => provider.followLink(from, href),
   };
 }
 
