@@ -1,0 +1,49 @@
+/*
+ * テーマ paper（既定）。白地の紙の配色。
+ * 開発者が Markdown Preview Enhanced に当てている markdown-preview.less を基準にする（要件定義 4.9 節）。
+ * すべてのテーマは同じ変数の組を定義し、色だけを変える。
+ */
+
+body[data-theme='paper'] {
+  --yomu-bg: #ffffff;
+  --yomu-fg: #1a1a1a;
+  --yomu-link: #2c6fad;
+
+  --yomu-h1: #1a3550;
+  --yomu-h1-border: #2c5f8a;
+  --yomu-h2: #1e4a7a;
+  --yomu-h2-border: #5b9bd5;
+  --yomu-h3: #2c5f8a;
+  --yomu-h3-border: #b0c8e0;
+  --yomu-h4: #3a6f9a;
+  --yomu-h5: #555555;
+
+  --yomu-th: #1a3550;
+  --yomu-th-border: #2c5f8a;
+  --yomu-td-border: #d4dce5;
+  --yomu-row-hover: #f0f6fc;
+
+  --yomu-pre-bg: #f5f7fa;
+  --yomu-pre-border: #dce3ea;
+  --yomu-code-bg: #eef2f6;
+  --yomu-code-fg: #c7254e;
+  --yomu-code-label-fg: #6b7a8a;
+  --yomu-code-label-bg: #e6ebf1;
+
+  --yomu-quote-border: #5b9bd5;
+  --yomu-quote-bg: #f0f6fc;
+  --yomu-quote-fg: #445566;
+
+  --yomu-hr: #cdd8e3;
+
+  /* シンタックスハイライト。VS Code の Light+ に寄せる */
+  --yomu-hl-keyword: #0000ff;
+  --yomu-hl-string: #a31515;
+  --yomu-hl-number: #098658;
+  --yomu-hl-comment: #008000;
+  --yomu-hl-function: #795e26;
+  --yomu-hl-type: #267f99;
+  --yomu-hl-variable: #001080;
+  --yomu-hl-attr: #e50000;
+  --yomu-hl-meta: #808080;
+}

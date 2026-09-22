@@ -1,0 +1,47 @@
+/*
+ * テーマ dark。暗い背景に明るい文字。構成は paper と同じで、色だけを反転側に寄せる。
+ */
+
+body[data-theme='dark'] {
+  --yomu-bg: #1e1f22;
+  --yomu-fg: #d6d8dc;
+  --yomu-link: #6cb2ff;
+
+  --yomu-h1: #e8ecf2;
+  --yomu-h1-border: #5b9bd5;
+  --yomu-h2: #dbe3ee;
+  --yomu-h2-border: #4a7fb0;
+  --yomu-h3: #c9d6e6;
+  --yomu-h3-border: #3a5470;
+  --yomu-h4: #b8c8dc;
+  --yomu-h5: #a0a6ae;
+
+  --yomu-th: #e8ecf2;
+  --yomu-th-border: #5b9bd5;
+  --yomu-td-border: #383b40;
+  --yomu-row-hover: #26292e;
+
+  --yomu-pre-bg: #26282c;
+  --yomu-pre-border: #383b40;
+  --yomu-code-bg: #2c2f34;
+  --yomu-code-fg: #ff8fa3;
+  --yomu-code-label-fg: #9aa3ad;
+  --yomu-code-label-bg: #33373d;
+
+  --yomu-quote-border: #4a7fb0;
+  --yomu-quote-bg: #23272d;
+  --yomu-quote-fg: #b0b8c2;
+
+  --yomu-hr: #383b40;
+
+  /* シンタックスハイライト。VS Code の Dark+ に寄せる */
+  --yomu-hl-keyword: #569cd6;
+  --yomu-hl-string: #ce9178;
+  --yomu-hl-number: #b5cea8;
+  --yomu-hl-comment: #6a9955;
+  --yomu-hl-function: #dcdcaa;
+  --yomu-hl-type: #4ec9b0;
+  --yomu-hl-variable: #9cdcfe;
+  --yomu-hl-attr: #9cdcfe;
+  --yomu-hl-meta: #808080;
+}

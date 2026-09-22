@@ -46,6 +46,24 @@ function applyUpdate(html: string): void {
   saveScroll();
 }
 
+/** カスタム CSS。テーマの後（head の末尾）に <link> を置き、どのスタイルも上書きできるようにする */
+function applyCustomCss(uri: string | undefined): void {
+  const existing = document.getElementById('custom-css');
+  if (uri === undefined) {
+    existing?.remove();
+    return;
+  }
+  const link = existing instanceof HTMLLinkElement ? existing : document.createElement('link');
+  link.id = 'custom-css';
+  link.rel = 'stylesheet';
+  if (link.href !== uri) {
+    link.href = uri;
+  }
+  if (link.parentNode === null) {
+    document.head.appendChild(link);
+  }
+}
+
 /** 設定は再描画せず、CSS 変数とテーマ属性の差し替えだけで反映する */
 function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void {
   const root = document.documentElement;
@@ -53,6 +71,7 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
     root.style.setProperty(name, value);
   }
   document.body.dataset.theme = message.theme;
+  applyCustomCss(message.customCssUri);
 }
 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {

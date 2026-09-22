@@ -1,10 +1,12 @@
 /**
  * リーダータブの Custom Text Editor Provider（vscode 依存。統合テストで検証する）。
- * 変換、HTML の組み立て、設定の変換は純粋関数（render、webviewHtml、resourceRoots、readerSettings）に任せ、
+ * 変換、HTML の組み立て、設定の変換は純粋関数（render、webviewHtml、resourceRoots、readerSettings、customCss）に任せ、
  * ここでは VS Code とのやり取りだけを持つ。
  */
 import * as crypto from 'crypto';
+import * as path from 'path';
 import * as vscode from 'vscode';
+import { resolveCustomCss } from './customCss';
 import { classifyLink } from './links';
 import type { FromWebview, ToWebview } from './messages';
 import {
@@ -23,15 +25,38 @@ const UPDATE_DELAY = 200;
 /** 設定の接頭辞 */
 const CONFIG_SECTION = 'yomu';
 
+/** Webview に配る CSS。テーマは全部読み込み、body の data-theme で切り替える。vscode.css は最後（ハイコントラストの上書きのため） */
+const STYLE_FILES = [
+  'reader.css',
+  'highlight.css',
+  'themes/paper.css',
+  'themes/sepia.css',
+  'themes/dark.css',
+  'themes/vscode.css',
+];
+
+/** 開いているリーダータブ 1 つ分 */
+interface Entry {
+  panel: vscode.WebviewPanel;
+  /** カスタム CSS のフォルダを除いた localResourceRoots */
+  baseRoots: vscode.Uri[];
+}
+
 export class ReaderProvider implements vscode.CustomTextEditorProvider {
   static readonly viewType = 'yomu.reader';
 
   /** 開いているリーダータブ。設定の変更をすべてに配るために持つ */
-  private readonly panels = new Set<vscode.WebviewPanel>();
+  private readonly entries = new Set<Entry>();
 
   private readonly postMessageEmitter = new vscode.EventEmitter<ToWebview>();
   /** Webview へ送ったメッセージ。統合テストが観測するために公開する */
   readonly onDidPostMessage: vscode.Event<ToWebview> = this.postMessageEmitter.event;
+
+  /** カスタム CSS の保存を拾う。設定のパスが変わったら作り直す */
+  private customCssWatcher: { path: string; watcher: vscode.FileSystemWatcher } | undefined;
+
+  /** 同じ問題を何度も通知しないための記録 */
+  private readonly notified = new Set<string>();
 
   static register(context: vscode.ExtensionContext): ReaderProvider {
     const provider = new ReaderProvider(context.extensionUri);
@@ -43,10 +68,13 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       }),
       vscode.workspace.onDidChangeConfiguration((event) => {
         if (event.affectsConfiguration(CONFIG_SECTION)) {
+          // 通知はパスごとに一度だけ。設定を変えたら改めて知らせる
+          provider.notified.clear();
           provider.broadcastSettings();
         }
       }),
-      provider.postMessageEmitter
+      provider.postMessageEmitter,
+      { dispose: () => provider.customCssWatcher?.watcher.dispose() }
     );
     return provider;
   }
@@ -60,19 +88,20 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
   ): void {
     const documentDir = vscode.Uri.joinPath(document.uri, '..');
     const webview = panel.webview;
-
-    webview.options = {
-      enableScripts: true,
-      localResourceRoots: [
+    const entry: Entry = {
+      panel,
+      baseRoots: [
         vscode.Uri.joinPath(this.extensionUri, 'media'),
         vscode.Uri.joinPath(this.extensionUri, 'dist'),
         ...this.documentResourceRoots(documentDir),
       ],
     };
+
+    webview.options = { enableScripts: true, localResourceRoots: entry.baseRoots };
     webview.html = webviewHtml({
       nonce: crypto.randomBytes(16).toString('base64'),
       cspSource: webview.cspSource,
-      styleUris: ['reader.css', 'theme.css'].map((file) =>
+      styleUris: STYLE_FILES.map((file) =>
         webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'media', file)).toString()
       ),
       scriptUri: webview
@@ -98,18 +127,17 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       if (message.type === 'ready') {
         // 本文より先に見た目を決めておく。本文が出た後に幅やフォントが変わって見えるのを避ける。
         // retainContextWhenHidden を使わないので、タブを隠して戻すたびに Webview が作り直されてここに来る
-        this.sendSettings(panel);
-        update();
+        void this.sendSettings(entry).then(update);
       } else if (message.type === 'openLink') {
         void openLink(message.href, documentDir);
       }
     });
-    this.panels.add(panel);
+    this.entries.add(entry);
     panel.onDidDispose(() => {
       clearTimeout(timer);
       changeSubscription.dispose();
       messageSubscription.dispose();
-      this.panels.delete(panel);
+      this.entries.delete(entry);
     });
   }
 
@@ -130,20 +158,99 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     return normalizeSettings(raw);
   }
 
-  private sendSettings(panel: vscode.WebviewPanel): void {
+  private async sendSettings(entry: Entry): Promise<void> {
     const settings = this.readSettings();
-    this.post(panel, {
+    const customCss = await this.customCssUri(entry, settings.customCss);
+    this.post(entry.panel, {
       type: 'settings',
       theme: settings.theme,
       cssVariables: cssVariables(settings),
+      ...(customCss === undefined ? {} : { customCssUri: customCss }),
     });
   }
 
   /** 設定が変わった時に、開いているすべてのリーダータブへ配る */
   private broadcastSettings(): void {
-    for (const panel of this.panels) {
-      this.sendSettings(panel);
+    for (const entry of this.entries) {
+      void this.sendSettings(entry);
     }
+  }
+
+  /**
+   * カスタム CSS の Webview URI。無ければ undefined。
+   * ファイルのあるフォルダを localResourceRoots に足し、保存を拾う watcher を張る
+   */
+  private async customCssUri(entry: Entry, setting: string): Promise<string | undefined> {
+    const folders = (vscode.workspace.workspaceFolders ?? []).map((folder) => folder.uri.fsPath);
+    const resolved = resolveCustomCss(setting, folders);
+    if (resolved === undefined) {
+      this.watchCustomCss(undefined);
+      return undefined;
+    }
+    if ('error' in resolved) {
+      this.notifyOnce(
+        resolved.error + ':' + setting,
+        resolved.error === 'noWorkspace'
+          ? vscode.l10n.t(
+              'Yomu: ${workspaceFolder} in the custom CSS path needs an open workspace: {0}',
+              setting
+            )
+          : vscode.l10n.t(
+              'Yomu: the custom CSS path must be absolute or start with ${workspaceFolder}: {0}',
+              setting
+            )
+      );
+      return undefined;
+    }
+    const uri = vscode.Uri.file(resolved.path);
+    try {
+      await vscode.workspace.fs.stat(uri);
+    } catch {
+      this.notifyOnce(
+        'missing:' + resolved.path,
+        vscode.l10n.t('Yomu: the custom CSS file was not found: {0}', resolved.path)
+      );
+      return undefined;
+    }
+    const folder = vscode.Uri.joinPath(uri, '..');
+    entry.panel.webview.options = {
+      enableScripts: true,
+      localResourceRoots: [...entry.baseRoots, folder],
+    };
+    this.watchCustomCss(uri);
+    // 保存のたびに URI を変え、Webview のキャッシュを避ける
+    return entry.panel.webview
+      .asWebviewUri(uri)
+      .with({ query: 'v=' + Date.now() })
+      .toString();
+  }
+
+  private watchCustomCss(uri: vscode.Uri | undefined): void {
+    const target = uri?.fsPath;
+    if (this.customCssWatcher?.path === target) {
+      return;
+    }
+    this.customCssWatcher?.watcher.dispose();
+    this.customCssWatcher = undefined;
+    if (uri === undefined || target === undefined) {
+      return;
+    }
+    const watcher = vscode.workspace.createFileSystemWatcher(
+      new vscode.RelativePattern(vscode.Uri.joinPath(uri, '..'), path.basename(target))
+    );
+    const refresh = (): void => this.broadcastSettings();
+    watcher.onDidChange(refresh);
+    watcher.onDidCreate(refresh);
+    watcher.onDidDelete(refresh);
+    this.customCssWatcher = { path: target, watcher };
+  }
+
+  private notifyOnce(key: string, message: string): void {
+    if (this.notified.has(key)) {
+      return;
+    }
+    this.notified.add(key);
+    void vscode.window.showWarningMessage(message);
   }
 
   private post(panel: vscode.WebviewPanel, message: ToWebview): void {

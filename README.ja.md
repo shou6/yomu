@@ -21,6 +21,46 @@ Yomu は Markdown を専用のリーダータブで開き、日本語を読む�
 2. エディタ右上の本のアイコンを押す。コマンドパレット（`Ctrl+Shift+P` / `Cmd+Shift+P`）の **Yomu: リーダーで開く** や、「エディターを再度開く方法を選択」の **Yomu Reader** からも開ける
 3. 編集する時は「エディターを再度開く方法を選択」から **テキスト エディター** を選ぶ
 
+## 設定
+
+設定はすべて `yomu.` で始まります。変更は開いているリーダータブへ即座に反映されます。
+
+| 設定 | 既定値 | 内容 |
+| --- | --- | --- |
+| `yomu.theme` | `paper` | 配色。`paper`（白地）、`sepia`（淡い黄褐色）、`dark`（暗い背景）、`vscode`（VS Code のテーマに追従）。VS Code のハイコントラストテーマの時は常に VS Code の色を使います |
+| `yomu.layout.maxWidth` | `960` | 本文の最大幅（px）。`0` で制限なし |
+| `yomu.layout.align` | `center` | ウィンドウが広い時の本文の位置。`left` / `center` / `right` |
+| `yomu.layout.padding` | `32` | 本文の左右の余白（px） |
+| `yomu.font.family` | 欧文フォント、続けて和文フォント | 本文の `font-family`。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます |
+| `yomu.font.codeFamily` | （空） | コードのフォント。空ならエディタのフォント（`editor.fontFamily`） |
+| `yomu.font.size` | `15` | 文字の大きさ（px） |
+| `yomu.font.lineHeight` | `1.8` | 行間。文字の大きさに対する倍率 |
+| `yomu.customCss` | （空） | テーマの後に読み込む CSS ファイルのパス。絶対パスか `${workspaceFolder}` から始まるパス。保存すると即座に反映されます |
+
+### カスタム CSS
+
+色はすべて `body` の CSS 変数なので、小さなファイルで見た目を変えられます。
+
+```css
+body {
+  --yomu-link: rebeccapurple;
+  --yomu-h2-border: #888;
+}
+```
+
+変数の一覧は次のとおりです。
+
+- 全体：`--yomu-bg` `--yomu-fg` `--yomu-link` `--yomu-hr`
+- 見出し：`--yomu-h1` から `--yomu-h5`、`--yomu-h1-border` から `--yomu-h3-border`
+- 表：`--yomu-th` `--yomu-th-border` `--yomu-td-border` `--yomu-row-hover`
+- コードブロック：`--yomu-pre-bg` `--yomu-pre-border`
+- インラインコードと言語ラベル：`--yomu-code-bg` `--yomu-code-fg` `--yomu-code-label-fg` `--yomu-code-label-bg`
+- 引用：`--yomu-quote-border` `--yomu-quote-bg` `--yomu-quote-fg`
+- ハイライト（1）：`--yomu-hl-keyword` `--yomu-hl-string` `--yomu-hl-number` `--yomu-hl-comment`
+- ハイライト（2）：`--yomu-hl-function` `--yomu-hl-type` `--yomu-hl-variable` `--yomu-hl-attr` `--yomu-hl-meta`
+
+それ以外の規則も書けます。本文は `<main id="content">` の中にあり、言語指定のあるコードブロックは `<pre>` に `data-lang` が付きます。
+
 ## 動作環境
 
 - Visual Studio Code 1.138 以上

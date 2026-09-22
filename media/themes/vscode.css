@@ -1,0 +1,116 @@
+/*
+ * テーマ vscode。VS Code のカラーテーマの色（--vscode-*）に追従する。
+ * ハイコントラストのカラーテーマの時は、yomu.theme の値に関わらずこの配色にする（後半のブロック）。
+ * このファイルはテーマの中で最後に読み込む。ハイコントラストの上書きが他のテーマより後に来るようにするため。
+ */
+
+body[data-theme='vscode'] {
+  --yomu-bg: var(--vscode-editor-background);
+  --yomu-fg: var(--vscode-editor-foreground);
+  --yomu-link: var(--vscode-textLink-foreground);
+
+  --yomu-h1: var(--vscode-editor-foreground);
+  --yomu-h1-border: var(--vscode-textLink-foreground);
+  --yomu-h2: var(--vscode-editor-foreground);
+  --yomu-h2-border: color-mix(in srgb, var(--vscode-textLink-foreground) 70%, transparent);
+  --yomu-h3: var(--vscode-editor-foreground);
+  --yomu-h3-border: color-mix(in srgb, var(--vscode-editor-foreground) 25%, transparent);
+  --yomu-h4: var(--vscode-editor-foreground);
+  --yomu-h5: color-mix(in srgb, var(--vscode-editor-foreground) 70%, transparent);
+
+  --yomu-th: var(--vscode-editor-foreground);
+  --yomu-th-border: var(--vscode-textLink-foreground);
+  --yomu-td-border: color-mix(in srgb, var(--vscode-editor-foreground) 18%, transparent);
+  --yomu-row-hover: color-mix(in srgb, var(--vscode-editor-foreground) 5%, transparent);
+
+  --yomu-pre-bg: var(--vscode-textCodeBlock-background);
+  --yomu-pre-border: color-mix(in srgb, var(--vscode-editor-foreground) 15%, transparent);
+  --yomu-code-bg: var(--vscode-textPreformat-background, var(--vscode-textCodeBlock-background));
+  --yomu-code-fg: var(--vscode-textPreformat-foreground, var(--vscode-editor-foreground));
+  --yomu-code-label-fg: color-mix(in srgb, var(--vscode-editor-foreground) 60%, transparent);
+  --yomu-code-label-bg: color-mix(in srgb, var(--vscode-editor-foreground) 10%, transparent);
+
+  --yomu-quote-border: var(--vscode-textBlockQuote-border, var(--vscode-textLink-foreground));
+  --yomu-quote-bg: var(--vscode-textBlockQuote-background, transparent);
+  --yomu-quote-fg: color-mix(in srgb, var(--vscode-editor-foreground) 80%, transparent);
+
+  --yomu-hr: color-mix(in srgb, var(--vscode-editor-foreground) 20%, transparent);
+
+  /* シンタックスハイライト。VS Code はトークンの色を変数で公開していないので、Light+ の色。暗いテーマは下で Dark+ にする */
+  --yomu-hl-keyword: #0000ff;
+  --yomu-hl-string: #a31515;
+  --yomu-hl-number: #098658;
+  --yomu-hl-comment: #008000;
+  --yomu-hl-function: #795e26;
+  --yomu-hl-type: #267f99;
+  --yomu-hl-variable: #001080;
+  --yomu-hl-attr: #e50000;
+  --yomu-hl-meta: #808080;
+}
+
+body[data-theme='vscode'].vscode-dark,
+body[data-theme='vscode'].vscode-high-contrast {
+  --yomu-hl-keyword: #569cd6;
+  --yomu-hl-string: #ce9178;
+  --yomu-hl-number: #b5cea8;
+  --yomu-hl-comment: #6a9955;
+  --yomu-hl-function: #dcdcaa;
+  --yomu-hl-type: #4ec9b0;
+  --yomu-hl-variable: #9cdcfe;
+  --yomu-hl-attr: #9cdcfe;
+  --yomu-hl-meta: #808080;
+}
+
+/* ハイコントラストでは、yomu.theme に関わらず VS Code の色をそのまま使う */
+body.vscode-high-contrast,
+body.vscode-high-contrast-light {
+  --yomu-bg: var(--vscode-editor-background);
+  --yomu-fg: var(--vscode-editor-foreground);
+  --yomu-link: var(--vscode-textLink-foreground);
+  --yomu-h1: var(--vscode-editor-foreground);
+  --yomu-h1-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-h2: var(--vscode-editor-foreground);
+  --yomu-h2-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-h3: var(--vscode-editor-foreground);
+  --yomu-h3-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-h4: var(--vscode-editor-foreground);
+  --yomu-h5: var(--vscode-editor-foreground);
+  --yomu-th: var(--vscode-editor-foreground);
+  --yomu-th-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-td-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-row-hover: transparent;
+  --yomu-pre-bg: transparent;
+  --yomu-pre-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-code-bg: transparent;
+  --yomu-code-fg: var(--vscode-textPreformat-foreground, var(--vscode-editor-foreground));
+  --yomu-code-label-fg: var(--vscode-editor-foreground);
+  --yomu-code-label-bg: transparent;
+  --yomu-quote-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-quote-bg: transparent;
+  --yomu-quote-fg: var(--vscode-editor-foreground);
+  --yomu-hr: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+}
+
+body.vscode-high-contrast {
+  --yomu-hl-keyword: #569cd6;
+  --yomu-hl-string: #ce9178;
+  --yomu-hl-number: #b5cea8;
+  --yomu-hl-comment: #6a9955;
+  --yomu-hl-function: #dcdcaa;
+  --yomu-hl-type: #4ec9b0;
+  --yomu-hl-variable: #9cdcfe;
+  --yomu-hl-attr: #9cdcfe;
+  --yomu-hl-meta: #808080;
+}
+
+body.vscode-high-contrast-light {
+  --yomu-hl-keyword: #0000ff;
+  --yomu-hl-string: #a31515;
+  --yomu-hl-number: #098658;
+  --yomu-hl-comment: #008000;
+  --yomu-hl-function: #795e26;
+  --yomu-hl-type: #267f99;
+  --yomu-hl-variable: #001080;
+  --yomu-hl-attr: #e50000;
+  --yomu-hl-meta: #808080;
+}

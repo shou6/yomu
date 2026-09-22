@@ -1,0 +1,72 @@
+/*
+ * シンタックスハイライト。highlight.js のクラスを、テーマが定義する --yomu-hl-* の変数に対応付ける。
+ * 色そのものは media/themes/*.css が持つ。
+ */
+
+.hljs-keyword,
+.hljs-literal,
+.hljs-built_in,
+.hljs-selector-tag,
+.hljs-doctag {
+  color: var(--yomu-hl-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-quote {
+  color: var(--yomu-hl-string);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--yomu-hl-number);
+}
+
+.hljs-comment {
+  color: var(--yomu-hl-comment);
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-section,
+.hljs-name {
+  color: var(--yomu-hl-function);
+}
+
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-title.class_,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--yomu-hl-type);
+}
+
+.hljs-variable,
+.hljs-params,
+.hljs-property,
+.hljs-template-variable {
+  color: var(--yomu-hl-variable);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-selector-attr,
+.hljs-deletion {
+  color: var(--yomu-hl-attr);
+}
+
+.hljs-meta,
+.hljs-tag,
+.hljs-punctuation {
+  color: var(--yomu-hl-meta);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}

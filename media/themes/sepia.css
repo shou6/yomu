@@ -1,0 +1,47 @@
+/*
+ * テーマ sepia。目に優しい淡い黄褐色の紙。構成は paper と同じで、色だけを暖色に寄せる。
+ */
+
+body[data-theme='sepia'] {
+  --yomu-bg: #f6efe1;
+  --yomu-fg: #3d3227;
+  --yomu-link: #8a5a1f;
+
+  --yomu-h1: #4a3a2a;
+  --yomu-h1-border: #8a6a45;
+  --yomu-h2: #5a4736;
+  --yomu-h2-border: #b8956a;
+  --yomu-h3: #6e5844;
+  --yomu-h3-border: #dccbb0;
+  --yomu-h4: #7a6650;
+  --yomu-h5: #6b5f52;
+
+  --yomu-th: #4a3a2a;
+  --yomu-th-border: #8a6a45;
+  --yomu-td-border: #e0d3bd;
+  --yomu-row-hover: #efe5d0;
+
+  --yomu-pre-bg: #efe6d2;
+  --yomu-pre-border: #dccbb0;
+  --yomu-code-bg: #ece2cc;
+  --yomu-code-fg: #a8433a;
+  --yomu-code-label-fg: #7a6650;
+  --yomu-code-label-bg: #e3d6bd;
+
+  --yomu-quote-border: #b8956a;
+  --yomu-quote-bg: #efe5d0;
+  --yomu-quote-fg: #5f5142;
+
+  --yomu-hr: #d8c8ad;
+
+  /* シンタックスハイライト。暖色の紙に馴染む落ち着いた色 */
+  --yomu-hl-keyword: #7b3fa0;
+  --yomu-hl-string: #9a5b1c;
+  --yomu-hl-number: #2f6f4e;
+  --yomu-hl-comment: #7a7466;
+  --yomu-hl-function: #8a5a1f;
+  --yomu-hl-type: #1f6a7a;
+  --yomu-hl-variable: #3a4f8a;
+  --yomu-hl-attr: #a8433a;
+  --yomu-hl-meta: #8a8074;
+}

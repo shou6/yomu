@@ -40,7 +40,13 @@ suite('checkPackageFiles', () => {
     const manifest = { main: './dist/extension.js' };
     assert.deepStrictEqual(
       checkPackageFiles(
-        [...COMMON, 'dist/extension.js', 'dist/webview.js', 'media/reader.css', 'media/theme.css'],
+        [
+          ...COMMON,
+          'dist/extension.js',
+          'dist/webview.js',
+          'media/reader.css',
+          'media/themes/paper.css',
+        ],
         manifest
       ),
       { unexpected: [], missing: [] }
