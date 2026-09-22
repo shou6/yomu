@@ -33,12 +33,12 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | Setting | Default | What it does |
 | --- | --- | --- |
 | `yomu.theme` | `paper` | Color theme: `paper` (white page), `sepia` (warm page), `dark`, or `vscode` (follows your VS Code theme). High-contrast VS Code themes always use the VS Code colors. |
-| `yomu.layout.maxWidth` | `960` | Maximum width of the text in pixels. `0` means no limit. |
+| `yomu.layout.maxWidth` | `820` | Maximum width of the text in pixels. `0` means no limit. |
 | `yomu.layout.align` | `center` | Where the text sits when the window is wider: `left`, `center`, or `right`. |
 | `yomu.layout.padding` | `32` | Horizontal padding around the text in pixels. |
 | `yomu.font.family` | Latin fonts, then Japanese fonts | CSS `font-family` for the text. Put Latin fonts first and Japanese fonts after them so each script uses its own font. |
 | `yomu.font.codeFamily` | (empty) | Font for code. Empty means the editor font (`editor.fontFamily`). |
-| `yomu.font.size` | `15` | Font size in pixels. |
+| `yomu.font.size` | `16` | Font size in pixels. |
 | `yomu.font.lineHeight` | `1.8` | Line height as a multiple of the font size. |
 | `yomu.customCss` | (empty) | Path to a CSS file loaded after the theme. Absolute, or starting with `${workspaceFolder}`. Saved changes apply immediately. |
 
@@ -55,7 +55,7 @@ Two Japanese fonts ship with the extension, under the SIL Open Font License. Use
 - `BIZ UDPGothic` (Morisawa): a universal-design gothic made for legibility. Regular and Bold.
 - `Noto Sans JP` (Google): a variable font with weights 100 to 900.
 
-The default puts Latin fonts first and `BIZ UDPGothic` after them. To use a bundled font for everything, put it first:
+The default puts Latin fonts first and `Noto Sans JP` after them. To use a bundled font for everything, put it first:
 
 ```json
 "yomu.font.family": "'BIZ UDPGothic', sans-serif"

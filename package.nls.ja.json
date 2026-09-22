@@ -10,7 +10,7 @@
   "config.layout.maxWidth": "本文の最大幅（px）。0 で制限なし。",
   "config.layout.align": "ウィンドウが最大幅より広い時の、本文の位置。",
   "config.layout.padding": "本文の左右の余白（px）。",
-  "config.font.family": "本文のフォント。CSS の font-family と同じ書式。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます。同梱の和文フォント: \"BIZ UDPGothic\"、\"Noto Sans JP\"。",
+  "config.font.family": "本文のフォント。CSS の font-family と同じ書式。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます。同梱の和文フォント: \"Noto Sans JP\"、\"BIZ UDPGothic\"。",
   "config.font.codeFamily": "コードのフォント。空ならエディタのフォント（editor.fontFamily）を使います。",
   "config.font.size": "本文の文字の大きさ（px）。",
   "config.font.lineHeight": "本文の行間。文字の大きさに対する倍率。",

@@ -5,10 +5,10 @@ suite('normalizeSettings', () => {
   test('何も無ければ既定値', () => {
     assert.deepStrictEqual(normalizeSettings({}), DEFAULT_SETTINGS);
     assert.strictEqual(DEFAULT_SETTINGS.theme, 'paper');
-    assert.strictEqual(DEFAULT_SETTINGS.maxWidth, 960);
+    assert.strictEqual(DEFAULT_SETTINGS.maxWidth, 820);
     assert.strictEqual(DEFAULT_SETTINGS.align, 'center');
     assert.strictEqual(DEFAULT_SETTINGS.padding, 32);
-    assert.strictEqual(DEFAULT_SETTINGS.fontSize, 15);
+    assert.strictEqual(DEFAULT_SETTINGS.fontSize, 16);
     assert.strictEqual(DEFAULT_SETTINGS.lineHeight, 1.8);
     assert.strictEqual(DEFAULT_SETTINGS.codeFontFamily, '');
     assert.strictEqual(DEFAULT_SETTINGS.customCss, '');
@@ -46,12 +46,12 @@ suite('normalizeSettings', () => {
   });
 
   test('範囲外の数値は既定値に戻す。maxWidth の 0 は「制限なし」として通す', () => {
-    assert.strictEqual(normalizeSettings({ maxWidth: -1 }).maxWidth, 960);
+    assert.strictEqual(normalizeSettings({ maxWidth: -1 }).maxWidth, 820);
     assert.strictEqual(normalizeSettings({ maxWidth: 0 }).maxWidth, 0);
-    assert.strictEqual(normalizeSettings({ maxWidth: '900' }).maxWidth, 960);
+    assert.strictEqual(normalizeSettings({ maxWidth: '900' }).maxWidth, 820);
     assert.strictEqual(normalizeSettings({ padding: -5 }).padding, 32);
-    assert.strictEqual(normalizeSettings({ fontSize: 3 }).fontSize, 15);
-    assert.strictEqual(normalizeSettings({ fontSize: 100 }).fontSize, 15);
+    assert.strictEqual(normalizeSettings({ fontSize: 3 }).fontSize, 16);
+    assert.strictEqual(normalizeSettings({ fontSize: 100 }).fontSize, 16);
     assert.strictEqual(normalizeSettings({ lineHeight: 0.5 }).lineHeight, 1.8);
     assert.strictEqual(normalizeSettings({ lineHeight: 5 }).lineHeight, 1.8);
     assert.strictEqual(normalizeSettings({ lineHeight: Number.NaN }).lineHeight, 1.8);
@@ -83,7 +83,7 @@ suite('normalizeSettings', () => {
 suite('cssVariables', () => {
   test('既定値から CSS 変数を作る', () => {
     const vars = cssVariables(DEFAULT_SETTINGS);
-    assert.strictEqual(vars['--yomu-max-width'], '960px');
+    assert.strictEqual(vars['--yomu-max-width'], '820px');
     assert.strictEqual(vars['--yomu-margin-left'], 'auto');
     assert.strictEqual(vars['--yomu-margin-right'], 'auto');
     assert.strictEqual(vars['--yomu-padding'], '32px');
@@ -92,7 +92,7 @@ suite('cssVariables', () => {
       vars['--yomu-code-font-family'],
       'var(--vscode-editor-font-family, Consolas, monospace)'
     );
-    assert.strictEqual(vars['--yomu-font-size'], '15px');
+    assert.strictEqual(vars['--yomu-font-size'], '16px');
     assert.strictEqual(vars['--yomu-line-height'], '1.8');
   });
 

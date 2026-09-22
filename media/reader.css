@@ -9,7 +9,7 @@ body {
   min-height: 100vh;
   /* 値は設定（yomu.*）から CSS 変数で受ける。既定値は readerSettings.ts と合わせる */
   font-family: var(--yomu-font-family, sans-serif);
-  font-size: var(--yomu-font-size, 15px);
+  font-size: var(--yomu-font-size, 16px);
   line-height: var(--yomu-line-height, 1.8);
   /* 和文の字間を少しだけ広げる。字面の大きい書体（BIZ UDPGothic）の詰まりが和らぐ */
   letter-spacing: 0.02em;
@@ -24,7 +24,7 @@ body {
 
 #content {
   box-sizing: border-box;
-  max-width: var(--yomu-max-width, 960px);
+  max-width: var(--yomu-max-width, 820px);
   margin: 0 var(--yomu-margin-right, auto) 0 var(--yomu-margin-left, auto);
   padding: 2em var(--yomu-padding, 32px);
 }

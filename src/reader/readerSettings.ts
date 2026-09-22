@@ -32,15 +32,16 @@ export type RawSettings = Partial<Record<keyof ReaderSettings, unknown>>;
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
   theme: 'paper',
-  maxWidth: 960,
+  maxWidth: 820,
   align: 'center',
   padding: 32,
   // 欧文フォントを先に並べ、欧文フォントに無い和文は後ろの和文フォントで描く（和欧の出し分け）。
-  // 和文は同梱フォント（media/fonts.css で登録）なので、どの OS でも同じ見た目になる
+  // 和文は同梱フォント（media/fonts.css で登録）なので、どの OS でも同じ見た目になる。
+  // 既定値（幅 820、16px、Noto Sans JP）は開発者が設定で比べて決めた（実装計画のフェーズ 9.5）
   fontFamily:
-    "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'BIZ UDPGothic', 'Noto Sans JP', sans-serif",
+    "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Noto Sans JP', 'BIZ UDPGothic', sans-serif",
   codeFontFamily: '',
-  fontSize: 15,
+  fontSize: 16,
   lineHeight: 1.8,
   customCss: '',
 };

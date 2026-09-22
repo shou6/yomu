@@ -32,12 +32,12 @@ Yomu は Markdown を専用のリーダータブで開き、日本語を読む�
 | 設定 | 既定値 | 内容 |
 | --- | --- | --- |
 | `yomu.theme` | `paper` | 配色。`paper`（白地）、`sepia`（淡い黄褐色）、`dark`（暗い背景）、`vscode`（VS Code のテーマに追従）。VS Code のハイコントラストテーマの時は常に VS Code の色を使います |
-| `yomu.layout.maxWidth` | `960` | 本文の最大幅（px）。`0` で制限なし |
+| `yomu.layout.maxWidth` | `820` | 本文の最大幅（px）。`0` で制限なし |
 | `yomu.layout.align` | `center` | ウィンドウが広い時の本文の位置。`left` / `center` / `right` |
 | `yomu.layout.padding` | `32` | 本文の左右の余白（px） |
 | `yomu.font.family` | 欧文フォント、続けて和文フォント | 本文の `font-family`。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます |
 | `yomu.font.codeFamily` | （空） | コードのフォント。空ならエディタのフォント（`editor.fontFamily`） |
-| `yomu.font.size` | `15` | 文字の大きさ（px） |
+| `yomu.font.size` | `16` | 文字の大きさ（px） |
 | `yomu.font.lineHeight` | `1.8` | 行間。文字の大きさに対する倍率 |
 | `yomu.customCss` | （空） | テーマの後に読み込む CSS ファイルのパス。絶対パスか `${workspaceFolder}` から始まるパス。保存すると即座に反映されます |
 
@@ -54,7 +54,7 @@ SIL Open Font License の和文フォントを 2 書体同梱しています。`
 - `BIZ UDPGothic`（モリサワ）：読みやすさを重視したユニバーサルデザインのゴシック体。Regular と Bold
 - `Noto Sans JP`（Google）：太さ 100〜900 の可変フォント
 
-既定値は欧文フォントの後に `BIZ UDPGothic` を置いた並びです。欧文も含めて同梱フォントにしたい時は、先頭に置きます。
+既定値は欧文フォントの後に `Noto Sans JP` を置いた並びです。欧文も含めて同梱フォントにしたい時は、先頭に置きます。
 
 ```json
 "yomu.font.family": "'BIZ UDPGothic', sans-serif"

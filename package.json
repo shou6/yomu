@@ -99,7 +99,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 10000,
-          "default": 960,
+          "default": 820,
           "description": "%config.layout.maxWidth%"
         },
         "yomu.layout.align": {
@@ -121,7 +121,7 @@
         },
         "yomu.font.family": {
           "type": "string",
-          "default": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'BIZ UDPGothic', 'Noto Sans JP', sans-serif",
+          "default": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Noto Sans JP', 'BIZ UDPGothic', sans-serif",
           "description": "%config.font.family%"
         },
         "yomu.font.codeFamily": {
@@ -133,7 +133,7 @@
           "type": "number",
           "minimum": 8,
           "maximum": 72,
-          "default": 15,
+          "default": 16,
           "description": "%config.font.size%"
         },
         "yomu.font.lineHeight": {
