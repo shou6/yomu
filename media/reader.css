@@ -11,6 +11,8 @@ body {
   font-family: var(--yomu-font-family, sans-serif);
   font-size: var(--yomu-font-size, 15px);
   line-height: var(--yomu-line-height, 1.8);
+  /* 和文の字間を少しだけ広げる。字面の大きい書体（BIZ UDPGothic）の詰まりが和らぐ */
+  letter-spacing: 0.02em;
   color: var(--yomu-fg);
   background: var(--yomu-bg);
   cursor: default;
@@ -48,7 +50,7 @@ h2 {
   line-height: 1.4;
   border-bottom: 2px solid var(--yomu-h2-border);
   padding-bottom: 0.25em;
-  margin: 1.3em 0 0.5em;
+  margin: 1.8em 0 0.6em;
   color: var(--yomu-h2);
 }
 
@@ -58,7 +60,7 @@ h3 {
   line-height: 1.5;
   border-bottom: 1px solid var(--yomu-h3-border);
   padding-bottom: 0.2em;
-  margin: 1.1em 0 0.4em;
+  margin: 1.5em 0 0.5em;
   color: var(--yomu-h3);
 }
 
@@ -77,9 +79,9 @@ h6 {
   color: var(--yomu-h5);
 }
 
-/* 段落 */
+/* 段落。行間（1.8）より広く空けて、段落の切れ目が見えるようにする */
 p {
-  margin: 0.6em 0;
+  margin: 1em 0;
 }
 
 strong {
@@ -123,7 +125,8 @@ td {
   border-bottom: 1px solid var(--yomu-td-border);
   min-width: 3em;
   text-align: left;
-  word-break: keep-all;
+  /* 和文は普通に折り返す。keep-all だと「v1公開後、要望が出たら」のような不自然な位置で折れる */
+  overflow-wrap: anywhere;
 }
 
 tbody tr:last-child td {
@@ -136,6 +139,7 @@ tbody tr:hover td {
 
 /* コード */
 code {
+  letter-spacing: 0;
   background: var(--yomu-code-bg);
   padding: 0.15em 0.4em;
   border-radius: 4px;
@@ -145,6 +149,7 @@ code {
 }
 
 pre {
+  letter-spacing: 0;
   background: var(--yomu-pre-bg);
   border: 1px solid var(--yomu-pre-border);
   border-radius: 6px;
