@@ -141,6 +141,7 @@ suite('Reader', () => {
     const keys = Object.keys(manifest.contributes.configuration.properties);
     assert.deepStrictEqual(keys.sort(), [
       'yomu.customCss',
+      'yomu.focusMode',
       'yomu.font.codeFamily',
       'yomu.font.family',
       'yomu.font.lineHeight',
@@ -221,6 +222,26 @@ suite('Reader', () => {
       assert.strictEqual(message.customCssUri, undefined);
     } finally {
       await config.update('customCss', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
+
+  test('集中モードの切り替えコマンドで、yomu.focusMode が反転し、settings に載る', async () => {
+    const { onDidPostMessage } = await api();
+    const config = (): vscode.WorkspaceConfiguration => vscode.workspace.getConfiguration('yomu');
+    const opened = waitForMessage(onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    try {
+      assert.strictEqual(config().get('focusMode'), false);
+      const received = waitForMessage(
+        onDidPostMessage,
+        (m) => m.type === 'settings' && m.focusMode === true
+      );
+      await vscode.commands.executeCommand('yomu.toggleFocusMode');
+      await received;
+      assert.strictEqual(config().get('focusMode'), true);
+    } finally {
+      await config().update('focusMode', undefined, vscode.ConfigurationTarget.Global);
     }
   });
 });

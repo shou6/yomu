@@ -25,6 +25,7 @@ suite('normalizeSettings', () => {
       fontSize: 18,
       lineHeight: 2,
       customCss: '${workspaceFolder}/style.css',
+      focusMode: true,
     });
     assert.deepStrictEqual(settings, {
       theme: 'dark',
@@ -36,6 +37,7 @@ suite('normalizeSettings', () => {
       fontSize: 18,
       lineHeight: 2,
       customCss: '${workspaceFolder}/style.css',
+      focusMode: true,
     });
   });
 
@@ -72,6 +74,12 @@ suite('normalizeSettings', () => {
       DEFAULT_SETTINGS.fontFamily
     );
     assert.strictEqual(normalizeSettings({ fontFamily: '  Meiryo  ' }).fontFamily, 'Meiryo');
+  });
+
+  test('集中モードは既定でオフ。真偽値でなければオフ', () => {
+    assert.strictEqual(DEFAULT_SETTINGS.focusMode, false);
+    assert.strictEqual(normalizeSettings({ focusMode: true }).focusMode, true);
+    assert.strictEqual(normalizeSettings({ focusMode: 'yes' }).focusMode, false);
   });
 
   test('customCss は前後の空白を落とし、文字列でなければ空', () => {
