@@ -1,5 +1,63 @@
 /**
  * Webview 側のスクリプト。dist/webview.js にバンドルされ、リーダータブの中で動く。
- * 拡張機能側からのメッセージを受けて本文を差し替え、スクロール位置を保つ（実装計画のフェーズ 3）。
+ * 拡張機能からの update で本文を差し替え、スクロール位置を保ち、リンクのクリックを振り分ける。
  */
-export {};
+import { classifyLink } from '../reader/links';
+import type { FromWebview, ToWebview } from '../reader/messages';
+
+interface ReaderState {
+  scrollY: number;
+}
+
+interface VsCodeApi {
+  postMessage(message: FromWebview): void;
+  getState(): ReaderState | undefined;
+  setState(state: ReaderState): void;
+}
+
+declare function acquireVsCodeApi(): VsCodeApi;
+
+const vscode = acquireVsCodeApi();
+const content = document.getElementById('content');
+if (content === null) {
+  throw new Error('#content is missing');
+}
+
+/** タブを隠して戻した時のために、スクロール位置を保存する */
+function saveScroll(): void {
+  vscode.setState({ scrollY: window.scrollY });
+}
+
+function scrollToId(id: string): void {
+  document.getElementById(id)?.scrollIntoView();
+}
+
+window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
+  const message = event.data;
+  if (message.type !== 'update') {
+    return;
+  }
+  // 再描画でスクロール位置が失われないよう、差し替えの前後で位置を保つ
+  const scrollY =
+    content.childElementCount === 0 ? (vscode.getState()?.scrollY ?? 0) : window.scrollY;
+  content.innerHTML = message.html;
+  window.scrollTo(0, scrollY);
+  saveScroll();
+});
+
+window.addEventListener('scroll', saveScroll, { passive: true });
+
+document.addEventListener('click', (event) => {
+  const anchor = (event.target as Element | null)?.closest('a[href]');
+  const href = anchor?.getAttribute('href');
+  if (!href) {
+    return;
+  }
+  event.preventDefault();
+  const link = classifyLink(href);
+  if (link.kind === 'fragment') {
+    scrollToId(link.id);
+  } else if (link.kind !== 'ignore') {
+    vscode.postMessage({ type: 'openLink', href });
+  }
+});

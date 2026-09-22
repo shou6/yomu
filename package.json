@@ -58,9 +58,19 @@
       {
         "command": "yomu.openInReader",
         "title": "%command.openInReader%",
-        "category": "Yomu"
+        "category": "Yomu",
+        "icon": "$(book)"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "yomu.openInReader",
+          "when": "resourceExtname == .md && activeCustomEditorId != yomu.reader",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",

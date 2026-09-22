@@ -6,12 +6,16 @@ import { ReaderProvider } from './reader/readerProvider';
 export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(
     ReaderProvider.register(context),
-    vscode.commands.registerCommand('yomu.openInReader', async () => {
+    // タイトルバーのアイコンやエクスプローラーからは URI が渡る。コマンドパレットからは渡らない
+    vscode.commands.registerCommand('yomu.openInReader', async (uri?: vscode.Uri) => {
       const active = vscode.window.activeTextEditor?.document;
-      const decision = decideOpenInReader(
-        active ? { uri: active.uri, fileName: active.fileName } : undefined,
-        vscode.l10n.t
-      );
+      const target =
+        uri instanceof vscode.Uri
+          ? { uri, fileName: uri.path }
+          : active
+            ? { uri: active.uri, fileName: active.fileName }
+            : undefined;
+      const decision = decideOpenInReader(target, vscode.l10n.t);
       if (decision.kind === 'open') {
         await vscode.commands.executeCommand(
           'vscode.openWith',

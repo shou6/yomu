@@ -2,7 +2,8 @@
   "compilerOptions": {
     "module": "Node16",
     "target": "ES2022",
-    "lib": ["ES2022"],
+    // DOM は src/webview/ のため。拡張機能側では使わない
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["node", "mocha"],
     "sourceMap": true,
     // markdown-it と highlight.js は export = の形なので、default import に必要

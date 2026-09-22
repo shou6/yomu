@@ -5,15 +5,14 @@
  */
 import * as crypto from 'crypto';
 import * as vscode from 'vscode';
+import { classifyLink } from './links';
+import type { FromWebview, ToWebview } from './messages';
 import { render } from './render';
 import { resourceRoots } from './resourceRoots';
 import { webviewHtml } from './webviewHtml';
 
 /** 編集の追従のデバウンス（ms） */
 const UPDATE_DELAY = 200;
-
-/** 拡張機能側から Webview へ送るメッセージ */
-export type ReaderMessage = { type: 'update'; html: string };
 
 export class ReaderProvider implements vscode.CustomTextEditorProvider {
   static readonly viewType = 'yomu.reader';
@@ -62,7 +61,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     const resolveImageSrc = (src: string): string =>
       webview.asWebviewUri(vscode.Uri.joinPath(documentDir, decodePath(src))).toString();
     const update = (): void => {
-      const message: ReaderMessage = {
+      const message: ToWebview = {
         type: 'update',
         html: render(document.getText(), { resolveImageSrc }),
       };
@@ -77,9 +76,15 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       clearTimeout(timer);
       timer = setTimeout(update, UPDATE_DELAY);
     });
+    const messageSubscription = webview.onDidReceiveMessage((message: FromWebview) => {
+      if (message.type === 'openLink') {
+        void openLink(message.href, documentDir);
+      }
+    });
     panel.onDidDispose(() => {
       clearTimeout(timer);
       changeSubscription.dispose();
+      messageSubscription.dispose();
     });
 
     update();
@@ -93,6 +98,22 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       documentDir.fsPath,
       folders.map((uri) => uri.fsPath)
     ).map((fsPath) => byPath.get(fsPath) ?? vscode.Uri.file(fsPath));
+  }
+}
+
+/**
+ * Webview でクリックされたリンクを開く。
+ * 外部は既定のブラウザ、相対パスは標準エディタ（要件定義 4.6 節）。文書内の移動は Webview 側で済ませている
+ */
+async function openLink(href: string, documentDir: vscode.Uri): Promise<void> {
+  const link = classifyLink(href);
+  if (link.kind === 'external') {
+    await vscode.env.openExternal(vscode.Uri.parse(link.href));
+  } else if (link.kind === 'relative' && link.path !== '') {
+    await vscode.commands.executeCommand(
+      'vscode.open',
+      vscode.Uri.joinPath(documentDir, link.path)
+    );
   }
 }
 

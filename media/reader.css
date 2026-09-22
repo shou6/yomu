@@ -1,1 +1,225 @@
-/* 組版の CSS（本文幅、フォント、行間、約物）。実装計画のフェーズ 3 で書く */
+/*
+ * 組版の CSS。本文幅、和欧のフォントの出し分け、行間、約物のアキ。
+ * 色は theme.css に分ける。
+ */
+
+/* 和文フォント。システムフォントから最初に見つかったものを使う（Web フォントは同梱しない） */
+@font-face {
+  font-family: 'Yomu Sans JP';
+  src:
+    local('Yu Gothic Medium'), local('YuGothic-Medium'), local('Hiragino Sans'),
+    local('Hiragino Kaku Gothic ProN'), local('Noto Sans CJK JP'), local('Noto Sans JP'),
+    local('Meiryo');
+  /* 日本語の範囲だけに当て、欧文はこの前に並べた欧文フォントで描く */
+  unicode-range:
+    U+3000-303F, U+3040-309F, U+30A0-30FF, U+31F0-31FF, U+FF00-FFEF, U+4E00-9FFF, U+3400-4DBF,
+    U+F900-FAFF, U+2E80-2FDF, U+2190-21FF, U+2500-257F, U+25A0-25FF, U+2600-26FF;
+}
+
+@font-face {
+  font-family: 'Yomu Sans JP';
+  font-weight: bold;
+  src:
+    local('Yu Gothic Bold'), local('YuGothic-Bold'), local('Hiragino Sans W6'),
+    local('Hiragino Kaku Gothic ProN W6'), local('Noto Sans CJK JP Bold'),
+    local('Noto Sans JP Bold'), local('Meiryo Bold');
+  unicode-range:
+    U+3000-303F, U+3040-309F, U+30A0-30FF, U+31F0-31FF, U+FF00-FFEF, U+4E00-9FFF, U+3400-4DBF,
+    U+F900-FAFF, U+2E80-2FDF, U+2190-21FF, U+2500-257F, U+25A0-25FF, U+2600-26FF;
+}
+
+:root {
+  /* 本文 1 行の長さ。全角 38 字（要件定義 4.7 節）。MVP は固定で、v1 の設定で可変にする */
+  --yomu-measure: 38em;
+  --yomu-font-size: 16px;
+  --yomu-line-height: 1.9;
+  --yomu-font-latin: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --yomu-font-jp: 'Yomu Sans JP';
+  --yomu-font-mono: var(--vscode-editor-font-family, Consolas), 'Cascadia Mono', Menlo, monospace;
+}
+
+html {
+  font-size: var(--yomu-font-size);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--yomu-font-latin), var(--yomu-font-jp), sans-serif;
+  line-height: var(--yomu-line-height);
+  /* 約物（「」、。など）の前後のアキを詰める。Chromium 148 は trim-start まで対応 */
+  text-spacing-trim: trim-start;
+  overflow-wrap: anywhere;
+  line-break: strict;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 本文幅を固定し、ウィンドウを広げても伸びない */
+#content {
+  box-sizing: content-box;
+  max-width: var(--yomu-measure);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+/* 段落と見出し。見出しの前を広く、後を狭く */
+p,
+ul,
+ol,
+blockquote,
+pre,
+table,
+hr {
+  margin: 0 0 1.25em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+  line-height: 1.5;
+  margin: 2.5em 0 0.75em;
+  /* 見出しの直後で改ページしない意図の、見出しと本文の結び付き */
+  break-after: avoid;
+}
+
+h1 {
+  font-size: 1.75em;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 1.4em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--yomu-border);
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+h4,
+h5,
+h6 {
+  font-size: 1em;
+}
+
+/* 見出しの直後の見出しは、間を詰める */
+h1 + h2,
+h2 + h3,
+h3 + h4 {
+  margin-top: 1em;
+}
+
+a {
+  color: var(--yomu-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+strong {
+  font-weight: bold;
+}
+
+ul,
+ol {
+  padding-left: 1.75em;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+li > p {
+  margin-bottom: 0.5em;
+}
+
+/* GFM のタスクリスト。チェックボックスは表示だけ */
+li.task-list-item {
+  list-style: none;
+  margin-left: -1.5em;
+}
+
+.task-list-item-checkbox {
+  margin: 0 0.5em 0 0;
+  vertical-align: -0.1em;
+  pointer-events: none;
+}
+
+blockquote {
+  margin-left: 0;
+  padding: 0.25em 0 0.25em 1.25em;
+  border-left: 3px solid var(--yomu-border);
+  color: var(--yomu-muted);
+}
+
+blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--yomu-border);
+  margin: 2.5em 0;
+}
+
+/* コード。和文が混ざっても行が崩れないよう、等幅の後ろに和文フォントを置く */
+code,
+pre {
+  font-family: var(--yomu-font-mono), var(--yomu-font-jp), monospace;
+  font-size: 0.875em;
+  text-spacing-trim: space-all;
+}
+
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: var(--yomu-code-bg);
+}
+
+pre {
+  padding: 1em 1.25em;
+  border-radius: 4px;
+  background: var(--yomu-code-bg);
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+pre code {
+  padding: 0;
+  font-size: 1em;
+  background: none;
+}
+
+table {
+  border-collapse: collapse;
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+th,
+td {
+  padding: 0.4em 0.9em;
+  border: 1px solid var(--yomu-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: bold;
+  background: var(--yomu-table-head-bg);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}

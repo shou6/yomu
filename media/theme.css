@@ -1,1 +1,148 @@
-/* テーマの色の対応（ライト、ダーク、ハイコントラスト）。実装計画のフェーズ 3 で書く */
+/*
+ * テーマの色の対応。VS Code の --vscode-* の変数と body のクラスで、
+ * ライト、ダーク、ハイコントラストに追従する。タブを開き直さなくても切り替わる。
+ */
+
+:root {
+  --yomu-bg: var(--vscode-editor-background);
+  /* 長文を読むために、本文の色は前景色と背景色を少し混ぜてコントラストを落とす */
+  --yomu-fg: color-mix(
+    in srgb,
+    var(--vscode-editor-foreground) 86%,
+    var(--vscode-editor-background)
+  );
+  --yomu-muted: color-mix(
+    in srgb,
+    var(--vscode-editor-foreground) 60%,
+    var(--vscode-editor-background)
+  );
+  --yomu-border: color-mix(in srgb, var(--vscode-editor-foreground) 18%, transparent);
+  --yomu-link: var(--vscode-textLink-foreground);
+  --yomu-code-bg: var(--vscode-textCodeBlock-background);
+  --yomu-table-head-bg: color-mix(in srgb, var(--vscode-editor-foreground) 6%, transparent);
+}
+
+/* ハイコントラストでは、テーマの色をそのまま使う */
+body.vscode-high-contrast,
+body.vscode-high-contrast-light {
+  --yomu-fg: var(--vscode-editor-foreground);
+  --yomu-muted: var(--vscode-editor-foreground);
+  --yomu-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-table-head-bg: transparent;
+}
+
+body {
+  color: var(--yomu-fg);
+  background: var(--yomu-bg);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+th {
+  color: var(--vscode-editor-foreground);
+}
+
+/*
+ * シンタックスハイライト（highlight.js のクラス）。
+ * VS Code はトークンの色を CSS 変数で公開していないので、ライトとダークで色を持つ。
+ * 色は VS Code の既定のテーマ（Light+ / Dark+）に寄せる。
+ */
+body.vscode-light,
+body.vscode-high-contrast-light {
+  --hl-keyword: #0000ff;
+  --hl-control: #af00db;
+  --hl-string: #a31515;
+  --hl-number: #098658;
+  --hl-comment: #008000;
+  --hl-function: #795e26;
+  --hl-type: #267f99;
+  --hl-variable: #001080;
+  --hl-attr: #e50000;
+  --hl-meta: #808080;
+}
+
+body.vscode-dark,
+body.vscode-high-contrast {
+  --hl-keyword: #569cd6;
+  --hl-control: #c586c0;
+  --hl-string: #ce9178;
+  --hl-number: #b5cea8;
+  --hl-comment: #6a9955;
+  --hl-function: #dcdcaa;
+  --hl-type: #4ec9b0;
+  --hl-variable: #9cdcfe;
+  --hl-attr: #9cdcfe;
+  --hl-meta: #808080;
+}
+
+.hljs-keyword,
+.hljs-literal,
+.hljs-built_in,
+.hljs-selector-tag,
+.hljs-doctag {
+  color: var(--hl-keyword);
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-quote {
+  color: var(--hl-string);
+}
+
+.hljs-number,
+.hljs-symbol,
+.hljs-bullet {
+  color: var(--hl-number);
+}
+
+.hljs-comment {
+  color: var(--hl-comment);
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-section,
+.hljs-name {
+  color: var(--hl-function);
+}
+
+.hljs-type,
+.hljs-class .hljs-title,
+.hljs-title.class_,
+.hljs-selector-class,
+.hljs-selector-id {
+  color: var(--hl-type);
+}
+
+.hljs-variable,
+.hljs-params,
+.hljs-property,
+.hljs-template-variable {
+  color: var(--hl-variable);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-selector-attr,
+.hljs-deletion {
+  color: var(--hl-attr);
+}
+
+.hljs-meta,
+.hljs-tag,
+.hljs-punctuation {
+  color: var(--hl-meta);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
