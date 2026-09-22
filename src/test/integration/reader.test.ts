@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 
 interface Manifest {
   contributes: {
-    commands: { command: string; icon?: string }[];
+    commands: { command: string; icon?: string | { light: string; dark: string } }[];
     menus: { 'editor/title': { command: string; when: string; group?: string }[] };
     configuration: { properties: Record<string, { default?: unknown }> };
   };
@@ -76,6 +76,12 @@ suite('Reader', () => {
     assert.strictEqual(item.group, 'navigation');
     const command = manifest.contributes.commands.find((c) => c.command === 'yomu.openInReader');
     assert.ok(command?.icon, 'コマンドにアイコンが無い');
+    // 自前の SVG。ライトとダークの両方があり、公開パッケージに入る
+    assert.ok(typeof command.icon === 'object', 'アイコンが SVG でない');
+    for (const file of [command.icon.light, command.icon.dark]) {
+      assert.ok(fs.existsSync(path.join(ROOT, file)), file + ' が無い');
+      assert.match(file, /^resources\/[\w.-]+\.svg$/);
+    }
   });
 
   setup(closeAll);

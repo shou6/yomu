@@ -59,7 +59,10 @@
         "command": "yomu.openInReader",
         "title": "%command.openInReader%",
         "category": "Yomu",
-        "icon": "$(book)"
+        "icon": {
+          "light": "resources/reader-light.svg",
+          "dark": "resources/reader-dark.svg"
+        }
       }
     ],
     "menus": {
