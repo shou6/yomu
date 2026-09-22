@@ -15,12 +15,12 @@ suite('render: 基本の変換', () => {
     const out = html('# Title\n\nHello **world** and *you*.\n');
     assert.ok(out.includes('<h1'), out);
     assert.ok(out.includes('>Title</h1>'), out);
-    assert.ok(out.includes('<p>Hello <strong>world</strong> and <em>you</em>.</p>'), out);
+    assert.match(out, /<p[^>]*>Hello <strong>world<\/strong> and <em>you<\/em>\.<\/p>/);
   });
 
   test('GFM の表と取り消し線を変換する', () => {
     const out = html('| a | b |\n| - | - |\n| 1 | 2 |\n\n~~gone~~\n');
-    assert.ok(out.includes('<table>'), out);
+    assert.ok(out.includes('<table'), out);
     assert.ok(out.includes('<td>1</td>'), out);
     assert.ok(out.includes('<s>gone</s>'), out);
   });
@@ -57,8 +57,8 @@ suite('render: 画像', () => {
 suite('render: 見出しの ID', () => {
   test('見出しに ID が付き、日本語はそのまま使う', () => {
     const out = html('## はじめに\n\n## Getting Started\n');
-    assert.ok(out.includes('<h2 id="はじめに">'), out);
-    assert.ok(out.includes('<h2 id="getting-started">'), out);
+    assert.ok(out.includes('<h2 id="はじめに"'), out);
+    assert.ok(out.includes('<h2 id="getting-started"'), out);
   });
 
   test('同じ見出しが重複したら連番で区別する', () => {
@@ -79,10 +79,7 @@ suite('render: 見出しの ID', () => {
 suite('render: コードブロック', () => {
   test('言語指定があれば、その言語でハイライトする', () => {
     const out = html('```ts\nconst a: number = 1;\n```\n');
-    assert.ok(
-      out.includes('<div class="yomu-code" data-lang="ts"><pre><code class="language-ts">'),
-      out
-    );
+    assert.match(out, /<div class="yomu-code" data-lang="ts"[^>]*><pre><code class="language-ts">/);
     assert.ok(out.includes('<span class="hljs-'), out);
   });
 
@@ -96,10 +93,7 @@ suite('render: コードブロック', () => {
   test('言語指定のあるコードブロックは、ラベル用の data-lang を持つ枠で包む', () => {
     // 枠は横スクロールしない。pre の中にラベルを置くと、横に長いコードでラベルも一緒に流れてしまう
     const out = html('```ts\nconst a = 1;\n```\n');
-    assert.ok(
-      out.includes('<div class="yomu-code" data-lang="ts"><pre><code class="language-ts">'),
-      out
-    );
+    assert.match(out, /<div class="yomu-code" data-lang="ts"[^>]*><pre><code class="language-ts">/);
     assert.ok(out.includes('</pre></div>'), out);
     const plain = html('```\nplain\n```\n');
     assert.ok(!plain.includes('data-lang') && !plain.includes('yomu-code'), '言語なしに枠がある');
@@ -114,16 +108,14 @@ suite('render: コードブロック', () => {
 
   test('言語指定が無ければ、装飾なしでエスケープして表示する', () => {
     const out = html('```\nif (a < b) {}\n```\n');
-    assert.ok(out.includes('<pre><code>if (a &lt; b) {}\n</code></pre>'), out);
+    assert.match(out, /<pre[^>]*><code>if \(a &lt; b\) \{\}\n<\/code><\/pre>/);
   });
 
   test('未対応の言語なら、装飾なしでエスケープして表示する', () => {
     const out = html('```nosuchlang\n<tag>\n```\n');
-    assert.ok(
-      out.includes(
-        '<div class="yomu-code" data-lang="nosuchlang"><pre><code class="language-nosuchlang">&lt;tag&gt;\n</code></pre></div>'
-      ),
-      out
+    assert.match(
+      out,
+      /<div class="yomu-code" data-lang="nosuchlang"[^>]*><pre><code class="language-nosuchlang">&lt;tag&gt;\n<\/code><\/pre><\/div>/
     );
     assert.ok(!out.includes('hljs-'), out);
   });
@@ -178,7 +170,7 @@ suite('renderSafely: 例外時の表示', () => {
 suite('render: Mermaid', () => {
   test('言語が mermaid のブロックは、Webview で描く枠に入れ、ソースはエスケープして持つ', () => {
     const out = html('```mermaid\nflowchart LR\n  A --> B<br>\n```\n');
-    assert.ok(out.includes('<div class="yomu-mermaid">'), out);
+    assert.ok(out.includes('<div class="yomu-mermaid"'), out);
     assert.ok(
       out.includes('<pre class="yomu-mermaid-source">flowchart LR\n  A --&gt; B&lt;br&gt;\n</pre>'),
       out

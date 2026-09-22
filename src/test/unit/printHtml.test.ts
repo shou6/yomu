@@ -17,14 +17,21 @@ suite('rewriteFontUrls', () => {
 });
 
 suite('injectMermaid', () => {
+  // 本文の要素には元の行番号（data-line）が付く
   const html =
-    '<p>a</p>\n<div class="yomu-mermaid"><pre class="yomu-mermaid-source">flowchart</pre></div>\n' +
-    '<div class="yomu-mermaid"><pre class="yomu-mermaid-source">pie</pre></div>\n';
+    '<p>a</p>\n<div class="yomu-mermaid" data-line="2"><pre class="yomu-mermaid-source">flowchart</pre></div>\n' +
+    '<div class="yomu-mermaid" data-line="6"><pre class="yomu-mermaid-source">pie</pre></div>\n';
 
   test('Mermaid の枠を、上から順にリーダーが描いた SVG に差し替える', () => {
     const out = injectMermaid(html, ['<svg id="a"></svg>', '<svg id="b"></svg>']);
-    assert.ok(out.includes('<div class="yomu-mermaid"><svg id="a"></svg></div>'), out);
-    assert.ok(out.includes('<div class="yomu-mermaid"><svg id="b"></svg></div>'), out);
+    assert.ok(
+      out.includes('<div class="yomu-mermaid" data-line="2"><svg id="a"></svg></div>'),
+      out
+    );
+    assert.ok(
+      out.includes('<div class="yomu-mermaid" data-line="6"><svg id="b"></svg></div>'),
+      out
+    );
     assert.ok(!out.includes('yomu-mermaid-source'), out);
   });
 
