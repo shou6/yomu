@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 
 interface Manifest {
   contributes: {
+    views: { explorer: { id: string; name: string; when?: string }[] };
     commands: { command: string; icon?: string | { light: string; dark: string } }[];
     menus: { 'editor/title': { command: string; when: string; group?: string }[] };
     configuration: { properties: Record<string, { default?: unknown }> };
@@ -16,6 +17,8 @@ interface YomuApi {
   onDidPostMessage: vscode.Event<{ type: string; [key: string]: unknown }>;
   /** アクティブなリーダーの本文を印刷用の HTML に書き出し、そのパスを返す（ブラウザは開かない） */
   exportForPrint(): Promise<string | undefined>;
+  /** 目次のビューに出している、一番上の階層の見出しの ID */
+  outlineIds(): string[];
 }
 
 async function api(): Promise<YomuApi> {
@@ -347,5 +350,35 @@ suite('Reader', () => {
     assert.ok(icons.length > 0);
     const missing = icons.filter((name) => !workbench.includes(`("${name}",`));
     assert.deepStrictEqual(missing, [], 'VS Code に無いアイコン');
+  });
+
+  test('エクスプローラーに目次のビューがあり、リーダーがアクティブな時だけ出す', () => {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    const view = manifest.contributes.views.explorer.find((v) => v.id === 'yomu.outline');
+    assert.ok(view, 'yomu.outline が無い');
+    assert.strictEqual(view.when, 'yomu.readerActive');
+  });
+
+  test('リーダーで開くと、目次にその文書の見出しが出る', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    assert.deepStrictEqual(yomu.outlineIds(), ['サンプル']);
+  });
+
+  test('目次の項目を選ぶと、リーダーにその見出しへ移動する指示が送られる', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    const received = waitForMessage(
+      yomu.onDidPostMessage,
+      (m) => m.type === 'scrollTo' && m.id === 'サンプル'
+    );
+    await vscode.commands.executeCommand('yomu.revealHeading', 'サンプル');
+    await received;
   });
 });
