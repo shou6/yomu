@@ -35,6 +35,7 @@ body[data-theme='vscode'] {
   --yomu-quote-fg: color-mix(in srgb, var(--vscode-editor-foreground) 80%, transparent);
 
   --yomu-hr: color-mix(in srgb, var(--vscode-editor-foreground) 20%, transparent);
+  --yomu-zoom-backdrop: rgb(0 0 0 / 80%);
 
   /* シンタックスハイライト。VS Code はトークンの色を変数で公開していないので、Light+ の色。暗いテーマは下で Dark+ にする */
   --yomu-hl-keyword: #0000ff;

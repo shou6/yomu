@@ -311,3 +311,60 @@ img {
   font-size: 0.88em;
   color: var(--yomu-code-fg);
 }
+
+/* 画像と図のズーム表示。クリックで開く重ね表示 */
+#content img,
+.yomu-mermaid svg {
+  cursor: zoom-in;
+}
+
+#content a img {
+  cursor: pointer;
+}
+
+.yomu-zoom {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: var(--yomu-zoom-backdrop);
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+
+.yomu-zoom-dragging {
+  cursor: grabbing;
+}
+
+.yomu-zoom-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  background: var(--yomu-bg);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 35%);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.yomu-zoom-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  font-size: 22px;
+  line-height: 36px;
+  color: var(--yomu-bg);
+  background: var(--yomu-fg);
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.yomu-zoom-close:hover {
+  opacity: 1;
+}

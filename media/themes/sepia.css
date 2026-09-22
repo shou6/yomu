@@ -33,6 +33,7 @@ body[data-theme='sepia'] {
   --yomu-quote-fg: #5f5142;
 
   --yomu-hr: #d8c8ad;
+  --yomu-zoom-backdrop: rgb(45 35 25 / 82%);
 
   /* シンタックスハイライト。暖色の紙に馴染む落ち着いた色 */
   --yomu-hl-keyword: #7b3fa0;

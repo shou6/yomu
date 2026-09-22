@@ -15,6 +15,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 - **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Two Japanese fonts are bundled, so the text looks the same on every OS.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, Mermaid diagrams, heading anchors, local and remote images. Raw HTML is disabled.
 - **Themes**: `paper` (white page), `sepia`, `dark`, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
+- **Zoom**: click an image or a Mermaid diagram to view it full screen. Scroll to zoom, drag to pan, double-click to fit, Esc to close.
 - **Live update**: editing and saving the file in the text editor updates the reader tab.
 
 ## Usage

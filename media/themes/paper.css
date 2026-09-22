@@ -35,6 +35,7 @@ body[data-theme='paper'] {
   --yomu-quote-fg: #445566;
 
   --yomu-hr: #cdd8e3;
+  --yomu-zoom-backdrop: rgb(20 30 45 / 82%);
 
   /* シンタックスハイライト。VS Code の Light+ に寄せる */
   --yomu-hl-keyword: #0000ff;

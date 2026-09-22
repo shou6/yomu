@@ -7,6 +7,7 @@ import type { FromWebview, ToWebview } from '../reader/messages';
 import { mermaidTheme } from '../reader/mermaidTheme';
 import type { Theme } from '../reader/readerSettings';
 import { renderMermaid, resetMermaid } from './mermaid';
+import { openZoom, zoomTarget } from './zoom';
 
 interface ReaderState {
   scrollY: number;
@@ -140,6 +141,13 @@ new MutationObserver(() => {
 vscode.postMessage({ type: 'ready' });
 
 document.addEventListener('click', (event) => {
+  // 画像と図はクリックで拡大する（リンクの中の画像は、下のリンクの処理を優先する）
+  const zoomable = zoomTarget(event.target as Element | null);
+  if (zoomable !== undefined) {
+    event.preventDefault();
+    openZoom(zoomable);
+    return;
+  }
   const anchor = (event.target as Element | null)?.closest('a[href]');
   const href = anchor?.getAttribute('href');
   if (!href) {
