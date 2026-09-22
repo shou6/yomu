@@ -467,4 +467,19 @@ suite('Reader', () => {
     const message = await opened;
     assert.strictEqual(message.resume, 0.5);
   });
+
+  test('標準エディタで開くと、リーダーで読んでいる行にカーソルを置く', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    const asked = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'requestLine');
+    await vscode.commands.executeCommand('yomu.openInTextEditor');
+    await asked;
+    const editor = vscode.window.activeTextEditor;
+    assert.ok(editor, 'テキストエディタが開いていない');
+    assert.strictEqual(editor.document.uri.fsPath, fixture('sample.md').fsPath);
+    // 開いた直後は一番上を読んでいるので、先頭の見出しの行
+    assert.strictEqual(editor.selection.active.line, 0);
+  });
 });

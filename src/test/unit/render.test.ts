@@ -191,3 +191,50 @@ suite('render: Mermaid', () => {
     assert.ok(html('```Mermaid\npie\n```\n').includes('class="yomu-mermaid"'));
   });
 });
+
+suite('render: 元の行番号', () => {
+  const markdown = [
+    '# 見出し', // 0
+    '', // 1
+    '段落', // 2
+    '', // 3
+    '- 項目 1', // 4
+    '- 項目 2', // 5
+    '', // 6
+    '> 引用', // 7
+    '', // 8
+    '```ts', // 9
+    'const a = 1;', // 10
+    '```', // 11
+    '', // 12
+    '| a |', // 13
+    '| - |', // 14
+    '| 1 |', // 15
+    '', // 16
+    '```mermaid', // 17
+    'pie', // 18
+    '```', // 19
+    '', // 20
+    '```', // 21
+    'plain', // 22
+    '```', // 23
+  ].join('\n');
+
+  test('ブロックの要素に、元の Markdown の行番号（0 始まり）を data-line で付ける', () => {
+    const out = html(markdown);
+    assert.ok(out.includes('<h1 id="見出し" data-line="0">'), out);
+    assert.ok(out.includes('<p data-line="2">段落</p>'), out);
+    assert.ok(out.includes('<li data-line="4">'), out);
+    assert.ok(out.includes('<li data-line="5">'), out);
+    assert.ok(out.includes('<blockquote data-line="7">'), out);
+    assert.ok(out.includes('<div class="yomu-code" data-lang="ts" data-line="9">'), out);
+    assert.ok(out.includes('<table data-line="13">'), out);
+    assert.ok(out.includes('<div class="yomu-mermaid" data-line="17">'), out);
+    assert.ok(out.includes('<pre data-line="21">'), out);
+  });
+
+  test('リストや引用の中の段落には付けない（外側の要素で足りる）', () => {
+    const out = html('- 項目\n\n  続き\n');
+    assert.ok(!/<p data-line/.test(out), out);
+  });
+});
