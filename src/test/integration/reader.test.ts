@@ -182,4 +182,40 @@ suite('Reader', () => {
       await config.update('font.size', undefined, vscode.ConfigurationTarget.Global);
     }
   });
+
+  test('yomu.customCss に CSS のパスを書くと、settings にその Webview URI が入る', async () => {
+    const { onDidPostMessage } = await api();
+    const config = vscode.workspace.getConfiguration('yomu');
+    const cssPath = path.join(FIXTURES, 'custom.css');
+    try {
+      const received = waitForMessage(
+        onDidPostMessage,
+        (m) => m.type === 'settings' && String(m.customCssUri ?? '').includes('custom.css')
+      );
+      await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+      await config.update('customCss', cssPath, vscode.ConfigurationTarget.Global);
+      const message = await received;
+      assert.match(String(message.customCssUri), /^https:\/\//, 'asWebviewUri で変換されていない');
+    } finally {
+      await config.update('customCss', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
+
+  test('yomu.customCss のファイルが無ければ、settings に customCssUri は入らない', async () => {
+    const { onDidPostMessage } = await api();
+    const config = vscode.workspace.getConfiguration('yomu');
+    try {
+      await config.update(
+        'customCss',
+        path.join(FIXTURES, 'missing.css'),
+        vscode.ConfigurationTarget.Global
+      );
+      const received = waitForMessage(onDidPostMessage, (m) => m.type === 'settings');
+      await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+      const message = await received;
+      assert.strictEqual(message.customCssUri, undefined);
+    } finally {
+      await config.update('customCss', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
 });
