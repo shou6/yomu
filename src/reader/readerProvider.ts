@@ -4,6 +4,8 @@
  * ここでは VS Code とのやり取りだけを持つ。
  */
 import * as crypto from 'crypto';
+import * as fs from 'fs/promises';
+import * as os from 'os';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { resolveCustomCss } from './customCss';
@@ -15,6 +17,7 @@ import {
   type RawSettings,
   type ReaderSettings,
 } from './readerSettings';
+import { injectMermaid, printHtml, rewriteFontUrls } from './printHtml';
 import { renderSafely } from './render';
 import { resourceRoots } from './resourceRoots';
 import { webviewHtml } from './webviewHtml';
@@ -36,9 +39,24 @@ const STYLE_FILES = [
   'themes/vscode.css',
 ];
 
+/** 印刷用の HTML に埋め込む CSS。テーマは paper だけ（印刷は白地にする） */
+const PRINT_STYLE_FILES = [
+  'fonts.css',
+  'reader.css',
+  'highlight.css',
+  'themes/paper.css',
+  'print.css',
+];
+
+/** 印刷の書き出しで、Webview の返事を待つ時間（ms） */
+const EXPORT_TIMEOUT = 5000;
+
 /** 開いているリーダータブ 1 つ分 */
 interface Entry {
   panel: vscode.WebviewPanel;
+  document: vscode.TextDocument;
+  /** 印刷の書き出しで、Webview の返事を待っている時の受け口 */
+  onExported?: (mermaid: (string | null)[]) => void;
   /** カスタム CSS のフォルダを除いた localResourceRoots */
   baseRoots: vscode.Uri[];
 }
@@ -91,6 +109,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     const webview = panel.webview;
     const entry: Entry = {
       panel,
+      document,
       baseRoots: [
         vscode.Uri.joinPath(this.extensionUri, 'media'),
         vscode.Uri.joinPath(this.extensionUri, 'dist'),
@@ -144,6 +163,8 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         void this.sendSettings(entry).then(update);
       } else if (message.type === 'openLink') {
         void openLink(message.href, documentDir);
+      } else if (message.type === 'exported') {
+        entry.onExported?.(message.mermaid);
       }
     });
     this.entries.add(entry);
@@ -153,6 +174,57 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       messageSubscription.dispose();
       this.entries.delete(entry);
     });
+  }
+
+  /**
+   * アクティブなリーダーの本文を、印刷用の 1 つの HTML にして一時フォルダに書き出す。
+   * 本文は画像をローカルのファイルの URI にして描き直し、Mermaid の図はリーダーが描いた SVG を使う。
+   * @returns 書き出したファイルのパス。アクティブなリーダーが無ければ undefined
+   */
+  async exportForPrint(): Promise<string | undefined> {
+    const entry = [...this.entries].find((candidate) => candidate.panel.active);
+    if (entry === undefined) {
+      return undefined;
+    }
+    const mermaid = await new Promise<(string | null)[]>((resolve) => {
+      const timer = setTimeout(() => resolve([]), EXPORT_TIMEOUT);
+      entry.onExported = (svgs) => {
+        clearTimeout(timer);
+        entry.onExported = undefined;
+        resolve(svgs);
+      };
+      void entry.panel.webview.postMessage({ type: 'export' } satisfies ToWebview);
+    });
+
+    const documentDir = vscode.Uri.joinPath(entry.document.uri, '..');
+    const body = injectMermaid(
+      renderSafely(entry.document.getText(), {
+        resolveImageSrc: (src) => vscode.Uri.joinPath(documentDir, decodePath(src)).toString(),
+      }),
+      mermaid
+    );
+    const fontsDir = vscode.Uri.joinPath(this.extensionUri, 'fonts').toString();
+    const css = await Promise.all(
+      PRINT_STYLE_FILES.map(async (file) =>
+        rewriteFontUrls(
+          new TextDecoder().decode(
+            await vscode.workspace.fs.readFile(
+              vscode.Uri.joinPath(this.extensionUri, 'media', file)
+            )
+          ),
+          fontsDir
+        )
+      )
+    );
+    const settings = this.readSettings();
+    const title = path.basename(entry.document.fileName);
+    const html = printHtml({ title, body, css, cssVariables: cssVariables(settings) });
+
+    const dir = path.join(os.tmpdir(), 'yomu-print');
+    await fs.mkdir(dir, { recursive: true });
+    const file = path.join(dir, title.replace(/\.md$/i, '') + '.html');
+    await fs.writeFile(file, html, 'utf8');
+    return file;
   }
 
   /** 設定を読み、検査して返す */

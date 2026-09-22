@@ -76,6 +76,12 @@
         "command": "yomu.toggleFocusMode",
         "title": "%command.toggleFocusMode%",
         "category": "Yomu"
+      },
+      {
+        "command": "yomu.openInBrowser",
+        "title": "%command.openInBrowser%",
+        "category": "Yomu",
+        "icon": "$(print)"
       }
     ],
     "menus": {
@@ -84,6 +90,11 @@
           "command": "yomu.openInReader",
           "when": "resourceExtname == .md && activeCustomEditorId != yomu.reader",
           "group": "navigation"
+        },
+        {
+          "command": "yomu.openInBrowser",
+          "when": "activeCustomEditorId == yomu.reader",
+          "group": "1_yomu"
         }
       ]
     },

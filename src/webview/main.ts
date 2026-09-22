@@ -128,6 +128,14 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
     applyUpdate(message.html);
   } else if (message.type === 'settings') {
     applySettings(message);
+  } else if (message.type === 'export') {
+    // 印刷用に、描いた Mermaid の SVG を枠の順に返す。描けていない枠は null
+    vscode.postMessage({
+      type: 'exported',
+      mermaid: [...content.querySelectorAll('.yomu-mermaid')].map(
+        (block) => block.querySelector('svg')?.outerHTML ?? null
+      ),
+    });
   }
 });
 

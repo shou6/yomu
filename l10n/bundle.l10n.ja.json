@@ -5,5 +5,6 @@
   "Yomu: the custom CSS path must be absolute or start with ${workspaceFolder}: {0}": "Yomu: カスタム CSS のパスは絶対パスか、${workspaceFolder} から始めてください: {0}",
   "Yomu: the custom CSS file was not found: {0}": "Yomu: カスタム CSS のファイルが見つかりません: {0}",
   "Show all {0} lines": "全 {0} 行を表示",
-  "Collapse": "折りたたむ"
+  "Collapse": "折りたたむ",
+  "Open a Markdown file in the Yomu reader first.": "先に Markdown を Yomu のリーダーで開いてください。"
 }

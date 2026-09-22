@@ -6,6 +6,8 @@ import type { Theme } from './readerSettings';
 export type ToWebview =
   /** 本文の差し替え */
   | { type: 'update'; html: string }
+  /** 印刷用に、描いた Mermaid の SVG を返してほしい */
+  | { type: 'export' }
   /** 設定の反映。CSS 変数とテーマ名。カスタム CSS があればその Webview URI */
   | {
       type: 'settings';
@@ -23,4 +25,7 @@ export type ToWebview =
 /** Webview → 拡張機能 */
 export type FromWebview =
   /** スクリプトの読み込みが終わった。タブを隠して戻した時にも Webview が作り直されて再び送られる */
-  { type: 'ready' } | { type: 'openLink'; href: string };
+  | { type: 'ready' }
+  | { type: 'openLink'; href: string }
+  /** export への返事。Mermaid の枠ごとの SVG（描けていない枠は null） */
+  | { type: 'exported'; mermaid: (string | null)[] };

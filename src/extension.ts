@@ -6,6 +6,8 @@ import { ReaderProvider } from './reader/readerProvider';
 /** activate が返す API。統合テストが Webview へのメッセージを観測するために使う */
 export interface YomuApi {
   onDidPostMessage: vscode.Event<ToWebview>;
+  /** アクティブなリーダーの本文を印刷用の HTML に書き出し、そのパスを返す（ブラウザは開かない） */
+  exportForPrint(): Promise<string | undefined>;
 }
 
 /** エントリポイント。登録だけを行い、ロジックは各モジュールに置く */
@@ -44,7 +46,23 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
       );
     })
   );
-  return { onDidPostMessage: provider.onDidPostMessage };
+  context.subscriptions.push(
+    // Webview は印刷に対応していないので、1 つの HTML に書き出してブラウザで開き、ブラウザの印刷を使う
+    vscode.commands.registerCommand('yomu.openInBrowser', async () => {
+      const file = await provider.exportForPrint();
+      if (file === undefined) {
+        void vscode.window.showInformationMessage(
+          vscode.l10n.t('Open a Markdown file in the Yomu reader first.')
+        );
+        return;
+      }
+      await vscode.env.openExternal(vscode.Uri.file(file));
+    })
+  );
+  return {
+    onDidPostMessage: provider.onDidPostMessage,
+    exportForPrint: () => provider.exportForPrint(),
+  };
 }
 
 export function deactivate(): void {}

@@ -1,0 +1,70 @@
+/*
+ * 印刷用の CSS。「Yomu: ブラウザで開いて印刷」で書き出した HTML で効く。
+ * VS Code の Webview は印刷に対応していないので、リーダーの中では使われない。
+ */
+
+@media print {
+  @page {
+    margin: 16mm 14mm;
+  }
+
+  body {
+    min-height: auto;
+    background: #ffffff;
+    /* 背景色（コードブロックや引用）も印刷する */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #content {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* コードは横スクロールできないので折り返す */
+  pre,
+  pre code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    overflow: visible;
+  }
+
+  /* 見出しの直後で改ページしない */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+  }
+
+  /* 表・図・コード・引用・画像の途中で改ページしない */
+  pre,
+  table,
+  blockquote,
+  img,
+  .yomu-code,
+  .yomu-mermaid {
+    break-inside: avoid;
+  }
+
+  /* 紙ではリンクを押せないので、外部リンクの URL を併記する */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    color: var(--yomu-h5);
+    overflow-wrap: anywhere;
+  }
+
+  /* 画面向けの操作は印刷しない */
+  .yomu-fold-button,
+  .yomu-zoom {
+    display: none;
+  }
+
+  tbody tr:hover td {
+    background-color: transparent;
+  }
+}
