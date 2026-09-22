@@ -10,9 +10,9 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 ## Features
 
 - **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the book icon in the editor title bar, the Command Palette, or "Reopen Editor With...".
-- **Japanese typography**: fixed line length (about 38 full-width characters), separate fonts for Japanese and Latin text, wider line height, and tighter spacing around Japanese punctuation. No web fonts are bundled; system fonts are used.
+- **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. No web fonts are bundled; system fonts are used.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, heading anchors, local and remote images. Raw HTML is disabled.
-- **Follows your theme**: light, dark and high-contrast themes are supported and update without reopening the tab.
+- **Paper-like look**: a white page with clear heading levels, tables with horizontal rules, and soft code blocks, regardless of your color theme. High-contrast themes use the theme colors.
 - **Live update**: editing and saving the file in the text editor updates the reader tab.
 
 ## Usage

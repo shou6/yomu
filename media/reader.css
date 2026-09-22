@@ -1,119 +1,94 @@
 /*
- * 組版の CSS。本文幅、和欧のフォントの出し分け、行間、約物のアキ。
- * 色は theme.css に分ける。
+ * レイアウトと組版。開発者が Markdown Preview Enhanced に当てている markdown-preview.less を基準にする
+ * （要件定義 4.9 節）。色は theme.css の変数で持つ。
  */
-
-/* 和文フォント。システムフォントから最初に見つかったものを使う（Web フォントは同梱しない） */
-@font-face {
-  font-family: 'Yomu Sans JP';
-  src:
-    local('Yu Gothic Medium'), local('YuGothic-Medium'), local('Hiragino Sans'),
-    local('Hiragino Kaku Gothic ProN'), local('Noto Sans CJK JP'), local('Noto Sans JP'),
-    local('Meiryo');
-  /* 日本語の範囲だけに当て、欧文はこの前に並べた欧文フォントで描く */
-  unicode-range:
-    U+3000-303F, U+3040-309F, U+30A0-30FF, U+31F0-31FF, U+FF00-FFEF, U+4E00-9FFF, U+3400-4DBF,
-    U+F900-FAFF, U+2E80-2FDF, U+2190-21FF, U+2500-257F, U+25A0-25FF, U+2600-26FF;
-}
-
-@font-face {
-  font-family: 'Yomu Sans JP';
-  font-weight: bold;
-  src:
-    local('Yu Gothic Bold'), local('YuGothic-Bold'), local('Hiragino Sans W6'),
-    local('Hiragino Kaku Gothic ProN W6'), local('Noto Sans CJK JP Bold'),
-    local('Noto Sans JP Bold'), local('Meiryo Bold');
-  unicode-range:
-    U+3000-303F, U+3040-309F, U+30A0-30FF, U+31F0-31FF, U+FF00-FFEF, U+4E00-9FFF, U+3400-4DBF,
-    U+F900-FAFF, U+2E80-2FDF, U+2190-21FF, U+2500-257F, U+25A0-25FF, U+2600-26FF;
-}
-
-:root {
-  /* 本文 1 行の長さ。全角 38 字（要件定義 4.7 節）。MVP は固定で、v1 の設定で可変にする */
-  --yomu-measure: 38em;
-  --yomu-font-size: 16px;
-  --yomu-line-height: 1.9;
-  --yomu-font-latin: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --yomu-font-jp: 'Yomu Sans JP';
-  --yomu-font-mono: var(--vscode-editor-font-family, Consolas), 'Cascadia Mono', Menlo, monospace;
-}
-
-html {
-  font-size: var(--yomu-font-size);
-}
 
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--yomu-font-latin), var(--yomu-font-jp), sans-serif;
-  line-height: var(--yomu-line-height);
+  min-height: 100vh;
+  /* 欧文フォントを先に並べ、欧文フォントに無い和文は後ろの和文フォントで描く（和欧の出し分け） */
+  font-family:
+    'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Yu Gothic UI', Meiryo, 'Hiragino Sans',
+    'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--yomu-fg);
+  background: var(--yomu-bg);
+  cursor: default;
   /* 約物（「」、。など）の前後のアキを詰める。Chromium 148 は trim-start まで対応 */
   text-spacing-trim: trim-start;
-  overflow-wrap: anywhere;
   line-break: strict;
-  -webkit-font-smoothing: antialiased;
+  overflow-wrap: anywhere;
 }
 
-/* 本文幅を固定し、ウィンドウを広げても伸びない */
 #content {
-  box-sizing: content-box;
-  max-width: var(--yomu-measure);
+  box-sizing: border-box;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 3rem 1.5rem 6rem;
+  padding: 2em;
 }
 
-/* 段落と見出し。見出しの前を広く、後を狭く */
-p,
-ul,
-ol,
-blockquote,
-pre,
-table,
-hr {
-  margin: 0 0 1.25em;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-weight: bold;
-  line-height: 1.5;
-  margin: 2.5em 0 0.75em;
-  /* 見出しの直後で改ページしない意図の、見出しと本文の結び付き */
-  break-after: avoid;
-}
-
-h1 {
-  font-size: 1.75em;
+#content > :first-child {
   margin-top: 0;
 }
 
+/* 見出し */
+h1 {
+  font-size: 2em;
+  font-weight: 700;
+  line-height: 1.4;
+  border-bottom: 3px solid var(--yomu-h1-border);
+  padding-bottom: 0.3em;
+  margin: 1.4em 0 0.6em;
+  color: var(--yomu-h1);
+}
+
 h2 {
-  font-size: 1.4em;
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.4;
+  border-bottom: 2px solid var(--yomu-h2-border);
   padding-bottom: 0.25em;
-  border-bottom: 1px solid var(--yomu-border);
+  margin: 1.3em 0 0.5em;
+  color: var(--yomu-h2);
 }
 
 h3 {
   font-size: 1.2em;
+  font-weight: 600;
+  line-height: 1.5;
+  border-bottom: 1px solid var(--yomu-h3-border);
+  padding-bottom: 0.2em;
+  margin: 1.1em 0 0.4em;
+  color: var(--yomu-h3);
 }
 
-h4,
+h4 {
+  font-size: 1.05em;
+  font-weight: 600;
+  margin: 1em 0 0.3em;
+  color: var(--yomu-h4);
+}
+
 h5,
 h6 {
-  font-size: 1em;
+  font-size: 0.95em;
+  font-weight: 600;
+  margin: 0.9em 0 0.3em;
+  color: var(--yomu-h5);
 }
 
-/* 見出しの直後の見出しは、間を詰める */
-h1 + h2,
-h2 + h3,
-h3 + h4 {
-  margin-top: 1em;
+/* 段落 */
+p {
+  margin: 0.6em 0;
 }
 
+strong {
+  font-weight: 700;
+}
+
+/* リンク */
 a {
   color: var(--yomu-link);
   text-decoration: none;
@@ -123,27 +98,119 @@ a:hover {
   text-decoration: underline;
 }
 
-strong {
-  font-weight: bold;
+/* テーブル（横線のみ） */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  font-size: 0.93em;
+  border: none;
 }
 
+th {
+  font-weight: 700;
+  text-align: left;
+  padding: 0.55em 0.9em;
+  border: none;
+  border-bottom: 2.5px solid var(--yomu-th-border);
+  color: var(--yomu-th);
+  background: transparent;
+  white-space: nowrap;
+  min-width: 3em;
+}
+
+td {
+  padding: 0.45em 0.9em;
+  border: none;
+  border-bottom: 1px solid var(--yomu-td-border);
+  min-width: 3em;
+  text-align: left;
+  word-break: keep-all;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover td {
+  background-color: var(--yomu-row-hover);
+}
+
+/* コード */
+code {
+  background: var(--yomu-code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.88em;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Consolas, monospace;
+  color: var(--yomu-code-fg);
+}
+
+pre {
+  background: var(--yomu-pre-bg);
+  border: 1px solid var(--yomu-pre-border);
+  border-radius: 6px;
+  padding: 1em 1.2em;
+  margin: 1em 0;
+  font-size: 0.88em;
+  line-height: 1.65;
+  overflow-x: auto;
+  white-space: pre;
+  /* コードの中では約物を詰めない（等幅の桁をそろえる） */
+  text-spacing-trim: space-all;
+  overflow-wrap: normal;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 1em;
+  color: inherit;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Consolas, monospace;
+}
+
+/* 引用 */
+blockquote {
+  border-left: 4px solid var(--yomu-quote-border);
+  margin: 1em 0;
+  padding: 0.6em 1em;
+  background: var(--yomu-quote-bg);
+  color: var(--yomu-quote-fg);
+  border-radius: 0 4px 4px 0;
+}
+
+blockquote p {
+  margin: 0;
+}
+
+/* リスト */
 ul,
 ol {
-  padding-left: 1.75em;
+  padding-left: 1.6em;
+  margin: 0.6em 0;
+  line-height: 1.9;
+}
+
+li > ul,
+li > ol {
+  margin: 0;
 }
 
 li + li {
-  margin-top: 0.25em;
+  margin-top: 0.15em;
 }
 
 li > p {
-  margin-bottom: 0.5em;
+  margin: 0;
 }
 
 /* GFM のタスクリスト。チェックボックスは表示だけ */
+ul.contains-task-list {
+  padding-left: 0.4em;
+}
+
 li.task-list-item {
   list-style: none;
-  margin-left: -1.5em;
 }
 
 .task-list-item-checkbox {
@@ -152,71 +219,11 @@ li.task-list-item {
   pointer-events: none;
 }
 
-blockquote {
-  margin-left: 0;
-  padding: 0.25em 0 0.25em 1.25em;
-  border-left: 3px solid var(--yomu-border);
-  color: var(--yomu-muted);
-}
-
-blockquote > :last-child {
-  margin-bottom: 0;
-}
-
+/* 水平線 */
 hr {
-  border: 0;
-  border-top: 1px solid var(--yomu-border);
-  margin: 2.5em 0;
-}
-
-/* コード。和文が混ざっても行が崩れないよう、等幅の後ろに和文フォントを置く */
-code,
-pre {
-  font-family: var(--yomu-font-mono), var(--yomu-font-jp), monospace;
-  font-size: 0.875em;
-  text-spacing-trim: space-all;
-}
-
-code {
-  padding: 0.1em 0.35em;
-  border-radius: 3px;
-  background: var(--yomu-code-bg);
-}
-
-pre {
-  padding: 1em 1.25em;
-  border-radius: 4px;
-  background: var(--yomu-code-bg);
-  line-height: 1.6;
-  overflow-x: auto;
-  white-space: pre;
-}
-
-pre code {
-  padding: 0;
-  font-size: 1em;
-  background: none;
-}
-
-table {
-  border-collapse: collapse;
-  max-width: 100%;
-  display: block;
-  overflow-x: auto;
-  line-height: 1.6;
-}
-
-th,
-td {
-  padding: 0.4em 0.9em;
-  border: 1px solid var(--yomu-border);
-  text-align: left;
-  vertical-align: top;
-}
-
-th {
-  font-weight: bold;
-  background: var(--yomu-table-head-bg);
+  border: none;
+  border-top: 2px solid var(--yomu-hr);
+  margin: 1.8em 0;
 }
 
 img {

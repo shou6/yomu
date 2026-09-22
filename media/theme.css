@@ -1,60 +1,41 @@
 /*
- * テーマの色の対応。VS Code の --vscode-* の変数と body のクラスで、
- * ライト、ダーク、ハイコントラストに追従する。タブを開き直さなくても切り替わる。
+ * 配色。開発者が Markdown Preview Enhanced に当てている markdown-preview.less を基準にする（要件定義 4.9 節）。
+ * VS Code のテーマに関わらず、白地の紙の配色で表示する。
+ * ハイコントラストのテーマの時だけ、テーマの色に従う（アクセシビリティのため）。
  */
-
-:root {
-  --yomu-bg: var(--vscode-editor-background);
-  /* 長文を読むために、本文の色は前景色と背景色を少し混ぜてコントラストを落とす */
-  --yomu-fg: color-mix(
-    in srgb,
-    var(--vscode-editor-foreground) 86%,
-    var(--vscode-editor-background)
-  );
-  --yomu-muted: color-mix(
-    in srgb,
-    var(--vscode-editor-foreground) 60%,
-    var(--vscode-editor-background)
-  );
-  --yomu-border: color-mix(in srgb, var(--vscode-editor-foreground) 18%, transparent);
-  --yomu-link: var(--vscode-textLink-foreground);
-  --yomu-code-bg: var(--vscode-textCodeBlock-background);
-  --yomu-table-head-bg: color-mix(in srgb, var(--vscode-editor-foreground) 6%, transparent);
-}
-
-/* ハイコントラストでは、テーマの色をそのまま使う */
-body.vscode-high-contrast,
-body.vscode-high-contrast-light {
-  --yomu-fg: var(--vscode-editor-foreground);
-  --yomu-muted: var(--vscode-editor-foreground);
-  --yomu-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
-  --yomu-table-head-bg: transparent;
-}
 
 body {
-  color: var(--yomu-fg);
-  background: var(--yomu-bg);
-}
+  --yomu-bg: #ffffff;
+  --yomu-fg: #1a1a1a;
+  --yomu-link: #2c6fad;
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-th {
-  color: var(--vscode-editor-foreground);
-}
+  --yomu-h1: #1a3550;
+  --yomu-h1-border: #2c5f8a;
+  --yomu-h2: #1e4a7a;
+  --yomu-h2-border: #5b9bd5;
+  --yomu-h3: #2c5f8a;
+  --yomu-h3-border: #b0c8e0;
+  --yomu-h4: #3a6f9a;
+  --yomu-h5: #555555;
 
-/*
- * シンタックスハイライト（highlight.js のクラス）。
- * VS Code はトークンの色を CSS 変数で公開していないので、ライトとダークで色を持つ。
- * 色は VS Code の既定のテーマ（Light+ / Dark+）に寄せる。
- */
-body.vscode-light,
-body.vscode-high-contrast-light {
+  --yomu-th: #1a3550;
+  --yomu-th-border: #2c5f8a;
+  --yomu-td-border: #d4dce5;
+  --yomu-row-hover: #f0f6fc;
+
+  --yomu-pre-bg: #f5f7fa;
+  --yomu-pre-border: #dce3ea;
+  --yomu-code-bg: #eef2f6;
+  --yomu-code-fg: #c7254e;
+
+  --yomu-quote-border: #5b9bd5;
+  --yomu-quote-bg: #f0f6fc;
+  --yomu-quote-fg: #445566;
+
+  --yomu-hr: #cdd8e3;
+
+  /* シンタックスハイライト（highlight.js のクラス）。VS Code の Light+ に寄せる */
   --hl-keyword: #0000ff;
-  --hl-control: #af00db;
   --hl-string: #a31515;
   --hl-number: #098658;
   --hl-comment: #008000;
@@ -65,10 +46,37 @@ body.vscode-high-contrast-light {
   --hl-meta: #808080;
 }
 
-body.vscode-dark,
+/* ハイコントラストでは、テーマの色をそのまま使う */
+body.vscode-high-contrast,
+body.vscode-high-contrast-light {
+  --yomu-bg: var(--vscode-editor-background);
+  --yomu-fg: var(--vscode-editor-foreground);
+  --yomu-link: var(--vscode-textLink-foreground);
+  --yomu-h1: var(--vscode-editor-foreground);
+  --yomu-h1-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-h2: var(--vscode-editor-foreground);
+  --yomu-h2-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-h3: var(--vscode-editor-foreground);
+  --yomu-h3-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-h4: var(--vscode-editor-foreground);
+  --yomu-h5: var(--vscode-editor-foreground);
+  --yomu-th: var(--vscode-editor-foreground);
+  --yomu-th-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-td-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-row-hover: transparent;
+  --yomu-pre-bg: transparent;
+  --yomu-pre-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-code-bg: transparent;
+  --yomu-code-fg: var(--vscode-textPreformat-foreground, var(--vscode-editor-foreground));
+  --yomu-quote-border: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+  --yomu-quote-bg: transparent;
+  --yomu-quote-fg: var(--vscode-editor-foreground);
+  --yomu-hr: var(--vscode-contrastBorder, var(--vscode-editor-foreground));
+}
+
+/* ハイコントラストの暗い背景では、ハイライトを Dark+ の色にする */
 body.vscode-high-contrast {
   --hl-keyword: #569cd6;
-  --hl-control: #c586c0;
   --hl-string: #ce9178;
   --hl-number: #b5cea8;
   --hl-comment: #6a9955;
