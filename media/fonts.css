@@ -21,6 +21,26 @@
   src: url('../fonts/BIZUDPGothic-Bold.woff2') format('woff2');
 }
 
+/*
+ * BIZ UDPMincho（モリサワ）。読みやすさを重視した UD 書体の明朝体。Regular と Bold。
+ * 既定の本文には使わない。yomu.font.family に 'BIZ UDPMincho' と書けば使える
+ */
+@font-face {
+  font-family: 'BIZ UDPMincho';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/BIZUDPMincho-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'BIZ UDPMincho';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/BIZUDPMincho-Bold.woff2') format('woff2');
+}
+
 /* Noto Sans JP（Google）。可変フォントで、太さ 100〜900 を 1 ファイルで持つ */
 @font-face {
   font-family: 'Noto Sans JP';

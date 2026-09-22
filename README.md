@@ -12,7 +12,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 ## Features
 
 - **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the book icon in the editor title bar, the Command Palette, or "Reopen Editor With...".
-- **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Two Japanese fonts are bundled, so the text looks the same on every OS.
+- **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Japanese gothic and mincho fonts are bundled, so the text looks the same on every OS.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, Mermaid diagrams, heading anchors, local and remote images. Raw HTML is disabled.
 - **Themes**: `paper` (white page), `sepia`, `dark`, Solarized, GitHub, Nord, Catppuccin, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
 - **Outline**: click the Yomu (book) icon in the activity bar to see the headings of the document you are reading. Click to jump; the current heading follows your scrolling.
@@ -68,15 +68,22 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 
 ### Bundled fonts
 
-Two Japanese fonts ship with the extension, under the SIL Open Font License. Use their names in `yomu.font.family`:
+Three Japanese fonts ship with the extension, under the SIL Open Font License. Use their names in `yomu.font.family`:
 
 - `BIZ UDPGothic` (Morisawa): a universal-design gothic made for legibility. Regular and Bold.
 - `Noto Sans JP` (Google): a variable font with weights 100 to 900.
+- `BIZ UDPMincho` (Morisawa): a universal-design mincho (serif) for book-like reading. Regular and Bold. Not used by default.
 
 The default puts Latin fonts first and `Noto Sans JP` after them. To use a bundled font for everything, put it first:
 
 ```json
 "yomu.font.family": "'BIZ UDPGothic', sans-serif"
+```
+
+To read in mincho:
+
+```json
+"yomu.font.family": "Georgia, 'BIZ UDPMincho', serif"
 ```
 
 ### Custom CSS

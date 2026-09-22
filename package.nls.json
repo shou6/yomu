@@ -10,7 +10,7 @@
   "config.layout.maxWidth": "Maximum width of the text in pixels. 0 means no limit.",
   "config.layout.align": "Where to place the text when the window is wider than the maximum width.",
   "config.layout.padding": "Horizontal padding around the text in pixels.",
-  "config.font.family": "Font family for the text, in CSS font-family syntax. Put Latin fonts first and Japanese fonts after them so each script uses its own font. Bundled Japanese fonts: \"Noto Sans JP\" and \"BIZ UDPGothic\".",
+  "config.font.family": "Font family for the text, in CSS font-family syntax. Put Latin fonts first and Japanese fonts after them so each script uses its own font. Bundled Japanese fonts: \"Noto Sans JP\" and \"BIZ UDPGothic\" (gothic), and \"BIZ UDPMincho\" (mincho, serif).",
   "config.font.codeFamily": "Font family for code. Leave empty to use a Japanese monospace font whose Latin and Japanese widths are exactly 1:2 (BIZ UDGothic, Osaka-Mono, Noto Sans Mono CJK JP), with box-drawing characters narrowed to half width, so text diagrams line up even when they contain Japanese.",
   "config.font.size": "Font size of the text in pixels.",
   "config.font.lineHeight": "Line height of the text, as a multiple of the font size.",
