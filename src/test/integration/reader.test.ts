@@ -5,7 +5,9 @@ import * as vscode from 'vscode';
 
 interface Manifest {
   contributes: {
-    views: { explorer: { id: string; name: string; when?: string }[] };
+    viewsContainers: { activitybar: { id: string; title: string; icon: string }[] };
+    views: Record<string, { id: string; name: string; when?: string }[]>;
+    viewsWelcome?: { view: string; contents: string; when?: string }[];
     commands: { command: string; icon?: string | { light: string; dark: string } }[];
     menus: { 'editor/title': { command: string; when: string; group?: string }[] };
     configuration: { properties: Record<string, { default?: unknown }> };
@@ -355,13 +357,20 @@ suite('Reader', () => {
     assert.deepStrictEqual(missing, [], 'VS Code に無いアイコン');
   });
 
-  test('エクスプローラーに目次のビューがあり、リーダーがアクティブな時だけ出す', () => {
+  test('アクティビティバーに Yomu の入口があり、その中に目次のビューがある', () => {
     const manifest = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
     ) as Manifest;
-    const view = manifest.contributes.views.explorer.find((v) => v.id === 'yomu.outline');
+    const container = manifest.contributes.viewsContainers.activitybar.find((c) => c.id === 'yomu');
+    assert.ok(container, 'アクティビティバーに yomu が無い');
+    assert.ok(fs.existsSync(path.join(ROOT, container.icon)), container.icon + ' が無い');
+    // エクスプローラーには置かない（他の拡張機能のビューと混ざって窮屈になるため）
+    assert.strictEqual(manifest.contributes.views.explorer, undefined);
+    const view = manifest.contributes.views.yomu?.find((v) => v.id === 'yomu.outline');
     assert.ok(view, 'yomu.outline が無い');
-    assert.strictEqual(view.when, 'yomu.readerActive');
+    // リーダーを開いていない時は、見出しの代わりに案内を出す
+    const welcome = manifest.contributes.viewsWelcome?.find((w) => w.view === 'yomu.outline');
+    assert.ok(welcome, 'yomu.outline の案内が無い');
   });
 
   test('リーダーで開くと、目次にその文書の見出しが出る', async () => {
@@ -385,25 +394,32 @@ suite('Reader', () => {
     await received;
   });
 
-  test('目次のビューは、既定で開いた状態にする設定がある', () => {
+  test('リーダーを開いた時に目次を開いて見せる設定があり、既定はオフ', () => {
+    // 専用のビューなので、開くたびにファイル一覧から勝手に切り替わると煩わしい
     const manifest = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
     ) as Manifest;
     const property = manifest.contributes.configuration.properties['yomu.outline.revealOnOpen'];
-    assert.strictEqual(property?.default, true);
+    assert.strictEqual(property?.default, false);
   });
 
-  test('リーダーを開くと、目次のビューが開いて見える', async () => {
+  test('設定をオンにすると、リーダーを開いた時に目次のビューが開いて見える', async () => {
     const yomu = await api();
-    await vscode.commands.executeCommand('workbench.action.closeSidebar');
-    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
-    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
-    await opened;
-    for (let i = 0; i < 50 && !yomu.outlineVisible(); i++) {
-      await new Promise((resolve) => setTimeout(resolve, 100));
+    const config = vscode.workspace.getConfiguration('yomu');
+    await config.update('outline.revealOnOpen', true, vscode.ConfigurationTarget.Global);
+    try {
+      await vscode.commands.executeCommand('workbench.action.closeSidebar');
+      const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+      await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+      await opened;
+      for (let i = 0; i < 50 && !yomu.outlineVisible(); i++) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+      assert.strictEqual(yomu.outlineVisible(), true);
+      // 操作先はリーダーのまま
+      assert.strictEqual(activeCustomViewType(), VIEW_TYPE);
+    } finally {
+      await config.update('outline.revealOnOpen', undefined, vscode.ConfigurationTarget.Global);
     }
-    assert.strictEqual(yomu.outlineVisible(), true);
-    // 操作先はリーダーのまま
-    assert.strictEqual(activeCustomViewType(), VIEW_TYPE);
   });
 });
