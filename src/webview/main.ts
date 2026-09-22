@@ -8,6 +8,7 @@ import { mermaidTheme } from '../reader/mermaidTheme';
 import type { Theme } from '../reader/readerSettings';
 import { renderMermaid, resetMermaid } from './mermaid';
 import { openZoom, zoomTarget } from './zoom';
+import { setFocusMode, updateFocus, watchFocus } from './focus';
 
 interface ReaderState {
   scrollY: number;
@@ -83,6 +84,7 @@ function applyUpdate(html: string): void {
   }
   saveScroll();
   drawMermaid();
+  updateFocus(content);
 }
 
 /** カスタム CSS。テーマの後（head の末尾）に <link> を置き、どのスタイルも上書きできるようにする */
@@ -113,6 +115,7 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
   applyCustomCss(message.customCssUri);
   // 図の配色の描き直しは、data-theme の変化を見ている MutationObserver が行う
   theme = message.theme;
+  setFocusMode(content, message.focusMode);
 }
 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
@@ -125,6 +128,7 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
 });
 
 window.addEventListener('scroll', saveScroll, { passive: true });
+watchFocus(content);
 
 // VS Code のカラーテーマを変えると body のクラスが変わる。vscode テーマの時は図の配色が変わるので描き直す
 let lastMermaidTheme = currentMermaidTheme();

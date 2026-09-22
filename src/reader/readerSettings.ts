@@ -25,6 +25,8 @@ export interface ReaderSettings {
   lineHeight: number;
   /** カスタム CSS のパス。空なら無し */
   customCss: string;
+  /** 集中モード。読んでいるブロック以外を薄く表示する */
+  focusMode: boolean;
 }
 
 /** 設定から読んだままの値。型は信用しない */
@@ -44,6 +46,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   fontSize: 16,
   lineHeight: 1.8,
   customCss: '',
+  focusMode: false,
 };
 
 /**
@@ -88,6 +91,7 @@ export function normalizeSettings(raw: RawSettings): ReaderSettings {
     fontSize: numberIn(raw.fontSize, 8, 72, DEFAULT_SETTINGS.fontSize),
     lineHeight: numberIn(raw.lineHeight, 1, 3, DEFAULT_SETTINGS.lineHeight),
     customCss: typeof raw.customCss === 'string' ? raw.customCss.trim() : '',
+    focusMode: raw.focusMode === true,
   };
 }
 

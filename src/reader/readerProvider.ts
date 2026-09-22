@@ -168,6 +168,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       fontSize: config.get('font.size'),
       lineHeight: config.get('font.lineHeight'),
       customCss: config.get('customCss'),
+      focusMode: config.get('focusMode'),
     };
     return normalizeSettings(raw);
   }
@@ -179,6 +180,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       type: 'settings',
       theme: settings.theme,
       cssVariables: cssVariables(settings),
+      focusMode: settings.focusMode,
       ...(customCss === undefined ? {} : { customCssUri: customCss }),
     });
   }

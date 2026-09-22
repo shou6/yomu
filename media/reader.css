@@ -368,3 +368,22 @@ img {
 .yomu-zoom-close:hover {
   opacity: 1;
 }
+
+/*
+ * 集中モード。読んでいるブロック以外を薄く表示する。
+ * リストは項目ごとに薄くするので、リストそのものは薄くしない
+ */
+.yomu-focus-mode #content > *,
+.yomu-focus-mode #content > ul > li,
+.yomu-focus-mode #content > ol > li {
+  opacity: 0.28;
+  transition: opacity 0.25s ease;
+}
+
+.yomu-focus-mode #content > ul,
+.yomu-focus-mode #content > ol,
+.yomu-focus-mode #content > .yomu-focused,
+.yomu-focus-mode #content > ul > li.yomu-focused,
+.yomu-focus-mode #content > ol > li.yomu-focused {
+  opacity: 1;
+}

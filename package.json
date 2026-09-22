@@ -71,6 +71,11 @@
           "light": "resources/reader-light.svg",
           "dark": "resources/reader-dark.svg"
         }
+      },
+      {
+        "command": "yomu.toggleFocusMode",
+        "title": "%command.toggleFocusMode%",
+        "category": "Yomu"
       }
     ],
     "menus": {
@@ -154,6 +159,11 @@
           "type": "string",
           "default": "",
           "description": "%config.customCss%"
+        },
+        "yomu.focusMode": {
+          "type": "boolean",
+          "default": false,
+          "description": "%config.focusMode%"
         }
       }
     }

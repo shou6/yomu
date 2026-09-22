@@ -14,5 +14,7 @@
   "config.font.codeFamily": "Font family for code. Leave empty to use a Japanese monospace font whose Latin and Japanese widths are exactly 1:2 (BIZ UDGothic, Osaka-Mono, Noto Sans Mono CJK JP), with box-drawing characters narrowed to half width, so text diagrams line up even when they contain Japanese.",
   "config.font.size": "Font size of the text in pixels.",
   "config.font.lineHeight": "Line height of the text, as a multiple of the font size.",
-  "config.customCss": "Path to a CSS file loaded after the theme. Absolute, or starting with ${workspaceFolder}. Override any --yomu-* variable or rule."
+  "config.customCss": "Path to a CSS file loaded after the theme. Absolute, or starting with ${workspaceFolder}. Override any --yomu-* variable or rule.",
+  "command.toggleFocusMode": "Toggle Focus Mode",
+  "config.focusMode": "Focus mode: dim everything except the block you are reading (about 40% down the screen). Toggle it with \"Yomu: Toggle Focus Mode\"."
 }

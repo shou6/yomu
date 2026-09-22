@@ -33,6 +33,17 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
       }
     })
   );
+  context.subscriptions.push(
+    // 集中モードはユーザー設定で持つ。コマンドはその値を反転するだけ
+    vscode.commands.registerCommand('yomu.toggleFocusMode', async () => {
+      const config = vscode.workspace.getConfiguration('yomu');
+      await config.update(
+        'focusMode',
+        config.get<boolean>('focusMode') !== true,
+        vscode.ConfigurationTarget.Global
+      );
+    })
+  );
   return { onDidPostMessage: provider.onDidPostMessage };
 }
 

@@ -7,7 +7,14 @@ export type ToWebview =
   /** 本文の差し替え */
   | { type: 'update'; html: string }
   /** 設定の反映。CSS 変数とテーマ名。カスタム CSS があればその Webview URI */
-  | { type: 'settings'; theme: Theme; cssVariables: Record<string, string>; customCssUri?: string };
+  | {
+      type: 'settings';
+      theme: Theme;
+      cssVariables: Record<string, string>;
+      customCssUri?: string;
+      /** 集中モード */
+      focusMode: boolean;
+    };
 
 /** Webview → 拡張機能 */
 export type FromWebview =
