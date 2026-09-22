@@ -145,6 +145,29 @@ suite('Marketplace 公開の準備', () => {
 /** vsce が SVG でも受け付ける GitHub Actions のバッジの URL */
 const GITHUB_BADGE = /^https:\/\/github\.com\/[^/]+\/[^/]+\/(actions\/)?workflows\/.*badge\.svg/;
 
+suite('ビュー', () => {
+  test('どのビューにもアイコンがあり、そのファイルは公開パッケージに入る', () => {
+    // アイコンは、ビューをアクティビティバーやパネルへ単独で移した時に使われる。無いと package.json の検査で警告になる
+    const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as {
+      contributes: { views: Record<string, { id: string; icon?: string }[]> };
+    };
+    const views = Object.values(pkg.contributes.views).flat();
+    assert.ok(views.length > 0);
+    for (const view of views) {
+      assert.ok(view.icon, view.id + ' に icon が無い');
+      assert.ok(
+        fs.existsSync(path.join(ROOT, view.icon)),
+        view.id + ' の icon が無い: ' + view.icon
+      );
+      assert.match(
+        view.icon,
+        /^resources\//,
+        view.id + ' の icon が公開パッケージの外: ' + view.icon
+      );
+    }
+  });
+});
+
 suite('Dependabot', () => {
   const read = (): string => fs.readFileSync(path.join(ROOT, '.github/dependabot.yml'), 'utf8');
 
