@@ -7,12 +7,10 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  /* 欧文フォントを先に並べ、欧文フォントに無い和文は後ろの和文フォントで描く（和欧の出し分け） */
-  font-family:
-    'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Yu Gothic UI', Meiryo, 'Hiragino Sans',
-    'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
-  font-size: 15px;
-  line-height: 1.8;
+  /* 値は設定（yomu.*）から CSS 変数で受ける。既定値は readerSettings.ts と合わせる */
+  font-family: var(--yomu-font-family, sans-serif);
+  font-size: var(--yomu-font-size, 15px);
+  line-height: var(--yomu-line-height, 1.8);
   color: var(--yomu-fg);
   background: var(--yomu-bg);
   cursor: default;
@@ -24,9 +22,9 @@ body {
 
 #content {
   box-sizing: border-box;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2em;
+  max-width: var(--yomu-max-width, 960px);
+  margin: 0 var(--yomu-margin-right, auto) 0 var(--yomu-margin-left, auto);
+  padding: 2em var(--yomu-padding, 32px);
 }
 
 #content > :first-child {
@@ -142,7 +140,7 @@ code {
   padding: 0.15em 0.4em;
   border-radius: 4px;
   font-size: 0.88em;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Consolas, monospace;
+  font-family: var(--yomu-code-font-family, monospace);
   color: var(--yomu-code-fg);
 }
 
@@ -166,7 +164,7 @@ pre code {
   padding: 0;
   font-size: 1em;
   color: inherit;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Source Code Pro', Consolas, monospace;
+  font-family: var(--yomu-code-font-family, monospace);
 }
 
 /* 引用 */

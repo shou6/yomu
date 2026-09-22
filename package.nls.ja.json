@@ -1,5 +1,18 @@
 {
   "description": "Markdown を専用のリーダータブで読む拡張機能。行長の固定、和欧フォントの出し分け、日本語向けの行間、約物のアキ詰めで日本語の組版を整える。",
   "customEditor.displayName": "Yomu Reader",
-  "command.openInReader": "リーダーで開く"
+  "command.openInReader": "リーダーで開く",
+  "config.theme": "リーダーの配色。VS Code のハイコントラストテーマの時は常に VS Code の色を使います。",
+  "config.theme.paper": "白地の紙（既定）。",
+  "config.theme.sepia": "目に優しい淡い黄褐色の紙。",
+  "config.theme.dark": "暗い背景に明るい文字。",
+  "config.theme.vscode": "現在の VS Code のカラーテーマの色に従う。",
+  "config.layout.maxWidth": "本文の最大幅（px）。0 で制限なし。",
+  "config.layout.align": "ウィンドウが最大幅より広い時の、本文の位置。",
+  "config.layout.padding": "本文の左右の余白（px）。",
+  "config.font.family": "本文のフォント。CSS の font-family と同じ書式。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます。",
+  "config.font.codeFamily": "コードのフォント。空ならエディタのフォント（editor.fontFamily）を使います。",
+  "config.font.size": "本文の文字の大きさ（px）。",
+  "config.font.lineHeight": "本文の行間。文字の大きさに対する倍率。",
+  "config.customCss": "テーマの後に読み込む CSS ファイルのパス。絶対パスか、${workspaceFolder} から始まるパス。--yomu-* の変数やどの規則でも上書きできます。"
 }

@@ -1,5 +1,18 @@
 {
   "description": "Read Markdown in a dedicated reader tab with Japanese typography: fixed line length, Japanese and Latin font pairing, comfortable line height, and punctuation spacing.",
   "customEditor.displayName": "Yomu Reader",
-  "command.openInReader": "Open in Reader"
+  "command.openInReader": "Open in Reader",
+  "config.theme": "Color theme of the reader. High-contrast VS Code themes always use the VS Code colors.",
+  "config.theme.paper": "White page (default).",
+  "config.theme.sepia": "Warm, low-glare page.",
+  "config.theme.dark": "Dark background with light text.",
+  "config.theme.vscode": "Follow the colors of the current VS Code theme.",
+  "config.layout.maxWidth": "Maximum width of the text in pixels. 0 means no limit.",
+  "config.layout.align": "Where to place the text when the window is wider than the maximum width.",
+  "config.layout.padding": "Horizontal padding around the text in pixels.",
+  "config.font.family": "Font family for the text, in CSS font-family syntax. Put Latin fonts first and Japanese fonts after them so each script uses its own font.",
+  "config.font.codeFamily": "Font family for code. Leave empty to use the editor font (editor.fontFamily).",
+  "config.font.size": "Font size of the text in pixels.",
+  "config.font.lineHeight": "Line height of the text, as a multiple of the font size.",
+  "config.customCss": "Path to a CSS file loaded after the theme. Absolute, or starting with ${workspaceFolder}. Override any --yomu-* variable or rule."
 }

@@ -70,6 +70,81 @@
           "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Yomu",
+      "properties": {
+        "yomu.theme": {
+          "type": "string",
+          "enum": [
+            "paper",
+            "sepia",
+            "dark",
+            "vscode"
+          ],
+          "enumDescriptions": [
+            "%config.theme.paper%",
+            "%config.theme.sepia%",
+            "%config.theme.dark%",
+            "%config.theme.vscode%"
+          ],
+          "default": "paper",
+          "description": "%config.theme%"
+        },
+        "yomu.layout.maxWidth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10000,
+          "default": 960,
+          "description": "%config.layout.maxWidth%"
+        },
+        "yomu.layout.align": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "center",
+          "description": "%config.layout.align%"
+        },
+        "yomu.layout.padding": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1000,
+          "default": 32,
+          "description": "%config.layout.padding%"
+        },
+        "yomu.font.family": {
+          "type": "string",
+          "default": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Yu Gothic UI', Meiryo, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif",
+          "description": "%config.font.family%"
+        },
+        "yomu.font.codeFamily": {
+          "type": "string",
+          "default": "",
+          "description": "%config.font.codeFamily%"
+        },
+        "yomu.font.size": {
+          "type": "number",
+          "minimum": 8,
+          "maximum": 72,
+          "default": 15,
+          "description": "%config.font.size%"
+        },
+        "yomu.font.lineHeight": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 3,
+          "default": 1.8,
+          "description": "%config.font.lineHeight%"
+        },
+        "yomu.customCss": {
+          "type": "string",
+          "default": "",
+          "description": "%config.customCss%"
+        }
+      }
     }
   },
   "scripts": {

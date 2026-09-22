@@ -1,12 +1,18 @@
 /**
  * リーダータブの Custom Text Editor Provider（vscode 依存。統合テストで検証する）。
- * 変換と HTML の組み立ては純粋関数（render、webviewHtml、resourceRoots）に任せ、
+ * 変換、HTML の組み立て、設定の変換は純粋関数（render、webviewHtml、resourceRoots、readerSettings）に任せ、
  * ここでは VS Code とのやり取りだけを持つ。
  */
 import * as crypto from 'crypto';
 import * as vscode from 'vscode';
 import { classifyLink } from './links';
 import type { FromWebview, ToWebview } from './messages';
+import {
+  cssVariables,
+  normalizeSettings,
+  type RawSettings,
+  type ReaderSettings,
+} from './readerSettings';
 import { render } from './render';
 import { resourceRoots } from './resourceRoots';
 import { webviewHtml } from './webviewHtml';
@@ -14,19 +20,35 @@ import { webviewHtml } from './webviewHtml';
 /** 編集の追従のデバウンス（ms） */
 const UPDATE_DELAY = 200;
 
+/** 設定の接頭辞 */
+const CONFIG_SECTION = 'yomu';
+
 export class ReaderProvider implements vscode.CustomTextEditorProvider {
   static readonly viewType = 'yomu.reader';
 
-  static register(context: vscode.ExtensionContext): vscode.Disposable {
-    return vscode.window.registerCustomEditorProvider(
-      ReaderProvider.viewType,
-      new ReaderProvider(context.extensionUri),
-      {
+  /** 開いているリーダータブ。設定の変更をすべてに配るために持つ */
+  private readonly panels = new Set<vscode.WebviewPanel>();
+
+  private readonly postMessageEmitter = new vscode.EventEmitter<ToWebview>();
+  /** Webview へ送ったメッセージ。統合テストが観測するために公開する */
+  readonly onDidPostMessage: vscode.Event<ToWebview> = this.postMessageEmitter.event;
+
+  static register(context: vscode.ExtensionContext): ReaderProvider {
+    const provider = new ReaderProvider(context.extensionUri);
+    context.subscriptions.push(
+      vscode.window.registerCustomEditorProvider(ReaderProvider.viewType, provider, {
         // VS Code 標準の検索ウィジェット（Ctrl+F）を Webview の中で使えるようにする
         webviewOptions: { enableFindWidget: true, retainContextWhenHidden: false },
         supportsMultipleEditorsPerDocument: true,
-      }
+      }),
+      vscode.workspace.onDidChangeConfiguration((event) => {
+        if (event.affectsConfiguration(CONFIG_SECTION)) {
+          provider.broadcastSettings();
+        }
+      }),
+      provider.postMessageEmitter
     );
+    return provider;
   }
 
   constructor(private readonly extensionUri: vscode.Uri) {}
@@ -61,11 +83,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     const resolveImageSrc = (src: string): string =>
       webview.asWebviewUri(vscode.Uri.joinPath(documentDir, decodePath(src))).toString();
     const update = (): void => {
-      const message: ToWebview = {
-        type: 'update',
-        html: render(document.getText(), { resolveImageSrc }),
-      };
-      void webview.postMessage(message);
+      this.post(panel, { type: 'update', html: render(document.getText(), { resolveImageSrc }) });
     };
 
     let timer: NodeJS.Timeout | undefined;
@@ -81,13 +99,55 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         void openLink(message.href, documentDir);
       }
     });
+    this.panels.add(panel);
     panel.onDidDispose(() => {
       clearTimeout(timer);
       changeSubscription.dispose();
       messageSubscription.dispose();
+      this.panels.delete(panel);
     });
 
+    // 本文より先に見た目を決めておく。本文が出た後に幅やフォントが変わって見えるのを避ける
+    this.sendSettings(panel);
     update();
+  }
+
+  /** 設定を読み、検査して返す */
+  readSettings(): ReaderSettings {
+    const config = vscode.workspace.getConfiguration(CONFIG_SECTION);
+    const raw: RawSettings = {
+      theme: config.get('theme'),
+      maxWidth: config.get('layout.maxWidth'),
+      align: config.get('layout.align'),
+      padding: config.get('layout.padding'),
+      fontFamily: config.get('font.family'),
+      codeFontFamily: config.get('font.codeFamily'),
+      fontSize: config.get('font.size'),
+      lineHeight: config.get('font.lineHeight'),
+      customCss: config.get('customCss'),
+    };
+    return normalizeSettings(raw);
+  }
+
+  private sendSettings(panel: vscode.WebviewPanel): void {
+    const settings = this.readSettings();
+    this.post(panel, {
+      type: 'settings',
+      theme: settings.theme,
+      cssVariables: cssVariables(settings),
+    });
+  }
+
+  /** 設定が変わった時に、開いているすべてのリーダータブへ配る */
+  private broadcastSettings(): void {
+    for (const panel of this.panels) {
+      this.sendSettings(panel);
+    }
+  }
+
+  private post(panel: vscode.WebviewPanel, message: ToWebview): void {
+    void panel.webview.postMessage(message);
+    this.postMessageEmitter.fire(message);
   }
 
   /** ワークスペースフォルダと、ワークスペース外ならドキュメントのフォルダ */

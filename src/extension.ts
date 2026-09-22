@@ -1,11 +1,17 @@
 import * as vscode from 'vscode';
+import type { ToWebview } from './reader/messages';
 import { decideOpenInReader } from './reader/openInReader';
 import { ReaderProvider } from './reader/readerProvider';
 
+/** activate が返す API。統合テストが Webview へのメッセージを観測するために使う */
+export interface YomuApi {
+  onDidPostMessage: vscode.Event<ToWebview>;
+}
+
 /** エントリポイント。登録だけを行い、ロジックは各モジュールに置く */
-export function activate(context: vscode.ExtensionContext): void {
+export function activate(context: vscode.ExtensionContext): YomuApi {
+  const provider = ReaderProvider.register(context);
   context.subscriptions.push(
-    ReaderProvider.register(context),
     // タイトルバーのアイコンやエクスプローラーからは URI が渡る。コマンドパレットからは渡らない
     vscode.commands.registerCommand('yomu.openInReader', async (uri?: vscode.Uri) => {
       const active = vscode.window.activeTextEditor?.document;
@@ -27,6 +33,7 @@ export function activate(context: vscode.ExtensionContext): void {
       }
     })
   );
+  return { onDidPostMessage: provider.onDidPostMessage };
 }
 
 export function deactivate(): void {}
