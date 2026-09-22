@@ -7,7 +7,40 @@ interface Manifest {
   contributes: {
     commands: { command: string; icon?: string }[];
     menus: { 'editor/title': { command: string; when: string; group?: string }[] };
+    configuration: { properties: Record<string, { default?: unknown }> };
   };
+}
+
+/** activate が返す API（テスト用の観測点） */
+interface YomuApi {
+  onDidPostMessage: vscode.Event<{ type: string; [key: string]: unknown }>;
+}
+
+async function api(): Promise<YomuApi> {
+  const extension = vscode.extensions.getExtension('shou6.yomu');
+  assert.ok(extension);
+  return (await extension.activate()) as YomuApi;
+}
+
+/** 条件を満たすメッセージが来るまで待つ */
+function waitForMessage(
+  event: vscode.Event<{ type: string; [key: string]: unknown }>,
+  predicate: (message: { type: string; [key: string]: unknown }) => boolean,
+  timeoutMs = 5000
+): Promise<{ type: string; [key: string]: unknown }> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      subscription.dispose();
+      reject(new Error('メッセージが来ない'));
+    }, timeoutMs);
+    const subscription = event((message) => {
+      if (predicate(message)) {
+        clearTimeout(timer);
+        subscription.dispose();
+        resolve(message);
+      }
+    });
+  });
 }
 
 // out/test/integration から見たプロジェクトルート
@@ -88,5 +121,54 @@ suite('Reader', () => {
     assert.ok(
       vscode.window.tabGroups.activeTabGroup.activeTab?.input instanceof vscode.TabInputText
     );
+  });
+
+  test('package.json に yomu.* の設定がすべて定義されている', () => {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    const keys = Object.keys(manifest.contributes.configuration.properties);
+    assert.deepStrictEqual(keys.sort(), [
+      'yomu.customCss',
+      'yomu.font.codeFamily',
+      'yomu.font.family',
+      'yomu.font.lineHeight',
+      'yomu.font.size',
+      'yomu.layout.align',
+      'yomu.layout.maxWidth',
+      'yomu.layout.padding',
+      'yomu.theme',
+    ]);
+  });
+
+  test('リーダータブを開くと、本文より先に settings が送られる', async () => {
+    const { onDidPostMessage } = await api();
+    const types: string[] = [];
+    const subscription = onDidPostMessage((message) => types.push(message.type));
+    try {
+      await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+      assert.deepStrictEqual(types.slice(0, 2), ['settings', 'update']);
+    } finally {
+      subscription.dispose();
+    }
+  });
+
+  test('yomu の設定を変えると、開いているリーダータブに settings が再送される', async () => {
+    const { onDidPostMessage } = await api();
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    const config = vscode.workspace.getConfiguration('yomu');
+    try {
+      const received = waitForMessage(
+        onDidPostMessage,
+        (m) =>
+          m.type === 'settings' &&
+          (m.cssVariables as Record<string, string>)['--yomu-font-size'] === '17px'
+      );
+      await config.update('font.size', 17, vscode.ConfigurationTarget.Global);
+      const message = await received;
+      assert.strictEqual(message.theme, 'paper');
+    } finally {
+      await config.update('font.size', undefined, vscode.ConfigurationTarget.Global);
+    }
   });
 });
