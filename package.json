@@ -82,6 +82,24 @@
         "title": "%command.openInBrowser%",
         "category": "Yomu",
         "icon": "$(print)"
+      },
+      {
+        "command": "yomu.enableFocusMode",
+        "title": "%command.enableFocusMode%",
+        "category": "Yomu",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "yomu.disableFocusMode",
+        "title": "%command.disableFocusMode%",
+        "category": "Yomu",
+        "icon": "$(eye-closed)"
+      },
+      {
+        "command": "yomu.openInTextEditor",
+        "title": "%command.openInTextEditor%",
+        "category": "Yomu",
+        "icon": "$(go-to-file)"
       }
     ],
     "menus": {
@@ -92,9 +110,42 @@
           "group": "navigation"
         },
         {
+          "command": "yomu.enableFocusMode",
+          "when": "activeCustomEditorId == yomu.reader && !config.yomu.focusMode",
+          "group": "navigation"
+        },
+        {
+          "command": "yomu.disableFocusMode",
+          "when": "activeCustomEditorId == yomu.reader && config.yomu.focusMode",
+          "group": "navigation"
+        },
+        {
           "command": "yomu.openInBrowser",
           "when": "activeCustomEditorId == yomu.reader",
-          "group": "1_yomu"
+          "group": "navigation"
+        },
+        {
+          "command": "yomu.openInTextEditor",
+          "when": "activeCustomEditorId == yomu.reader",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "yomu.enableFocusMode",
+          "when": "!config.yomu.focusMode"
+        },
+        {
+          "command": "yomu.disableFocusMode",
+          "when": "config.yomu.focusMode"
+        },
+        {
+          "command": "yomu.openInBrowser",
+          "when": "activeCustomEditorId == yomu.reader"
+        },
+        {
+          "command": "yomu.openInTextEditor",
+          "when": "activeCustomEditorId == yomu.reader"
         }
       ]
     },

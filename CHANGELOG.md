@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Focus mode: dims everything except the blocks you are reading (between 30% and 55% down the screen). Turn it on with `yomu.focusMode` or the command "Yomu: Toggle Focus Mode".
 - Long code blocks fold: blocks longer than `yomu.code.foldLines` (20 by default, 0 to disable) show that many lines with a "Show all N lines" button.
 - Print and PDF: "Yomu: Open in Browser to Print" (also in the reader tab's ... menu) opens the document in your browser with print styles and the print dialog. Save it as PDF from there. VS Code webviews cannot print, so Yomu hands the page to the browser.
+- Reader tab title bar buttons: focus mode on/off (the icon shows the current state), print, and open in the text editor.
 
 ### Fixed
 

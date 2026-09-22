@@ -35,15 +35,24 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
       }
     })
   );
+  // 集中モードはユーザー設定で持つ。コマンドはその値を書き換えるだけ
+  const setFocusMode = (on: boolean): Thenable<void> =>
+    vscode.workspace
+      .getConfiguration('yomu')
+      .update('focusMode', on, vscode.ConfigurationTarget.Global);
   context.subscriptions.push(
-    // 集中モードはユーザー設定で持つ。コマンドはその値を反転するだけ
-    vscode.commands.registerCommand('yomu.toggleFocusMode', async () => {
-      const config = vscode.workspace.getConfiguration('yomu');
-      await config.update(
-        'focusMode',
-        config.get<boolean>('focusMode') !== true,
-        vscode.ConfigurationTarget.Global
-      );
+    vscode.commands.registerCommand('yomu.toggleFocusMode', () =>
+      setFocusMode(vscode.workspace.getConfiguration('yomu').get<boolean>('focusMode') !== true)
+    ),
+    // リーダータブの右上のボタン。オンとオフで別のアイコンを出すため、コマンドを分ける
+    vscode.commands.registerCommand('yomu.enableFocusMode', () => setFocusMode(true)),
+    vscode.commands.registerCommand('yomu.disableFocusMode', () => setFocusMode(false)),
+    // リーダーから編集に戻る。タイトルバーのボタンからは、そのタブの URI が渡る
+    vscode.commands.registerCommand('yomu.openInTextEditor', async (uri?: vscode.Uri) => {
+      const target = uri instanceof vscode.Uri ? uri : provider.activeDocumentUri();
+      if (target !== undefined) {
+        await vscode.commands.executeCommand('vscode.openWith', target, 'default');
+      }
     })
   );
   context.subscriptions.push(

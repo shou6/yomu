@@ -176,6 +176,11 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     });
   }
 
+  /** アクティブなリーダーの文書の URI。リーダーがアクティブでなければ undefined */
+  activeDocumentUri(): vscode.Uri | undefined {
+    return [...this.entries].find((entry) => entry.panel.active)?.document.uri;
+  }
+
   /**
    * アクティブなリーダーの本文を、印刷用の 1 つの HTML にして一時フォルダに書き出す。
    * 本文は画像をローカルのファイルの URI にして描き直し、Mermaid の図はリーダーが描いた SVG を使う。

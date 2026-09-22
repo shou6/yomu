@@ -21,12 +21,20 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 - **Zoom**: click an image or a Mermaid diagram to view it full screen. Scroll to zoom, drag to pan, double-click to fit, Esc to close.
 - **Live update**: editing and saving the file in the text editor updates the reader tab.
 
+## Title bar buttons
+
+The reader tab shows three buttons at the top right:
+
+- **Focus mode**: an eye icon turns it on, a closed eye turns it off.
+- **Print**: opens the document in your browser to print or save as PDF.
+- **Open in Text Editor**: switches back to the text editor to edit.
+
 ## Usage
 
 1. Open a `.md` file.
 2. Click the book icon in the editor title bar, or open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run **Yomu: Open in Reader**.
    You can also use **Reopen Editor With...** and choose **Yomu Reader**.
-3. To edit, use **Reopen Editor With...** and choose **Text Editor**.
+3. To edit, click **Open in Text Editor** in the title bar, or use **Reopen Editor With...** and choose **Text Editor**.
 
 ![Syntax-highlighted code blocks with language labels](images/code-block.png)
 
