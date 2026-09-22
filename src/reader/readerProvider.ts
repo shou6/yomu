@@ -15,7 +15,7 @@ import {
   type RawSettings,
   type ReaderSettings,
 } from './readerSettings';
-import { render } from './render';
+import { renderSafely } from './render';
 import { resourceRoots } from './resourceRoots';
 import { webviewHtml } from './webviewHtml';
 
@@ -114,7 +114,10 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     const resolveImageSrc = (src: string): string =>
       webview.asWebviewUri(vscode.Uri.joinPath(documentDir, decodePath(src))).toString();
     const update = (): void => {
-      this.post(panel, { type: 'update', html: render(document.getText(), { resolveImageSrc }) });
+      this.post(panel, {
+        type: 'update',
+        html: renderSafely(document.getText(), { resolveImageSrc }),
+      });
     };
 
     let timer: NodeJS.Timeout | undefined;

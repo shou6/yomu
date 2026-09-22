@@ -68,3 +68,21 @@ function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
 export function render(markdown: string, options: RenderOptions): string {
   return createMarkdownIt(options).render(markdown);
 }
+
+/**
+ * render と同じだが、変換中に例外が出ても投げず、エラーの内容を本文として返す。
+ * Webview が白紙になるのを避けるため、Provider はこちらを使う。
+ */
+export function renderSafely(markdown: string, options: RenderOptions): string {
+  try {
+    return render(markdown, options);
+  } catch (error) {
+    const message = error instanceof Error ? (error.stack ?? error.message) : String(error);
+    const escape = new MarkdownIt().utils.escapeHtml;
+    return (
+      '<div class="yomu-error"><p>Yomu could not render this document.</p><pre>' +
+      escape(message) +
+      '</pre></div>'
+    );
+  }
+}

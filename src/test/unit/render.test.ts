@@ -158,6 +158,7 @@ suite('renderSafely: 例外時の表示', () => {
 
   test('Error でないものが投げられても表示できる', () => {
     const boom = (): string => {
+      // eslint-disable-next-line no-throw-literal -- Error でないものが投げられた場合の検証
       throw 'plain string';
     };
     const out = renderSafely('![x](./a.png)\n', { resolveImageSrc: boom });

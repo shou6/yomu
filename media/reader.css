@@ -249,3 +249,21 @@ img {
   max-width: 100%;
   height: auto;
 }
+
+/* 変換に失敗した時の表示。白紙にせず、原因を読めるようにする */
+.yomu-error {
+  border: 1px solid var(--yomu-code-fg);
+  border-radius: 6px;
+  padding: 1em 1.2em;
+}
+
+.yomu-error > p {
+  margin: 0 0 0.6em;
+  font-weight: 700;
+  color: var(--yomu-code-fg);
+}
+
+.yomu-error > pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
