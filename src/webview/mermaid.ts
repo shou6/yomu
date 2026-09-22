@@ -3,16 +3,12 @@
  * render.ts が出力した .yomu-mermaid の枠を探し、mermaid.js で SVG にして差し替える。
  * mermaid.js（dist/mermaid.min.js、約 5.5MB）は枠がある時だけ読み込む。
  */
-import type { MermaidTheme } from '../reader/mermaidTheme';
+import { mermaidConfig, type MermaidConfig } from '../reader/mermaidTheme';
+import type { Theme } from '../reader/readerSettings';
 
 /** mermaid.min.js が globalThis.mermaid に置く API のうち、使うもの */
 interface MermaidApi {
-  initialize(config: {
-    startOnLoad: boolean;
-    securityLevel: 'strict';
-    theme: MermaidTheme;
-    fontFamily?: string;
-  }): void;
+  initialize(config: MermaidConfig): void;
   render(id: string, source: string): Promise<{ svg: string }>;
 }
 
@@ -25,7 +21,7 @@ declare global {
 /** 読み込みは 1 回だけ。失敗したら次の描画でやり直す */
 let loading: Promise<MermaidApi> | undefined;
 
-/** 同じソースとテーマの SVG を覚えておき、編集で本文を差し替えた時に図がちらつかないようにする */
+/** 同じソース・テーマ・幅の SVG を覚えておき、編集で本文を差し替えた時に図がちらつかないようにする */
 const cache = new Map<string, string>();
 
 let renderCount = 0;
@@ -65,7 +61,9 @@ export interface MermaidOptions {
   src: string;
   /** このスクリプト自身の nonce */
   nonce: string;
-  theme: MermaidTheme;
+  theme: Theme;
+  /** VS Code のカラーテーマが暗いか */
+  vscodeIsDark: boolean;
 }
 
 /**
@@ -76,12 +74,15 @@ export interface MermaidOptions {
 export async function renderMermaid(root: HTMLElement, options: MermaidOptions): Promise<void> {
   const blocks = [...root.querySelectorAll<HTMLElement>('.yomu-mermaid')];
   const current = ++generation;
+  // 図を置く枠の幅。ガントチャートはこの幅で描く（枠はすべて本文の幅なので、最初の 1 つで足りる）
+  const width = blocks[0]?.clientWidth ?? 0;
+  const config = mermaidConfig(options.theme, width, options.vscodeIsDark);
   const pending: { block: HTMLElement; source: string; key: string }[] = [];
   for (const block of blocks) {
     // ソースは最初の描画の前に保存しておく。テーマを変えた時の描き直しに使う
     block.dataset.source ??= block.querySelector('.yomu-mermaid-source')?.textContent ?? '';
     const source = block.dataset.source;
-    const key = options.theme + '\n' + source;
+    const key = [config.theme, width, source].join('\n');
     const svg = cache.get(key);
     if (svg !== undefined) {
       block.innerHTML = svg;
@@ -105,7 +106,7 @@ export async function renderMermaid(root: HTMLElement, options: MermaidOptions):
   if (current !== generation) {
     return;
   }
-  mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: options.theme });
+  mermaid.initialize(config);
   for (const { block, source, key } of pending) {
     try {
       const { svg } = await mermaid.render('yomu-mermaid-' + ++renderCount, source);

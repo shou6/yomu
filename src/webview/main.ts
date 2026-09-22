@@ -46,11 +46,15 @@ function scrollToId(id: string): void {
   document.getElementById(id)?.scrollIntoView();
 }
 
-function currentMermaidTheme(): ReturnType<typeof mermaidTheme> {
-  const dark =
+function vscodeIsDark(): boolean {
+  return (
     document.body.classList.contains('vscode-dark') ||
-    document.body.classList.contains('vscode-high-contrast');
-  return mermaidTheme(theme, dark);
+    document.body.classList.contains('vscode-high-contrast')
+  );
+}
+
+function currentMermaidTheme(): ReturnType<typeof mermaidTheme> {
+  return mermaidTheme(theme, vscodeIsDark());
 }
 
 /** Mermaid の図を描く。開いた直後なら、図で本文が伸びた後にスクロール位置を合わせ直す */
@@ -59,7 +63,7 @@ function drawMermaid(): void {
   if (src === undefined || content.querySelector('.yomu-mermaid') === null) {
     return;
   }
-  void renderMermaid(content, { src, nonce, theme: currentMermaidTheme() }).then(() => {
+  void renderMermaid(content, { src, nonce, theme, vscodeIsDark: vscodeIsDark() }).then(() => {
     if (restoreScrollY !== undefined) {
       window.scrollTo(0, restoreScrollY);
       restoreScrollY = undefined;
