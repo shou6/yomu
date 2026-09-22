@@ -56,6 +56,8 @@ const EXPORT_TIMEOUT = 5000;
 interface Entry {
   panel: vscode.WebviewPanel;
   document: vscode.TextDocument;
+  /** 読んでいる行を尋ねた時の、Webview の返事の受け口 */
+  onLine?: (line: number) => void;
   /** 読んだ位置の割合。Webview から知らされるまでは undefined */
   progress?: number;
   /** 印刷の書き出しで、Webview の返事を待っている時の受け口 */
@@ -199,6 +201,8 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         entry.onExported?.(message.mermaid);
       } else if (message.type === 'position' && panel.active) {
         this.positionEmitter.fire(message.id);
+      } else if (message.type === 'line') {
+        entry.onLine?.(message.line);
       } else if (message.type === 'progress') {
         entry.progress = message.value;
         void this.history.record(document.uri, path.basename(document.fileName), message.value);
@@ -234,6 +238,28 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
   /** アクティブなリーダーの文書の URI。リーダーがアクティブでなければ undefined */
   activeDocumentUri(): vscode.Uri | undefined {
     return this.activeDocument()?.uri;
+  }
+
+  /**
+   * その文書を開いているリーダーに、今読んでいる箇所の元の行番号を尋ねる。
+   * リーダーが無い、または 1 秒以内に返事が無ければ undefined
+   */
+  async readingLine(uri: vscode.Uri): Promise<number | undefined> {
+    const entry = [...this.entries]
+      .filter((candidate) => candidate.document.uri.toString() === uri.toString())
+      .sort((a, b) => Number(b.panel.active) - Number(a.panel.active))[0];
+    if (entry === undefined) {
+      return undefined;
+    }
+    return new Promise<number | undefined>((resolve) => {
+      const timer = setTimeout(() => resolve(undefined), 1000);
+      entry.onLine = (line) => {
+        clearTimeout(timer);
+        entry.onLine = undefined;
+        resolve(line);
+      };
+      this.post(entry.panel, { type: 'requestLine' });
+    });
   }
 
   /** アクティブなリーダーを、その見出しまでスクロールさせる */

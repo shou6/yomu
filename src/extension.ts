@@ -66,12 +66,23 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
     // リーダータブの右上のボタン。オンとオフで別のアイコンを出すため、コマンドを分ける
     vscode.commands.registerCommand('yomu.enableFocusMode', () => setFocusMode(true)),
     vscode.commands.registerCommand('yomu.disableFocusMode', () => setFocusMode(false)),
-    // リーダーから編集に戻る。タイトルバーのボタンからは、そのタブの URI が渡る
+    // リーダーから編集に戻る。今読んでいる箇所の行にカーソルを置く（ソースへのジャンプ）。
+    // タイトルバーのボタンからは、そのタブの URI が渡る
     vscode.commands.registerCommand('yomu.openInTextEditor', async (uri?: vscode.Uri) => {
       const target = uri instanceof vscode.Uri ? uri : provider.activeDocumentUri();
-      if (target !== undefined) {
-        await vscode.commands.executeCommand('vscode.openWith', target, 'default');
+      if (target === undefined) {
+        return;
       }
+      const line = (await provider.readingLine(target)) ?? 0;
+      await vscode.commands.executeCommand('vscode.openWith', target, 'default');
+      const position = new vscode.Position(line, 0);
+      await vscode.window.showTextDocument(target, {
+        selection: new vscode.Range(position, position),
+      });
+      vscode.window.activeTextEditor?.revealRange(
+        new vscode.Range(position, position),
+        vscode.TextEditorRevealType.InCenter
+      );
     })
   );
   context.subscriptions.push(

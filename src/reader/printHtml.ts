@@ -16,7 +16,7 @@ export function rewriteFontUrls(css: string, fontsDirUri: string): string {
   return css.replace(/url\((['"]?)\.\.\/fonts\//g, `url($1${fontsDirUri}/`);
 }
 
-const MERMAID_BLOCK = /<div class="yomu-mermaid">[\s\S]*?<\/div>/g;
+const MERMAID_BLOCK = /<div class="yomu-mermaid"([^>]*)>[\s\S]*?<\/div>/g;
 
 /**
  * Mermaid の枠を、上から順にリーダーが描いた SVG に差し替える。
@@ -24,9 +24,11 @@ const MERMAID_BLOCK = /<div class="yomu-mermaid">[\s\S]*?<\/div>/g;
  */
 export function injectMermaid(html: string, svgs: readonly (string | null)[]): string {
   let index = 0;
-  return html.replace(MERMAID_BLOCK, (block) => {
+  return html.replace(MERMAID_BLOCK, (block, attributes: string) => {
     const svg = svgs[index++];
-    return svg === null || svg === undefined ? block : `<div class="yomu-mermaid">${svg}</div>`;
+    return svg === null || svg === undefined
+      ? block
+      : `<div class="yomu-mermaid"${attributes}>${svg}</div>`;
   });
 }
 

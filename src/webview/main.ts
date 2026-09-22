@@ -13,6 +13,7 @@ import { applyFolding } from './fold';
 import { watchPosition } from './position';
 import { watchProgress } from './progress';
 import { resumeScrollY } from '../reader/reading';
+import { readingLine } from '../reader/sourceLine';
 
 interface ReaderState {
   scrollY: number;
@@ -140,6 +141,16 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
     checkProgress();
   } else if (message.type === 'settings') {
     applySettings(message);
+  } else if (message.type === 'requestLine') {
+    // 画面の上から 2 割の高さを、今読んでいる箇所とみなす（目次の今読んでいる見出しと同じ）
+    const blocks = [...content.querySelectorAll<HTMLElement>('[data-line]')].map((element) => {
+      const rect = element.getBoundingClientRect();
+      return { line: Number(element.dataset.line), top: rect.top, bottom: rect.bottom };
+    });
+    // 一番上にいる時は、文書の先頭を読んでいるとみなす
+    const line =
+      window.scrollY <= 0 ? (blocks[0]?.line ?? 0) : readingLine(blocks, window.innerHeight * 0.2);
+    vscode.postMessage({ type: 'line', line });
   } else if (message.type === 'scrollTo') {
     document.getElementById(message.id)?.scrollIntoView();
   } else if (message.type === 'export') {

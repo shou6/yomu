@@ -12,6 +12,18 @@ export interface RenderOptions {
   resolveImageSrc: (src: string) => string;
 }
 
+/** 元の行番号を付ける、一番外側のブロックの要素 */
+const LINE_BLOCKS = new Set([
+  'paragraph_open',
+  'heading_open',
+  'blockquote_open',
+  'table_open',
+  'bullet_list_open',
+  'ordered_list_open',
+  'hr',
+  'code_block',
+]);
+
 /** スキーム付き（https:、data: など）か、プロトコル相対（//）の URL */
 const ABSOLUTE_URL = /^([a-z][a-z0-9+.-]*:|\/\/)/i;
 
@@ -39,22 +51,41 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
 
+  // ブロックの要素に元の行番号（0 始まり）を data-line で付ける。「標準エディタで開く」で読んでいる行へ移るため。
+  // 見出しの id より後に付けるよう、anchor の後に足す。リストの項目は深さに関わらず、他は一番外側だけに付ける
+  md.core.ruler.push('yomu_source_line', (state) => {
+    for (const token of state.tokens) {
+      const line = token.map?.[0];
+      if (line === undefined || token.nesting === -1) {
+        continue;
+      }
+      const topLevel = token.level === 0 && LINE_BLOCKS.has(token.type);
+      if (token.type === 'list_item_open' || topLevel) {
+        token.attrSet('data-line', String(line));
+      }
+    }
+  });
+
   // 言語指定のあるコードブロックを data-lang 付きの枠で包み、CSS でラベルを出す。
   // ラベルは横スクロールする pre の中ではなく、スクロールしない枠に置く
   const renderFence = md.renderer.rules.fence;
   md.renderer.rules.fence = (tokens, idx, opts, env, self) => {
     const lang = tokens[idx].info.trim().split(/\s+/)[0] ?? '';
+    const line = tokens[idx].map?.[0];
+    const dataLine = line === undefined ? '' : ` data-line="${line}"`;
     if (lang.toLowerCase() === 'mermaid') {
       // 図は Webview で mermaid.js が描く。描くまでと、描けなかった時はソースを見せる
       const source = md.utils.escapeHtml(tokens[idx].content);
-      return `<div class="yomu-mermaid"><pre class="yomu-mermaid-source">${source}</pre></div>\n`;
+      return `<div class="yomu-mermaid"${dataLine}><pre class="yomu-mermaid-source">${source}</pre></div>\n`;
     }
+    // コードの行番号は、pre の中の code ではなく外側の要素に付ける
+    tokens[idx].attrs = tokens[idx].attrs?.filter(([name]) => name !== 'data-line') ?? null;
     const html = renderFence
       ? renderFence(tokens, idx, opts, env, self)
       : self.renderToken(tokens, idx, opts);
     return lang === ''
-      ? html
-      : `<div class="yomu-code" data-lang="${md.utils.escapeHtml(lang)}">${html.trimEnd()}</div>\n`;
+      ? html.replace(/^<pre>/, `<pre${dataLine}>`)
+      : `<div class="yomu-code" data-lang="${md.utils.escapeHtml(lang)}"${dataLine}>${html.trimEnd()}</div>\n`;
   };
 
   const renderImage = md.renderer.rules.image;

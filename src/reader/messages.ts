@@ -15,6 +15,8 @@ export type ToWebview =
   | { type: 'export' }
   /** 目次で選んだ見出しへ移動する */
   | { type: 'scrollTo'; id: string }
+  /** 今読んでいる箇所の、元の Markdown の行番号を返してほしい */
+  | { type: 'requestLine' }
   /** 設定の反映。CSS 変数とテーマ名。カスタム CSS があればその Webview URI */
   | {
       type: 'settings';
@@ -39,4 +41,6 @@ export type FromWebview =
   /** 今読んでいる見出しの id が変わった。最初の見出しより上なら null */
   | { type: 'position'; id: string | null }
   /** 読んだ位置の割合（0〜1）が変わった */
-  | { type: 'progress'; value: number };
+  | { type: 'progress'; value: number }
+  /** requestLine への返事 */
+  | { type: 'line'; line: number };

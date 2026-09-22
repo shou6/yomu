@@ -29,7 +29,7 @@ The reader tab shows three buttons at the top right:
 
 - **Focus mode**: an eye icon turns it on, a closed eye turns it off.
 - **Print**: opens the document in your browser to print or save as PDF.
-- **Open in Text Editor**: switches back to the text editor to edit.
+- **Open in Text Editor**: switches back to the text editor to edit, with the cursor on the line you were reading.
 
 ## Usage
 
