@@ -174,3 +174,20 @@ suite('renderSafely: 例外時の表示', () => {
     assert.ok(out.includes('plain string'), out);
   });
 });
+
+suite('render: Mermaid', () => {
+  test('言語が mermaid のブロックは、Webview で描く枠に入れ、ソースはエスケープして持つ', () => {
+    const out = html('```mermaid\nflowchart LR\n  A --> B<br>\n```\n');
+    assert.ok(out.includes('<div class="yomu-mermaid">'), out);
+    assert.ok(
+      out.includes('<pre class="yomu-mermaid-source">flowchart LR\n  A --&gt; B&lt;br&gt;\n</pre>'),
+      out
+    );
+    assert.ok(!out.includes('hljs-'), 'Mermaid のソースをハイライトしている');
+    assert.ok(!out.includes('yomu-code'), '言語ラベルの枠に入っている');
+  });
+
+  test('言語名の大文字小文字は問わない', () => {
+    assert.ok(html('```Mermaid\npie\n```\n').includes('class="yomu-mermaid"'));
+  });
+});

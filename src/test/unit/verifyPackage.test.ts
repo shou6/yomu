@@ -25,14 +25,20 @@ suite('checkPackageFiles', () => {
     const manifest = { main: './dist/extension.js', l10n: './l10n' };
     assert.deepStrictEqual(
       checkPackageFiles(
-        [...COMMON, 'dist/extension.js', 'dist/webview.js', 'l10n/bundle.l10n.ja.json'],
+        [
+          ...COMMON,
+          'dist/extension.js',
+          'dist/webview.js',
+          'dist/mermaid.min.js',
+          'l10n/bundle.l10n.ja.json',
+        ],
         manifest
       ),
       { unexpected: [], missing: [] }
     );
     assert.deepStrictEqual(checkPackageFiles(COMMON, manifest), {
       unexpected: [],
-      missing: ['dist/extension.js', 'dist/webview.js'],
+      missing: ['dist/extension.js', 'dist/webview.js', 'dist/mermaid.min.js'],
     });
   });
 
@@ -53,7 +59,7 @@ suite('checkPackageFiles', () => {
     );
     assert.deepStrictEqual(checkPackageFiles([...COMMON, 'dist/extension.js'], manifest), {
       unexpected: [],
-      missing: ['dist/webview.js'],
+      missing: ['dist/webview.js', 'dist/mermaid.min.js'],
     });
   });
 

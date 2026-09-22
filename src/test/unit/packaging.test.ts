@@ -23,6 +23,10 @@ suite('公開パッケージの中身', () => {
     assert.ok(Array.isArray(pkg.files) && pkg.files.length > 0, 'files が無い');
   });
 
+  test('mermaid.js を公開パッケージに入れる（Mermaid の図を描くため）', () => {
+    assert.ok((pkg.files ?? []).includes('dist/mermaid.min.js'));
+  });
+
   test('.vscodeignore を置かない（files と併用できず、除外リスト方式に戻ってしまう）', () => {
     assert.ok(!fs.existsSync(path.join(ROOT, '.vscodeignore')));
   });
