@@ -12,6 +12,10 @@ updates:
       # Node のメジャーは CI と engines に合わせて手で上げる
       - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
+      # typescript-eslint が対応する範囲を超えると npm ci が失敗する（7.0.2 で実際に起きた）。
+      # typescript-eslint の peerDependencies が新しいメジャーを含んでから手で上げる
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
     commit-message:
       prefix: chore
       prefix-development: chore
