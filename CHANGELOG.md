@@ -10,6 +10,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Mermaid diagrams: code blocks with the `mermaid` language are drawn as diagrams (flowcharts, sequence, class, state, Gantt, pie and more). Colors follow the reader theme, and a syntax error shows the message with the source instead of a blank area. mermaid.js is loaded only for documents that contain a Mermaid block.
 - Zoom for images and diagrams: click an image or a Mermaid diagram to open it full screen. Scroll to zoom around the pointer, drag to pan, double-click to fit, and press Esc or click the backdrop to close. Diagrams stay sharp at any zoom level.
 - Focus mode: dims everything except the blocks you are reading (between 30% and 55% down the screen). Turn it on with `yomu.focusMode` or the command "Yomu: Toggle Focus Mode".
+- Long code blocks fold: blocks longer than `yomu.code.foldLines` (20 by default, 0 to disable) show that many lines with a "Show all N lines" button.
 
 ### Fixed
 
