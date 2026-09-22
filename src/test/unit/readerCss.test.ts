@@ -20,3 +20,14 @@ suite('reader.css: Mermaid', () => {
     assert.match(rule, /max-width:\s*min\(100%,\s*480px\)\s*!important/);
   });
 });
+
+suite('reader.css: ズーム表示', () => {
+  test('重ね表示の画像は、最大の幅と高さの制限を外す', () => {
+    // VS Code は Webview に既定の CSS（img { max-width: 100%; max-height: 100%; }）を差し込む。
+    // 重ね表示では元の大きさで置いて transform で縮めるので、高さだけ画面に抑えられると縦に潰れる
+    const rule = readerCss().match(/\.yomu-zoom-content\s*{([^}]*)}/)?.[1];
+    assert.ok(rule, '.yomu-zoom-content の規則が無い');
+    assert.match(rule, /max-width:\s*none/);
+    assert.match(rule, /max-height:\s*none/);
+  });
+});
