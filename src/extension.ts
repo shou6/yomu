@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { ToWebview } from './reader/messages';
 import { decideOpenInReader } from './reader/openInReader';
+import { OutlineView } from './reader/outlineView';
 import { ReaderProvider } from './reader/readerProvider';
 
 /** activate が返す API。統合テストが Webview へのメッセージを観測するために使う */
@@ -8,11 +9,14 @@ export interface YomuApi {
   onDidPostMessage: vscode.Event<ToWebview>;
   /** アクティブなリーダーの本文を印刷用の HTML に書き出し、そのパスを返す（ブラウザは開かない） */
   exportForPrint(): Promise<string | undefined>;
+  /** 目次のビューに出している、一番上の階層の見出しの ID */
+  outlineIds(): string[];
 }
 
 /** エントリポイント。登録だけを行い、ロジックは各モジュールに置く */
 export function activate(context: vscode.ExtensionContext): YomuApi {
   const provider = ReaderProvider.register(context);
+  const outline = OutlineView.register(context, provider);
   context.subscriptions.push(
     // タイトルバーのアイコンやエクスプローラーからは URI が渡る。コマンドパレットからは渡らない
     vscode.commands.registerCommand('yomu.openInReader', async (uri?: vscode.Uri) => {
@@ -71,6 +75,7 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
   return {
     onDidPostMessage: provider.onDidPostMessage,
     exportForPrint: () => provider.exportForPrint(),
+    outlineIds: () => outline.roots().map((node) => node.heading.id),
   };
 }
 

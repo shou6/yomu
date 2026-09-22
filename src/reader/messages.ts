@@ -8,6 +8,8 @@ export type ToWebview =
   | { type: 'update'; html: string }
   /** 印刷用に、描いた Mermaid の SVG を返してほしい */
   | { type: 'export' }
+  /** 目次で選んだ見出しへ移動する */
+  | { type: 'scrollTo'; id: string }
   /** 設定の反映。CSS 変数とテーマ名。カスタム CSS があればその Webview URI */
   | {
       type: 'settings';
@@ -28,4 +30,6 @@ export type FromWebview =
   | { type: 'ready' }
   | { type: 'openLink'; href: string }
   /** export への返事。Mermaid の枠ごとの SVG（描けていない枠は null） */
-  | { type: 'exported'; mermaid: (string | null)[] };
+  | { type: 'exported'; mermaid: (string | null)[] }
+  /** 今読んでいる見出しの id が変わった。最初の見出しより上なら null */
+  | { type: 'position'; id: string | null };

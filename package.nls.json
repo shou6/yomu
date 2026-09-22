@@ -21,5 +21,7 @@
   "command.openInBrowser": "Open in Browser to Print",
   "command.enableFocusMode": "Turn On Focus Mode",
   "command.disableFocusMode": "Turn Off Focus Mode",
-  "command.openInTextEditor": "Open in Text Editor"
+  "command.openInTextEditor": "Open in Text Editor",
+  "view.outline": "Yomu Outline",
+  "command.revealHeading": "Go to Heading"
 }

@@ -10,6 +10,7 @@ import { renderMermaid, resetMermaid } from './mermaid';
 import { openZoom, zoomTarget } from './zoom';
 import { setFocusMode, updateFocus, watchFocus } from './focus';
 import { applyFolding } from './fold';
+import { watchPosition } from './position';
 
 interface ReaderState {
   scrollY: number;
@@ -128,6 +129,8 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
     applyUpdate(message.html);
   } else if (message.type === 'settings') {
     applySettings(message);
+  } else if (message.type === 'scrollTo') {
+    document.getElementById(message.id)?.scrollIntoView();
   } else if (message.type === 'export') {
     // 印刷用に、描いた Mermaid の SVG を枠の順に返す。描けていない枠は null
     vscode.postMessage({
@@ -141,6 +144,8 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
 
 window.addEventListener('scroll', saveScroll, { passive: true });
 watchFocus(content);
+// 今読んでいる見出しを拡張機能に知らせ、目次のビューで選んだ状態にしてもらう
+watchPosition(content, (id) => vscode.postMessage({ type: 'position', id }));
 
 // VS Code のカラーテーマを変えると body のクラスが変わる。vscode テーマの時は図の配色が変わるので描き直す
 let lastMermaidTheme = currentMermaidTheme();

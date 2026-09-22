@@ -77,6 +77,14 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
   /** 同じ問題を何度も通知しないための記録 */
   private readonly notified = new Set<string>();
 
+  private readonly activeChangeEmitter = new vscode.EventEmitter<void>();
+  /** アクティブなリーダーが変わった、またはその文書が編集された（目次を作り直す） */
+  readonly onDidChangeActiveReader: vscode.Event<void> = this.activeChangeEmitter.event;
+
+  private readonly positionEmitter = new vscode.EventEmitter<string | null>();
+  /** アクティブなリーダーで、今読んでいる見出しの id が変わった */
+  readonly onDidChangePosition: vscode.Event<string | null> = this.positionEmitter.event;
+
   static register(context: vscode.ExtensionContext): ReaderProvider {
     const provider = new ReaderProvider(context.extensionUri);
     context.subscriptions.push(
@@ -93,6 +101,8 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         }
       }),
       provider.postMessageEmitter,
+      provider.activeChangeEmitter,
+      provider.positionEmitter,
       { dispose: () => provider.customCssWatcher?.watcher.dispose() }
     );
     return provider;
@@ -155,6 +165,9 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       }
       clearTimeout(timer);
       timer = setTimeout(update, UPDATE_DELAY);
+      if (panel.active) {
+        this.activeChangeEmitter.fire();
+      }
     });
     const messageSubscription = webview.onDidReceiveMessage((message: FromWebview) => {
       if (message.type === 'ready') {
@@ -165,20 +178,49 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         void openLink(message.href, documentDir);
       } else if (message.type === 'exported') {
         entry.onExported?.(message.mermaid);
+      } else if (message.type === 'position' && panel.active) {
+        this.positionEmitter.fire(message.id);
       }
     });
     this.entries.add(entry);
+    // 目次のビューを出すかどうかと、その中身を、アクティブなリーダーに合わせる
+    const viewStateSubscription = panel.onDidChangeViewState(() => this.activeChanged());
     panel.onDidDispose(() => {
       clearTimeout(timer);
       changeSubscription.dispose();
       messageSubscription.dispose();
+      viewStateSubscription.dispose();
       this.entries.delete(entry);
+      this.activeChanged();
     });
+    this.activeChanged();
+  }
+
+  /** アクティブなリーダーの文書。リーダーがアクティブでなければ undefined */
+  activeDocument(): vscode.TextDocument | undefined {
+    return [...this.entries].find((entry) => entry.panel.active)?.document;
   }
 
   /** アクティブなリーダーの文書の URI。リーダーがアクティブでなければ undefined */
   activeDocumentUri(): vscode.Uri | undefined {
-    return [...this.entries].find((entry) => entry.panel.active)?.document.uri;
+    return this.activeDocument()?.uri;
+  }
+
+  /** アクティブなリーダーを、その見出しまでスクロールさせる */
+  revealHeading(id: string): void {
+    const entry = [...this.entries].find((candidate) => candidate.panel.active);
+    if (entry !== undefined) {
+      this.post(entry.panel, { type: 'scrollTo', id });
+    }
+  }
+
+  private activeChanged(): void {
+    void vscode.commands.executeCommand(
+      'setContext',
+      'yomu.readerActive',
+      this.activeDocument() !== undefined
+    );
+    this.activeChangeEmitter.fire();
   }
 
   /**

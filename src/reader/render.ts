@@ -34,7 +34,7 @@ function highlight(code: string, lang: string): string {
   return hljs.highlight(code, { language: lang }).value;
 }
 
-function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
+export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
   const md = new MarkdownIt({ html: false, linkify: false, typographer: false, highlight });
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });

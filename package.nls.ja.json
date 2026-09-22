@@ -21,5 +21,7 @@
   "command.openInBrowser": "ブラウザで開いて印刷",
   "command.enableFocusMode": "集中モードをオンにする",
   "command.disableFocusMode": "集中モードをオフにする",
-  "command.openInTextEditor": "標準エディタで開く"
+  "command.openInTextEditor": "標準エディタで開く",
+  "view.outline": "Yomu 目次",
+  "command.revealHeading": "見出しへ移動"
 }
