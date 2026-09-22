@@ -5,7 +5,12 @@ import type { Theme } from './readerSettings';
 /** 拡張機能 → Webview */
 export type ToWebview =
   /** 本文の差し替え */
-  | { type: 'update'; html: string }
+  | {
+      type: 'update';
+      html: string;
+      /** 新しく開いた時に、この割合（0〜1）の位置から再開する。読書の記録が無ければ付けない */
+      resume?: number;
+    }
   /** 印刷用に、描いた Mermaid の SVG を返してほしい */
   | { type: 'export' }
   /** 目次で選んだ見出しへ移動する */
@@ -32,4 +37,6 @@ export type FromWebview =
   /** export への返事。Mermaid の枠ごとの SVG（描けていない枠は null） */
   | { type: 'exported'; mermaid: (string | null)[] }
   /** 今読んでいる見出しの id が変わった。最初の見出しより上なら null */
-  | { type: 'position'; id: string | null };
+  | { type: 'position'; id: string | null }
+  /** 読んだ位置の割合（0〜1）が変わった */
+  | { type: 'progress'; value: number };

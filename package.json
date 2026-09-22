@@ -172,6 +172,10 @@
         {
           "id": "yomu.outline",
           "name": "%view.outline%"
+        },
+        {
+          "id": "yomu.history",
+          "name": "%view.history%"
         }
       ]
     },
@@ -180,6 +184,10 @@
         "view": "yomu.outline",
         "contents": "%viewsWelcome.outline%",
         "when": "!yomu.readerActive"
+      },
+      {
+        "view": "yomu.history",
+        "contents": "%viewsWelcome.history%"
       }
     ],
     "configuration": {

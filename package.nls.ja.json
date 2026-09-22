@@ -25,5 +25,7 @@
   "view.outline": "目次",
   "command.revealHeading": "見出しへ移動",
   "viewsWelcome.outline": "Yomu のリーダーで Markdown を開くと、ここに見出しが出ます。\n[リーダーで開く](command:yomu.openInReader)",
-  "config.outline.revealOnOpen": "リーダーのタブを開いた時に、Yomu の目次のビューを開いて見せます。キーボードの操作先はリーダーのままです。サイドバーの表示が切り替わるので、既定はオフです。"
+  "config.outline.revealOnOpen": "リーダーのタブを開いた時に、Yomu の目次のビューを開いて見せます。キーボードの操作先はリーダーのままです。サイドバーの表示が切り替わるので、既定はオフです。",
+  "view.history": "読書の記録",
+  "viewsWelcome.history": "Yomu のリーダーで読んだ文書が、読んだ割合つきでここに並びます。クリックすると続きから開きます。"
 }

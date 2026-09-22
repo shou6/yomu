@@ -18,6 +18,7 @@ import {
   type ReaderSettings,
 } from './readerSettings';
 import { injectMermaid, printHtml, rewriteFontUrls } from './printHtml';
+import type { ReadingHistory } from './readingHistory';
 import { renderSafely } from './render';
 import { resourceRoots } from './resourceRoots';
 import { webviewHtml } from './webviewHtml';
@@ -55,6 +56,8 @@ const EXPORT_TIMEOUT = 5000;
 interface Entry {
   panel: vscode.WebviewPanel;
   document: vscode.TextDocument;
+  /** 読んだ位置の割合。Webview から知らされるまでは undefined */
+  progress?: number;
   /** 印刷の書き出しで、Webview の返事を待っている時の受け口 */
   onExported?: (mermaid: (string | null)[]) => void;
   /** カスタム CSS のフォルダを除いた localResourceRoots */
@@ -85,12 +88,16 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
   /** リーダーのタブを新しく開いた（タブの切り替えでは起きない） */
   readonly onDidOpenReader: vscode.Event<void> = this.openEmitter.event;
 
+  private readonly progressEmitter = new vscode.EventEmitter<number>();
+  /** アクティブなリーダーの、読んだ位置の割合が変わった */
+  readonly onDidChangeProgress: vscode.Event<number> = this.progressEmitter.event;
+
   private readonly positionEmitter = new vscode.EventEmitter<string | null>();
   /** アクティブなリーダーで、今読んでいる見出しの id が変わった */
   readonly onDidChangePosition: vscode.Event<string | null> = this.positionEmitter.event;
 
-  static register(context: vscode.ExtensionContext): ReaderProvider {
-    const provider = new ReaderProvider(context.extensionUri);
+  static register(context: vscode.ExtensionContext, history: ReadingHistory): ReaderProvider {
+    const provider = new ReaderProvider(context.extensionUri, history);
     context.subscriptions.push(
       vscode.window.registerCustomEditorProvider(ReaderProvider.viewType, provider, {
         // VS Code 標準の検索ウィジェット（Ctrl+F）を Webview の中で使えるようにする
@@ -107,13 +114,17 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       provider.postMessageEmitter,
       provider.activeChangeEmitter,
       provider.openEmitter,
+      provider.progressEmitter,
       provider.positionEmitter,
       { dispose: () => provider.customCssWatcher?.watcher.dispose() }
     );
     return provider;
   }
 
-  constructor(private readonly extensionUri: vscode.Uri) {}
+  constructor(
+    private readonly extensionUri: vscode.Uri,
+    private readonly history: ReadingHistory
+  ) {}
 
   resolveCustomTextEditor(
     document: vscode.TextDocument,
@@ -156,10 +167,11 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
 
     const resolveImageSrc = (src: string): string =>
       webview.asWebviewUri(vscode.Uri.joinPath(documentDir, decodePath(src))).toString();
-    const update = (): void => {
+    const update = (resume?: number): void => {
       this.post(panel, {
         type: 'update',
         html: renderSafely(document.getText(), { resolveImageSrc }),
+        ...(resume === undefined ? {} : { resume }),
       });
     };
 
@@ -178,13 +190,20 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       if (message.type === 'ready') {
         // 本文より先に見た目を決めておく。本文が出た後に幅やフォントが変わって見えるのを避ける。
         // retainContextWhenHidden を使わないので、タブを隠して戻すたびに Webview が作り直されてここに来る
-        void this.sendSettings(entry).then(update);
+        // 読書の記録があれば、その位置から再開するよう伝える。
+        // タブを隠して戻した時は Webview が自分の覚えた位置を優先する
+        void this.sendSettings(entry).then(() => update(this.history.get(document.uri)?.progress));
       } else if (message.type === 'openLink') {
         void openLink(message.href, documentDir);
       } else if (message.type === 'exported') {
         entry.onExported?.(message.mermaid);
       } else if (message.type === 'position' && panel.active) {
         this.positionEmitter.fire(message.id);
+      } else if (message.type === 'progress') {
+        entry.progress = message.value;
+        void this.history.record(document.uri, path.basename(document.fileName), message.value);
+        // 出すかどうかは、受け手が今アクティブなリーダーを見て決める
+        this.progressEmitter.fire(message.value);
       }
     });
     this.entries.add(entry);
@@ -205,6 +224,11 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
   /** アクティブなリーダーの文書。リーダーがアクティブでなければ undefined */
   activeDocument(): vscode.TextDocument | undefined {
     return [...this.entries].find((entry) => entry.panel.active)?.document;
+  }
+
+  /** アクティブなリーダーの、読んだ位置の割合。リーダーがアクティブでない、または不明なら undefined */
+  activeProgress(): number | undefined {
+    return [...this.entries].find((entry) => entry.panel.active)?.progress;
   }
 
   /** アクティブなリーダーの文書の URI。リーダーがアクティブでなければ undefined */

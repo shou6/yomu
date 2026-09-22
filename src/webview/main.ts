@@ -11,6 +11,8 @@ import { openZoom, zoomTarget } from './zoom';
 import { setFocusMode, updateFocus, watchFocus } from './focus';
 import { applyFolding } from './fold';
 import { watchPosition } from './position';
+import { watchProgress } from './progress';
+import { resumeScrollY } from '../reader/reading';
 
 interface ReaderState {
   scrollY: number;
@@ -75,11 +77,19 @@ function drawMermaid(): void {
   });
 }
 
-function applyUpdate(html: string): void {
-  // 再描画でスクロール位置が失われないよう、差し替えの前後で位置を保つ
+function applyUpdate(html: string, resume: number | undefined): void {
+  // 再描画でスクロール位置が失われないよう、差し替えの前後で位置を保つ。
+  // 開いた直後は、タブを隠して戻した時の位置を優先し、無ければ読書の記録の割合から再開する
   const opening = content.childElementCount === 0;
-  const scrollY = opening ? (vscode.getState()?.scrollY ?? 0) : window.scrollY;
+  const saved = vscode.getState()?.scrollY;
   content.innerHTML = html;
+  const scrollY = !opening
+    ? window.scrollY
+    : saved !== undefined
+      ? saved
+      : resume !== undefined
+        ? resumeScrollY(resume, document.documentElement.scrollHeight, window.innerHeight)
+        : 0;
   window.scrollTo(0, scrollY);
   if (opening && scrollY > 0) {
     restoreScrollY = scrollY;
@@ -126,7 +136,8 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
   const message = event.data;
   if (message.type === 'update') {
-    applyUpdate(message.html);
+    applyUpdate(message.html, message.resume);
+    checkProgress();
   } else if (message.type === 'settings') {
     applySettings(message);
   } else if (message.type === 'scrollTo') {
@@ -144,6 +155,8 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
 
 window.addEventListener('scroll', saveScroll, { passive: true });
 watchFocus(content);
+// 読んだ位置の割合を拡張機能に知らせ、ステータスバーと読書の記録に使ってもらう
+const checkProgress = watchProgress((value) => vscode.postMessage({ type: 'progress', value }));
 // 今読んでいる見出しを拡張機能に知らせ、目次のビューで選んだ状態にしてもらう
 watchPosition(content, (id) => vscode.postMessage({ type: 'position', id }));
 

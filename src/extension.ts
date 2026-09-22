@@ -1,7 +1,10 @@
 import * as vscode from 'vscode';
 import type { ToWebview } from './reader/messages';
 import { decideOpenInReader } from './reader/openInReader';
+import { HistoryView } from './reader/historyView';
 import { OutlineView } from './reader/outlineView';
+import { ProgressStatus } from './reader/progressStatus';
+import { ReadingHistory } from './reader/readingHistory';
 import { ReaderProvider } from './reader/readerProvider';
 
 /** activate が返す API。統合テストが Webview へのメッセージを観測するために使う */
@@ -13,12 +16,22 @@ export interface YomuApi {
   outlineIds(): string[];
   /** 目次のビューが開いて見えているか */
   outlineVisible(): boolean;
+  /** 読書の記録（新しい順） */
+  readingHistory(): { uri: string; title: string; progress: number }[];
+  /** 読書の記録を書き換える（テスト用） */
+  recordProgress(uri: vscode.Uri, progress: number): Promise<void>;
+  /** ステータスバーに出している文字。出していなければ undefined */
+  statusBarText(): string | undefined;
 }
 
 /** エントリポイント。登録だけを行い、ロジックは各モジュールに置く */
 export function activate(context: vscode.ExtensionContext): YomuApi {
-  const provider = ReaderProvider.register(context);
+  const history = new ReadingHistory(context.globalState);
+  context.subscriptions.push(history);
+  const provider = ReaderProvider.register(context, history);
   const outline = OutlineView.register(context, provider);
+  HistoryView.register(context, history);
+  const status = ProgressStatus.register(context, provider, history);
   context.subscriptions.push(
     // タイトルバーのアイコンやエクスプローラーからは URI が渡る。コマンドパレットからは渡らない
     vscode.commands.registerCommand('yomu.openInReader', async (uri?: vscode.Uri) => {
@@ -79,6 +92,11 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
     exportForPrint: () => provider.exportForPrint(),
     outlineIds: () => outline.roots().map((node) => node.heading.id),
     outlineVisible: () => outline.visible(),
+    readingHistory: () =>
+      history.recent().map(({ uri, title, progress }) => ({ uri, title, progress })),
+    recordProgress: (uri, progress) =>
+      history.record(uri, uri.path.split('/').pop() ?? '', progress),
+    statusBarText: () => status.text(),
   };
 }
 

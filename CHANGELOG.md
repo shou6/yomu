@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Long code blocks fold: blocks longer than `yomu.code.foldLines` (20 by default, 0 to disable) show that many lines with a "Show all N lines" button.
 - Print and PDF: "Yomu: Open in Browser to Print" (also in the reader tab's ... menu) opens the document in your browser with print styles and the print dialog. Save it as PDF from there. VS Code webviews cannot print, so Yomu hands the page to the browser.
 - Outline view: the Yomu icon in the activity bar opens an Outline view with the headings of the active reader tab. Click a heading to jump to it; the heading you are reading is selected as you scroll. Set `yomu.outline.revealOnOpen` to open it automatically when you open a reader tab.
+- Reading progress: the status bar shows how far you have read the active reader tab (e.g. 42%). Yomu remembers the position for each document (up to 50) and continues from there next time. The Reading History view in the Yomu side bar lists recent documents with their progress; click one to continue.
 - Reader tab title bar buttons: focus mode on/off (the icon shows the current state), print, and open in the text editor.
 
 ### Fixed
