@@ -36,7 +36,7 @@ Yomu は Markdown を専用のリーダータブで開き、日本語を読む�
 | `yomu.layout.align` | `center` | ウィンドウが広い時の本文の位置。`left` / `center` / `right` |
 | `yomu.layout.padding` | `32` | 本文の左右の余白（px） |
 | `yomu.font.family` | 欧文フォント、続けて和文フォント | 本文の `font-family`。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます |
-| `yomu.font.codeFamily` | （空） | コードのフォント。空なら欧文の等幅フォント（Cascadia Mono、Consolas、Menlo など）で、和文だけエディタのフォント。罫線で書いた図が揃う |
+| `yomu.font.codeFamily` | （空） | コードのフォント。空なら半角と全角が 1:2 の和文等幅フォント（BIZ UDGothic、Osaka-Mono、Noto Sans Mono CJK JP）で、罫線だけ半角の幅に縮める。和文を含む図も揃う |
 | `yomu.font.size` | `16` | 文字の大きさ（px） |
 | `yomu.font.lineHeight` | `1.8` | 行間。文字の大きさに対する倍率 |
 | `yomu.customCss` | （空） | テーマの後に読み込む CSS ファイルのパス。絶対パスか `${workspaceFolder}` から始まるパス。保存すると即座に反映されます |

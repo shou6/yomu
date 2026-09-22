@@ -7,7 +7,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- Text diagrams drawn with box-drawing characters (─ │ ┌ ▶ ▼) no longer break apart in code blocks. The default code font is now a Latin monospace font (Cascadia Mono, Consolas, Menlo, DejaVu Sans Mono), and only Japanese falls back to the editor font. Japanese monospace fonts such as HackGen draw these characters 1.5 to 2 cells wide.
+- Text diagrams drawn with box-drawing characters (─ │ ┌ ▶ ▼) now line up in code blocks, including diagrams that contain Japanese. The default code font is a Japanese monospace font whose Latin and Japanese widths are exactly 1:2 (BIZ UDGothic on Windows, Osaka-Mono on macOS, Noto Sans Mono CJK JP on Linux). Box-drawing characters, arrows and geometric shapes are drawn from a Latin monospace font narrowed to exactly half width, because Japanese fonts draw them full width.
 
 ## [0.1.0]
 

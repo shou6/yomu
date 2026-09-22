@@ -11,7 +11,7 @@
   "config.layout.align": "ウィンドウが最大幅より広い時の、本文の位置。",
   "config.layout.padding": "本文の左右の余白（px）。",
   "config.font.family": "本文のフォント。CSS の font-family と同じ書式。欧文フォントを先に、和文フォントを後に並べると、それぞれの文字が自分のフォントで描かれます。同梱の和文フォント: \"Noto Sans JP\"、\"BIZ UDPGothic\"。",
-  "config.font.codeFamily": "コードのフォント。空なら欧文の等幅フォント（Cascadia Mono、Consolas、Menlo など）を使い、和文だけエディタのフォントで描きます。罫線で書いたテキストの図が揃います。",
+  "config.font.codeFamily": "コードのフォント。空なら、半角と全角の幅がちょうど 1:2 の和文等幅フォント（BIZ UDGothic、Osaka-Mono、Noto Sans Mono CJK JP）を使い、罫線だけ半角の幅に縮めて描きます。和文を含むテキストの図も揃います。",
   "config.font.size": "本文の文字の大きさ（px）。",
   "config.font.lineHeight": "本文の行間。文字の大きさに対する倍率。",
   "config.customCss": "テーマの後に読み込む CSS ファイルのパス。絶対パスか、${workspaceFolder} から始まるパス。--yomu-* の変数やどの規則でも上書きできます。"

@@ -18,7 +18,7 @@ export interface ReaderSettings {
   padding: number;
   /** CSS の font-family の値 */
   fontFamily: string;
-  /** コードの font-family。空なら欧文の等幅フォント、和文は VS Code の editor.fontFamily */
+  /** コードの font-family。空なら半角と全角が 1:2 の和文等幅フォント（CODE_FONT_FALLBACK） */
   codeFontFamily: string;
   /** 本文の文字の大きさ（px） */
   fontSize: number;
@@ -47,12 +47,14 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
 };
 
 /**
- * コードのフォントを指定しない時の値。欧文の等幅フォントを先に置き、和文だけエディタのフォントで描く。
- * 罫線（─ │ ┌）や三角（▶ ▼）は東アジアの文字幅が曖昧な文字で、和文の等幅フォント（HackGen など）は
- * 1.5〜2 文字幅で描くため、半角前提で書かれたテキストの図がずれる。欧文の等幅フォントなら ASCII と同じ幅になる
+ * コードのフォントを指定しない時の値。
+ * 土台は半角と全角がちょうど 1:2 の和文等幅フォント（Windows: BIZ UDGothic / MS Gothic、macOS: Osaka-Mono、
+ * Linux: Noto Sans Mono CJK JP）。和文を含むテキストの図が揃う。
+ * 罫線（─ │ ┌）や三角（▶ ▼）は東アジアの文字幅が曖昧な文字で、和文等幅フォントは全角の幅で描くので、
+ * その範囲だけ先頭の Yomu Symbols（欧文の等幅フォントを半角の幅に縮めたもの。media/fonts.css）で描く
  */
 const CODE_FONT_FALLBACK =
-  "'Cascadia Mono', Consolas, Menlo, 'DejaVu Sans Mono', 'Liberation Mono', var(--vscode-editor-font-family, monospace), monospace";
+  "'Yomu Symbols Cascadia', 'Yomu Symbols Consolas', 'Yomu Symbols Menlo', 'Yomu Symbols DejaVu', 'Yomu Symbols Liberation', 'BIZ UDGothic', 'Osaka-Mono', 'Noto Sans Mono CJK JP', 'MS Gothic', var(--vscode-editor-font-family, monospace), monospace";
 
 function oneOf<T extends string>(value: unknown, choices: readonly T[], fallback: T): T {
   return typeof value === 'string' && (choices as readonly string[]).includes(value)

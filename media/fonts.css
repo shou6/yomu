@@ -29,3 +29,51 @@
   font-display: swap;
   src: url('../fonts/NotoSansJP-VF.woff2') format('woff2');
 }
+
+/*
+ * コードの罫線・矢印・図形（─ │ ┌ ▶ ▼ → など）を、ちょうど半角（0.5em）の幅で描くための書体。
+ * コードの土台は半角と全角が 1:2 の和文等幅フォント（BIZ UDGothic など）だが、和文等幅フォントはこれらの文字を
+ * 全角の幅で描く。半角前提で書かれたテキストの図が崩れるので、この範囲だけ欧文の等幅フォントを使い、
+ * size-adjust で字幅がちょうど 0.5em になるよう縮める（倍率 = 0.5 / そのフォントの字幅）。
+ * フォントは同梱せず OS のものを使う。フォントごとに字幅が違うので、1 フォント 1 書体名にしている
+ */
+
+/* Windows（Cascadia Mono を入れている場合）。字幅 0.5859em */
+@font-face {
+  font-family: 'Yomu Symbols Cascadia';
+  src: local('Cascadia Mono Regular'), local('CascadiaMono-Regular'), local('Cascadia Mono');
+  size-adjust: 85.3333%;
+  unicode-range: U+2190-21FF, U+2500-257F, U+2580-259F, U+25A0-25FF;
+}
+
+/* Windows 標準。字幅 0.5498em */
+@font-face {
+  font-family: 'Yomu Symbols Consolas';
+  src: local('Consolas');
+  size-adjust: 90.9414%;
+  unicode-range: U+2190-21FF, U+2500-257F, U+2580-259F, U+25A0-25FF;
+}
+
+/* macOS 標準。字幅 0.6021em */
+@font-face {
+  font-family: 'Yomu Symbols Menlo';
+  src: local('Menlo Regular'), local('Menlo-Regular');
+  size-adjust: 83.0495%;
+  unicode-range: U+2190-21FF, U+2500-257F, U+2580-259F, U+25A0-25FF;
+}
+
+/* Linux。字幅 0.6021em */
+@font-face {
+  font-family: 'Yomu Symbols DejaVu';
+  src: local('DejaVu Sans Mono'), local('DejaVuSansMono');
+  size-adjust: 83.0495%;
+  unicode-range: U+2190-21FF, U+2500-257F, U+2580-259F, U+25A0-25FF;
+}
+
+/* Linux。字幅 0.6001em */
+@font-face {
+  font-family: 'Yomu Symbols Liberation';
+  src: local('Liberation Mono'), local('LiberationMono-Regular');
+  size-adjust: 83.3198%;
+  unicode-range: U+2190-21FF, U+2500-257F, U+2580-259F, U+25A0-25FF;
+}
