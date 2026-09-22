@@ -3,7 +3,19 @@
  * 設定の読み取り（vscode.workspace.getConfiguration）は Provider が行い、ここには生の値だけを渡す。
  */
 
-export const THEMES = ['paper', 'sepia', 'dark', 'vscode'] as const;
+export const THEMES = [
+  'paper',
+  'sepia',
+  'dark',
+  'solarized-light',
+  'solarized-dark',
+  'github-light',
+  'github-dark',
+  'nord',
+  'catppuccin-latte',
+  'catppuccin-mocha',
+  'vscode',
+] as const;
 export type Theme = (typeof THEMES)[number];
 
 export const ALIGNS = ['left', 'center', 'right'] as const;

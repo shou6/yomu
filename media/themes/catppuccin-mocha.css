@@ -1,0 +1,48 @@
+/*
+ * テーマ catppuccin-mocha。Catppuccin（MIT）の Mocha。柔らかいパステルのダーク。
+ * 構成は paper と同じで、色だけを変える（すべてのテーマが同じ変数の組を定義する）。
+ */
+
+body[data-theme='catppuccin-mocha'] {
+  --yomu-bg: #1e1e2e;
+  --yomu-fg: #cdd6f4;
+  --yomu-link: #89b4fa;
+
+  --yomu-h1: #cdd6f4;
+  --yomu-h1-border: #cba6f7;
+  --yomu-h2: #cdd6f4;
+  --yomu-h2-border: #b4befe;
+  --yomu-h3: #cdd6f4;
+  --yomu-h3-border: #45475a;
+  --yomu-h4: #bac2de;
+  --yomu-h5: #a6adc8;
+
+  --yomu-th: #cdd6f4;
+  --yomu-th-border: #b4befe;
+  --yomu-td-border: #45475a;
+  --yomu-row-hover: #181825;
+
+  --yomu-pre-bg: #181825;
+  --yomu-pre-border: #313244;
+  --yomu-code-bg: #313244;
+  --yomu-code-fg: #f38ba8;
+  --yomu-code-label-fg: #a6adc8;
+  --yomu-code-label-bg: #313244;
+
+  --yomu-quote-border: #b4befe;
+  --yomu-quote-bg: #181825;
+  --yomu-quote-fg: #a6adc8;
+
+  --yomu-hr: #45475a;
+  --yomu-zoom-backdrop: rgb(17 17 27 / 88%);
+
+  --yomu-hl-keyword: #cba6f7;
+  --yomu-hl-string: #a6e3a1;
+  --yomu-hl-number: #fab387;
+  --yomu-hl-comment: #7f849c;
+  --yomu-hl-function: #89b4fa;
+  --yomu-hl-type: #f9e2af;
+  --yomu-hl-variable: #cdd6f4;
+  --yomu-hl-attr: #94e2d5;
+  --yomu-hl-meta: #7f849c;
+}

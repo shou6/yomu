@@ -27,5 +27,12 @@
   "viewsWelcome.outline": "Yomu のリーダーで Markdown を開くと、ここに見出しが出ます。\n[リーダーで開く](command:yomu.openInReader)",
   "config.outline.revealOnOpen": "リーダーのタブを開いた時に、Yomu の目次のビューを開いて見せます。キーボードの操作先はリーダーのままです。サイドバーの表示が切り替わるので、既定はオフです。",
   "view.history": "読書の記録",
-  "viewsWelcome.history": "Yomu のリーダーで読んだ文書が、読んだ割合つきでここに並びます。クリックすると続きから開きます。"
+  "viewsWelcome.history": "Yomu のリーダーで読んだ文書が、読んだ割合つきでここに並びます。クリックすると続きから開きます。",
+  "config.theme.solarized-light": "Solarized Light：長文を読むために作られた、まぶしさを抑えた淡いベージュの紙。",
+  "config.theme.solarized-dark": "Solarized Dark：深い青緑の背景。",
+  "config.theme.github-light": "GitHub Light：GitHub の README の見た目。",
+  "config.theme.github-dark": "GitHub Dark：GitHub のダークの見た目。",
+  "config.theme.nord": "Nord：青みのある落ち着いた暗い配色。",
+  "config.theme.catppuccin-latte": "Catppuccin Latte：柔らかいパステルのライト。",
+  "config.theme.catppuccin-mocha": "Catppuccin Mocha：柔らかいパステルのダーク。"
 }

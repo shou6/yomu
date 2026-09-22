@@ -1,0 +1,48 @@
+/*
+ * テーマ solarized-dark。Solarized（MIT）のダーク。深い青緑の背景。
+ * 構成は paper と同じで、色だけを変える（すべてのテーマが同じ変数の組を定義する）。
+ */
+
+body[data-theme='solarized-dark'] {
+  --yomu-bg: #002b36;
+  --yomu-fg: #93a1a1;
+  --yomu-link: #268bd2;
+
+  --yomu-h1: #eee8d5;
+  --yomu-h1-border: #268bd2;
+  --yomu-h2: #eee8d5;
+  --yomu-h2-border: #2aa198;
+  --yomu-h3: #93a1a1;
+  --yomu-h3-border: #073642;
+  --yomu-h4: #93a1a1;
+  --yomu-h5: #839496;
+
+  --yomu-th: #eee8d5;
+  --yomu-th-border: #268bd2;
+  --yomu-td-border: #073642;
+  --yomu-row-hover: #073642;
+
+  --yomu-pre-bg: #073642;
+  --yomu-pre-border: #0b4251;
+  --yomu-code-bg: #073642;
+  --yomu-code-fg: #d33682;
+  --yomu-code-label-fg: #839496;
+  --yomu-code-label-bg: #0b4251;
+
+  --yomu-quote-border: #2aa198;
+  --yomu-quote-bg: #073642;
+  --yomu-quote-fg: #839496;
+
+  --yomu-hr: #0b4251;
+  --yomu-zoom-backdrop: rgb(0 20 26 / 88%);
+
+  --yomu-hl-keyword: #859900;
+  --yomu-hl-string: #2aa198;
+  --yomu-hl-number: #d33682;
+  --yomu-hl-comment: #586e75;
+  --yomu-hl-function: #268bd2;
+  --yomu-hl-type: #b58900;
+  --yomu-hl-variable: #cb4b16;
+  --yomu-hl-attr: #6c71c4;
+  --yomu-hl-meta: #586e75;
+}

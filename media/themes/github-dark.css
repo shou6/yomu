@@ -1,0 +1,48 @@
+/*
+ * テーマ github-dark。GitHub の Primer（MIT）のダークの配色。
+ * 構成は paper と同じで、色だけを変える（すべてのテーマが同じ変数の組を定義する）。
+ */
+
+body[data-theme='github-dark'] {
+  --yomu-bg: #0d1117;
+  --yomu-fg: #e6edf3;
+  --yomu-link: #4493f8;
+
+  --yomu-h1: #f0f6fc;
+  --yomu-h1-border: #3d444d;
+  --yomu-h2: #f0f6fc;
+  --yomu-h2-border: #3d444d;
+  --yomu-h3: #e6edf3;
+  --yomu-h3-border: #262c36;
+  --yomu-h4: #e6edf3;
+  --yomu-h5: #9198a1;
+
+  --yomu-th: #f0f6fc;
+  --yomu-th-border: #3d444d;
+  --yomu-td-border: #3d444d;
+  --yomu-row-hover: #151b23;
+
+  --yomu-pre-bg: #151b23;
+  --yomu-pre-border: #3d444d;
+  --yomu-code-bg: #262c36;
+  --yomu-code-fg: #e6edf3;
+  --yomu-code-label-fg: #9198a1;
+  --yomu-code-label-bg: #262c36;
+
+  --yomu-quote-border: #3d444d;
+  --yomu-quote-bg: #0d1117;
+  --yomu-quote-fg: #9198a1;
+
+  --yomu-hr: #3d444d;
+  --yomu-zoom-backdrop: rgb(1 4 9 / 85%);
+
+  --yomu-hl-keyword: #ff7b72;
+  --yomu-hl-string: #a5d6ff;
+  --yomu-hl-number: #79c0ff;
+  --yomu-hl-comment: #9198a1;
+  --yomu-hl-function: #d2a8ff;
+  --yomu-hl-type: #ffa657;
+  --yomu-hl-variable: #ffa657;
+  --yomu-hl-attr: #79c0ff;
+  --yomu-hl-meta: #9198a1;
+}

@@ -20,6 +20,7 @@ import {
 import { injectMermaid, printHtml, rewriteFontUrls } from './printHtml';
 import type { ReadingHistory } from './readingHistory';
 import { renderSafely } from './render';
+import { STYLE_FILES } from './styles';
 import { resourceRoots } from './resourceRoots';
 import { webviewHtml } from './webviewHtml';
 
@@ -28,17 +29,6 @@ const UPDATE_DELAY = 200;
 
 /** 設定の接頭辞 */
 const CONFIG_SECTION = 'yomu';
-
-/** Webview に配る CSS。テーマは全部読み込み、body の data-theme で切り替える。vscode.css は最後（ハイコントラストの上書きのため） */
-const STYLE_FILES = [
-  'fonts.css',
-  'reader.css',
-  'highlight.css',
-  'themes/paper.css',
-  'themes/sepia.css',
-  'themes/dark.css',
-  'themes/vscode.css',
-];
 
 /** 印刷用の HTML に埋め込む CSS。テーマは paper だけ（印刷は白地にする） */
 const PRINT_STYLE_FILES = [

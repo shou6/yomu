@@ -1,0 +1,48 @@
+/*
+ * テーマ catppuccin-latte。Catppuccin（MIT）の Latte。柔らかいパステルのライト。
+ * 構成は paper と同じで、色だけを変える（すべてのテーマが同じ変数の組を定義する）。
+ */
+
+body[data-theme='catppuccin-latte'] {
+  --yomu-bg: #eff1f5;
+  --yomu-fg: #4c4f69;
+  --yomu-link: #1e66f5;
+
+  --yomu-h1: #4c4f69;
+  --yomu-h1-border: #8839ef;
+  --yomu-h2: #4c4f69;
+  --yomu-h2-border: #7287fd;
+  --yomu-h3: #4c4f69;
+  --yomu-h3-border: #ccd0da;
+  --yomu-h4: #5c5f77;
+  --yomu-h5: #6c6f85;
+
+  --yomu-th: #4c4f69;
+  --yomu-th-border: #7287fd;
+  --yomu-td-border: #ccd0da;
+  --yomu-row-hover: #e6e9ef;
+
+  --yomu-pre-bg: #e6e9ef;
+  --yomu-pre-border: #ccd0da;
+  --yomu-code-bg: #dce0e8;
+  --yomu-code-fg: #d20f39;
+  --yomu-code-label-fg: #6c6f85;
+  --yomu-code-label-bg: #ccd0da;
+
+  --yomu-quote-border: #7287fd;
+  --yomu-quote-bg: #e6e9ef;
+  --yomu-quote-fg: #6c6f85;
+
+  --yomu-hr: #ccd0da;
+  --yomu-zoom-backdrop: rgb(76 79 105 / 82%);
+
+  --yomu-hl-keyword: #8839ef;
+  --yomu-hl-string: #40a02b;
+  --yomu-hl-number: #fe640b;
+  --yomu-hl-comment: #9ca0b0;
+  --yomu-hl-function: #1e66f5;
+  --yomu-hl-type: #df8e1d;
+  --yomu-hl-variable: #4c4f69;
+  --yomu-hl-attr: #179299;
+  --yomu-hl-meta: #9ca0b0;
+}

@@ -1,0 +1,48 @@
+/*
+ * テーマ nord。Arctic Ice Studio の Nord（MIT）。青みのある落ち着いた暗い配色。
+ * 構成は paper と同じで、色だけを変える（すべてのテーマが同じ変数の組を定義する）。
+ */
+
+body[data-theme='nord'] {
+  --yomu-bg: #2e3440;
+  --yomu-fg: #d8dee9;
+  --yomu-link: #88c0d0;
+
+  --yomu-h1: #eceff4;
+  --yomu-h1-border: #88c0d0;
+  --yomu-h2: #eceff4;
+  --yomu-h2-border: #81a1c1;
+  --yomu-h3: #e5e9f0;
+  --yomu-h3-border: #434c5e;
+  --yomu-h4: #e5e9f0;
+  --yomu-h5: #a3acbd;
+
+  --yomu-th: #eceff4;
+  --yomu-th-border: #81a1c1;
+  --yomu-td-border: #434c5e;
+  --yomu-row-hover: #3b4252;
+
+  --yomu-pre-bg: #3b4252;
+  --yomu-pre-border: #434c5e;
+  --yomu-code-bg: #3b4252;
+  --yomu-code-fg: #ebcb8b;
+  --yomu-code-label-fg: #a3acbd;
+  --yomu-code-label-bg: #434c5e;
+
+  --yomu-quote-border: #81a1c1;
+  --yomu-quote-bg: #3b4252;
+  --yomu-quote-fg: #a3acbd;
+
+  --yomu-hr: #434c5e;
+  --yomu-zoom-backdrop: rgb(36 41 51 / 88%);
+
+  --yomu-hl-keyword: #81a1c1;
+  --yomu-hl-string: #a3be8c;
+  --yomu-hl-number: #b48ead;
+  --yomu-hl-comment: #7b88a1;
+  --yomu-hl-function: #88c0d0;
+  --yomu-hl-type: #8fbcbb;
+  --yomu-hl-variable: #d8dee9;
+  --yomu-hl-attr: #8fbcbb;
+  --yomu-hl-meta: #7b88a1;
+}

@@ -27,5 +27,12 @@
   "viewsWelcome.outline": "Open a Markdown file in the Yomu reader to see its headings here.\n[Open in Reader](command:yomu.openInReader)",
   "config.outline.revealOnOpen": "Open the Yomu Outline view when you open a reader tab. The reader keeps the keyboard focus. Off by default, because it switches the side bar away from what you were looking at.",
   "view.history": "Reading History",
-  "viewsWelcome.history": "Documents you read in the Yomu reader appear here, with how far you have read. Click one to continue where you left off."
+  "viewsWelcome.history": "Documents you read in the Yomu reader appear here, with how far you have read. Click one to continue where you left off.",
+  "config.theme.solarized-light": "Solarized Light: a warm, low-glare page designed for long reading.",
+  "config.theme.solarized-dark": "Solarized Dark: a deep blue-green background.",
+  "config.theme.github-light": "GitHub Light: the look of README files on GitHub.",
+  "config.theme.github-dark": "GitHub Dark: the dark look of GitHub.",
+  "config.theme.nord": "Nord: a calm, bluish dark theme.",
+  "config.theme.catppuccin-latte": "Catppuccin Latte: soft pastel light theme.",
+  "config.theme.catppuccin-mocha": "Catppuccin Mocha: soft pastel dark theme."
 }

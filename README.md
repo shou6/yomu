@@ -14,7 +14,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 - **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the book icon in the editor title bar, the Command Palette, or "Reopen Editor With...".
 - **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Two Japanese fonts are bundled, so the text looks the same on every OS.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, Mermaid diagrams, heading anchors, local and remote images. Raw HTML is disabled.
-- **Themes**: `paper` (white page), `sepia`, `dark`, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
+- **Themes**: `paper` (white page), `sepia`, `dark`, Solarized, GitHub, Nord, Catppuccin, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
 - **Outline**: click the Yomu (book) icon in the activity bar to see the headings of the document you are reading. Click to jump; the current heading follows your scrolling.
 - **Links between documents**: relative links to other Markdown files open in the reader (with `#heading` support). Go back with **Alt+Left**.
 - **Reading progress**: the status bar shows how far you have read. Yomu remembers where you stopped and continues from there next time. The **Reading History** view in the Yomu side bar lists recent documents with their progress.
@@ -47,7 +47,7 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 
 | Setting | Default | What it does |
 | --- | --- | --- |
-| `yomu.theme` | `paper` | Color theme: `paper` (white page), `sepia` (warm page), `dark`, or `vscode` (follows your VS Code theme). High-contrast VS Code themes always use the VS Code colors. |
+| `yomu.theme` | `paper` | Color theme: `paper` (white page), `sepia` (warm page), `dark`, `solarized-light`, `solarized-dark`, `github-light`, `github-dark`, `nord`, `catppuccin-latte`, `catppuccin-mocha`, or `vscode` (follows your VS Code theme). High-contrast VS Code themes always use the VS Code colors. |
 | `yomu.layout.maxWidth` | `820` | Maximum width of the text in pixels. `0` means no limit. |
 | `yomu.layout.align` | `center` | Where the text sits when the window is wider: `left`, `center`, or `right`. |
 | `yomu.layout.padding` | `32` | Horizontal padding around the text in pixels. |

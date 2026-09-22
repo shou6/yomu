@@ -12,14 +12,18 @@ export type MermaidTheme = 'default' | 'neutral' | 'dark';
  */
 export function mermaidTheme(theme: Theme, vscodeIsDark: boolean): MermaidTheme {
   switch (theme) {
-    case 'paper':
-      return 'default';
     case 'sepia':
       return 'neutral';
     case 'dark':
+    case 'solarized-dark':
+    case 'github-dark':
+    case 'nord':
+    case 'catppuccin-mocha':
       return 'dark';
     case 'vscode':
       return vscodeIsDark ? 'dark' : 'default';
+    default:
+      return 'default';
   }
 }
 
