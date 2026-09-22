@@ -26,6 +26,7 @@ suite('normalizeSettings', () => {
       lineHeight: 2,
       customCss: '${workspaceFolder}/style.css',
       focusMode: true,
+      foldLines: 30,
     });
     assert.deepStrictEqual(settings, {
       theme: 'dark',
@@ -38,6 +39,7 @@ suite('normalizeSettings', () => {
       lineHeight: 2,
       customCss: '${workspaceFolder}/style.css',
       focusMode: true,
+      foldLines: 30,
     });
   });
 
@@ -80,6 +82,15 @@ suite('normalizeSettings', () => {
     assert.strictEqual(DEFAULT_SETTINGS.focusMode, false);
     assert.strictEqual(normalizeSettings({ focusMode: true }).focusMode, true);
     assert.strictEqual(normalizeSettings({ focusMode: 'yes' }).focusMode, false);
+  });
+
+  test('コードの折りたたみは既定で 20 行。0 は畳まない。範囲外や数でなければ既定値', () => {
+    assert.strictEqual(DEFAULT_SETTINGS.foldLines, 20);
+    assert.strictEqual(normalizeSettings({ foldLines: 0 }).foldLines, 0);
+    assert.strictEqual(normalizeSettings({ foldLines: 40 }).foldLines, 40);
+    assert.strictEqual(normalizeSettings({ foldLines: -1 }).foldLines, 20);
+    assert.strictEqual(normalizeSettings({ foldLines: 2.5 }).foldLines, 20);
+    assert.strictEqual(normalizeSettings({ foldLines: '30' }).foldLines, 20);
   });
 
   test('customCss は前後の空白を落とし、文字列でなければ空', () => {

@@ -140,6 +140,7 @@ suite('Reader', () => {
     ) as Manifest;
     const keys = Object.keys(manifest.contributes.configuration.properties);
     assert.deepStrictEqual(keys.sort(), [
+      'yomu.code.foldLines',
       'yomu.customCss',
       'yomu.focusMode',
       'yomu.font.codeFamily',
@@ -243,5 +244,16 @@ suite('Reader', () => {
     } finally {
       await config().update('focusMode', undefined, vscode.ConfigurationTarget.Global);
     }
+  });
+
+  test('settings に、コードの折りたたみの行数と翻訳済みのボタンの文言が載る', async () => {
+    const { onDidPostMessage } = await api();
+    const received = waitForMessage(onDidPostMessage, (m) => m.type === 'settings');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    const message = await received;
+    assert.strictEqual(message.foldLines, 20);
+    const labels = message.foldLabels as { expand: string; collapse: string };
+    assert.ok(labels.expand.includes('{0}'), labels.expand);
+    assert.ok(labels.collapse.length > 0);
   });
 });
