@@ -81,7 +81,7 @@
         "command": "yomu.openInBrowser",
         "title": "%command.openInBrowser%",
         "category": "Yomu",
-        "icon": "$(print)"
+        "icon": "$(file-pdf)"
       },
       {
         "command": "yomu.enableFocusMode",
