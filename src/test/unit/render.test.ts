@@ -79,7 +79,10 @@ suite('render: 見出しの ID', () => {
 suite('render: コードブロック', () => {
   test('言語指定があれば、その言語でハイライトする', () => {
     const out = html('```ts\nconst a: number = 1;\n```\n');
-    assert.ok(out.includes('<pre data-lang="ts"><code class="language-ts">'), out);
+    assert.ok(
+      out.includes('<div class="yomu-code" data-lang="ts"><pre><code class="language-ts">'),
+      out
+    );
     assert.ok(out.includes('<span class="hljs-'), out);
   });
 
@@ -90,10 +93,16 @@ suite('render: コードブロック', () => {
     assert.ok(docker.includes('<span class="hljs-'), docker);
   });
 
-  test('言語指定のあるコードブロックには、ラベル用に data-lang が付く', () => {
+  test('言語指定のあるコードブロックは、ラベル用の data-lang を持つ枠で包む', () => {
+    // 枠は横スクロールしない。pre の中にラベルを置くと、横に長いコードでラベルも一緒に流れてしまう
     const out = html('```ts\nconst a = 1;\n```\n');
-    assert.ok(out.includes('<pre data-lang="ts"><code class="language-ts">'), out);
-    assert.ok(!html('```\nplain\n```\n').includes('data-lang'), '言語なしに data-lang がある');
+    assert.ok(
+      out.includes('<div class="yomu-code" data-lang="ts"><pre><code class="language-ts">'),
+      out
+    );
+    assert.ok(out.includes('</pre></div>'), out);
+    const plain = html('```\nplain\n```\n');
+    assert.ok(!plain.includes('data-lang') && !plain.includes('yomu-code'), '言語なしに枠がある');
     // 未対応の言語でも、書いた言語名はラベルに出す
     assert.ok(html('```nosuchlang\nx\n```\n').includes('data-lang="nosuchlang"'));
   });
@@ -112,7 +121,7 @@ suite('render: コードブロック', () => {
     const out = html('```nosuchlang\n<tag>\n```\n');
     assert.ok(
       out.includes(
-        '<pre data-lang="nosuchlang"><code class="language-nosuchlang">&lt;tag&gt;\n</code></pre>'
+        '<div class="yomu-code" data-lang="nosuchlang"><pre><code class="language-nosuchlang">&lt;tag&gt;\n</code></pre></div>'
       ),
       out
     );
