@@ -293,6 +293,14 @@ img {
   height: auto;
 }
 
+/*
+ * 円グラフは、mermaid が高さ 450 の固定の枠で描き、style 属性の max-width で本文の幅いっぱいまで広げる。
+ * 他の図は中身に合わせた大きさなので、円グラフだけ大きく見える。style 属性に勝つよう !important で抑える
+ */
+.yomu-mermaid svg[aria-roledescription='pie'] {
+  max-width: min(100%, 480px) !important;
+}
+
 .yomu-mermaid-source {
   text-align: left;
 }
