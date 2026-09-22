@@ -59,26 +59,4 @@ suite('同梱フォント', () => {
     };
     assert.ok(pkg.files.includes('fonts/**'));
   });
-
-  test('コードの罫線・矢印・図形は、1 文字幅で描く等幅フォントに振り向ける', () => {
-    // 罫線（─ │ ┌）や三角（▶ ▼）は東アジアの文字幅が曖昧な文字で、和文の等幅フォント（HackGen など）は
-    // 1.5〜2 文字幅で描く。半角前提で書かれたテキストの図がずれるので、この範囲だけ欧文の等幅フォントで描く
-    const css = fontsCss();
-    const face = css.match(/@font-face\s*{[^}]*font-family:\s*'Yomu Mono Symbols'[^}]*}/)?.[0];
-    assert.ok(face, 'Yomu Mono Symbols の @font-face が無い');
-    for (const range of ['U+2190-21FF', 'U+2500-257F', 'U+2580-259F', 'U+25A0-25FF']) {
-      assert.ok(face.includes(range), range + ' が unicode-range に無い');
-    }
-    for (const font of ['Cascadia Mono', 'Consolas', 'Menlo', 'DejaVu Sans Mono']) {
-      assert.ok(face.includes(`local('${font}')`), font + ' が src に無い');
-    }
-    const reader = fs.readFileSync(path.join(ROOT, 'media', 'reader.css'), 'utf8');
-    const codeFonts = [
-      ...reader.matchAll(/font-family:\s*([^;]*var\(--yomu-code-font-family[^;]*);/g),
-    ];
-    assert.ok(codeFonts.length >= 2, 'コードの font-family が見つからない');
-    for (const [, value] of codeFonts) {
-      assert.ok(value.trim().startsWith("'Yomu Mono Symbols'"), 'コードの先頭に無い: ' + value);
-    }
-  });
 });

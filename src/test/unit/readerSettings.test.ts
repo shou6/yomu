@@ -88,10 +88,13 @@ suite('cssVariables', () => {
     assert.strictEqual(vars['--yomu-margin-right'], 'auto');
     assert.strictEqual(vars['--yomu-padding'], '32px');
     assert.strictEqual(vars['--yomu-font-family'], DEFAULT_SETTINGS.fontFamily);
-    assert.strictEqual(
-      vars['--yomu-code-font-family'],
-      'var(--vscode-editor-font-family, Consolas, monospace)'
-    );
+    // コードの既定は欧文の等幅フォントを先に置く。罫線（─ │ ┌）や三角（▶ ▼）は東アジアの文字幅が曖昧な文字で、
+    // 和文の等幅フォント（HackGen など）は 1.5〜2 文字幅で描くため、半角前提のテキストの図がずれる。
+    // 欧文の等幅フォントなら ASCII と罫線が同じ幅になる。和文だけエディタのフォントで描く
+    const code = vars['--yomu-code-font-family'];
+    assert.ok(code.startsWith("'Cascadia Mono', Consolas, Menlo, 'DejaVu Sans Mono'"), code);
+    assert.ok(code.includes('var(--vscode-editor-font-family'), code);
+    assert.ok(code.trim().endsWith('monospace'), code);
     assert.strictEqual(vars['--yomu-font-size'], '16px');
     assert.strictEqual(vars['--yomu-line-height'], '1.8');
   });
