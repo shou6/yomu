@@ -59,8 +59,6 @@ Yomu は Markdown を専用のリーダータブで開き、日本語を読む�
 | `yomu.outline.revealOnOpen` | `false` | リーダーを開いた時に、目次のビューを自動で開く |
 | `yomu.customCss` | （空） | テーマの後に読み込む CSS ファイルのパス。絶対パスか `${workspaceFolder}` から始まるパス。保存すると即座に反映されます |
 
-![VS Code の設定画面に並ぶ Yomu の設定](images/settings.png)
-
 ### テーマ
 
 ![11 テーマの比較（paper、sepia、dark、Solarized、GitHub、Nord、Catppuccin、vscode）](images/themes.png)

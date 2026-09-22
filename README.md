@@ -60,8 +60,6 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | `yomu.outline.revealOnOpen` | `false` | Open the Outline view automatically when you open a reader tab. |
 | `yomu.customCss` | (empty) | Path to a CSS file loaded after the theme. Absolute, or starting with `${workspaceFolder}`. Saved changes apply immediately. |
 
-![Yomu settings in the VS Code settings editor](images/settings.png)
-
 ### Themes
 
 ![All 11 themes: paper, sepia, dark, Solarized, GitHub, Nord, Catppuccin, and vscode](images/themes.png)
