@@ -79,8 +79,28 @@ suite('render: 見出しの ID', () => {
 suite('render: コードブロック', () => {
   test('言語指定があれば、その言語でハイライトする', () => {
     const out = html('```ts\nconst a: number = 1;\n```\n');
-    assert.ok(out.includes('<pre><code class="language-ts">'), out);
+    assert.ok(out.includes('<pre data-lang="ts"><code class="language-ts">'), out);
     assert.ok(out.includes('<span class="hljs-'), out);
+  });
+
+  test('lib/common に無い言語（PowerShell、Dockerfile）もハイライトされる', () => {
+    const ps = html("```powershell\n$cur = [Environment]::GetEnvironmentVariable('WSLENV')\n```\n");
+    assert.ok(ps.includes('<span class="hljs-'), ps);
+    const docker = html('```dockerfile\nFROM node:24\n```\n');
+    assert.ok(docker.includes('<span class="hljs-'), docker);
+  });
+
+  test('言語指定のあるコードブロックには、ラベル用に data-lang が付く', () => {
+    const out = html('```ts\nconst a = 1;\n```\n');
+    assert.ok(out.includes('<pre data-lang="ts"><code class="language-ts">'), out);
+    assert.ok(!html('```\nplain\n```\n').includes('data-lang'), '言語なしに data-lang がある');
+    // 未対応の言語でも、書いた言語名はラベルに出す
+    assert.ok(html('```nosuchlang\nx\n```\n').includes('data-lang="nosuchlang"'));
+  });
+
+  test('data-lang の値はエスケープされる', () => {
+    const out = html('```a"b\nx\n```\n');
+    assert.ok(!out.includes('data-lang="a"b"'), out);
   });
 
   test('言語指定が無ければ、装飾なしでエスケープして表示する', () => {
@@ -91,7 +111,9 @@ suite('render: コードブロック', () => {
   test('未対応の言語なら、装飾なしでエスケープして表示する', () => {
     const out = html('```nosuchlang\n<tag>\n```\n');
     assert.ok(
-      out.includes('<pre><code class="language-nosuchlang">&lt;tag&gt;\n</code></pre>'),
+      out.includes(
+        '<pre data-lang="nosuchlang"><code class="language-nosuchlang">&lt;tag&gt;\n</code></pre>'
+      ),
       out
     );
     assert.ok(!out.includes('hljs-'), out);

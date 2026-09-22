@@ -141,13 +141,16 @@ suite('Reader', () => {
     ]);
   });
 
-  test('リーダータブを開くと、本文より先に settings が送られる', async () => {
+  test('リーダータブを開くと、Webview の準備ができた後に settings、update の順で送られる', async () => {
     const { onDidPostMessage } = await api();
     const types: string[] = [];
     const subscription = onDidPostMessage((message) => types.push(message.type));
     try {
+      const firstUpdate = waitForMessage(onDidPostMessage, (m) => m.type === 'update');
       await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
-      assert.deepStrictEqual(types.slice(0, 2), ['settings', 'update']);
+      // Webview のスクリプトが ready を送ってから配るので、openWith が返った直後はまだ届いていない
+      await firstUpdate;
+      assert.deepStrictEqual(types, ['settings', 'update']);
     } finally {
       subscription.dispose();
     }
@@ -155,7 +158,9 @@ suite('Reader', () => {
 
   test('yomu の設定を変えると、開いているリーダータブに settings が再送される', async () => {
     const { onDidPostMessage } = await api();
+    const opened = waitForMessage(onDidPostMessage, (m) => m.type === 'update');
     await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
     const config = vscode.workspace.getConfiguration('yomu');
     try {
       const received = waitForMessage(
