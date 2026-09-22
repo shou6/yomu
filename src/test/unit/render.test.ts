@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { render } from '../../reader/render';
+import { render, renderSafely } from '../../reader/render';
 
 /** 相対パスの画像を、Webview 用の URI に見立てた文字列へ置き換える */
 function resolveImageSrc(src: string): string {
@@ -135,5 +135,32 @@ suite('render: タスクリスト', () => {
       boxes.every((box) => /disabled/.test(box)),
       out
     );
+  });
+});
+
+suite('renderSafely: 例外時の表示', () => {
+  test('変換に成功したら render と同じ HTML', () => {
+    assert.strictEqual(
+      renderSafely('# a\n', { resolveImageSrc }),
+      render('# a\n', { resolveImageSrc })
+    );
+  });
+
+  test('変換中に例外が出ても白紙にならず、エラーの内容をエスケープして表示する', () => {
+    const boom = (): string => {
+      throw new Error('resolver <broke>');
+    };
+    const out = renderSafely('![x](./a.png)\n', { resolveImageSrc: boom });
+    assert.ok(out.includes('class="yomu-error"'), out);
+    assert.ok(out.includes('resolver &lt;broke&gt;'), out);
+    assert.ok(!out.includes('<broke>'), out);
+  });
+
+  test('Error でないものが投げられても表示できる', () => {
+    const boom = (): string => {
+      throw 'plain string';
+    };
+    const out = renderSafely('![x](./a.png)\n', { resolveImageSrc: boom });
+    assert.ok(out.includes('plain string'), out);
   });
 });
