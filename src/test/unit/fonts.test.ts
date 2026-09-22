@@ -47,10 +47,23 @@ suite('同梱フォント', () => {
     }
   });
 
-  test('本文のフォントの既定値は、同梱フォントを含む', () => {
-    for (const family of bundledFamilies()) {
+  test('同梱のゴシック体は本文の既定値に入り、明朝体は選べる書体として登録だけする', () => {
+    // 明朝体は好みが分かれるので既定にはしない。yomu.font.family に名前を書けば使える
+    const families = bundledFamilies();
+    for (const family of ['BIZ UDPGothic', 'Noto Sans JP']) {
+      assert.ok(families.includes(family), family + ' が同梱されていない');
       assert.ok(DEFAULT_SETTINGS.fontFamily.includes(family), family + ' が既定値に無い');
     }
+    assert.ok(families.includes('BIZ UDPMincho'), 'BIZ UDPMincho が同梱されていない');
+    assert.ok(!DEFAULT_SETTINGS.fontFamily.includes('Mincho'), '明朝体が既定値に入っている');
+  });
+
+  test('明朝体は Regular と Bold の 2 つの太さを持つ', () => {
+    const faces = (fontsCss().match(/@font-face\s*{[^}]*}/g) ?? []).filter((face) =>
+      face.includes("'BIZ UDPMincho'")
+    );
+    const weights = faces.map((face) => face.match(/font-weight:\s*(\d+)/)?.[1]).sort();
+    assert.deepStrictEqual(weights, ['400', '700']);
   });
 
   test('fonts/ は公開パッケージに入る', () => {
