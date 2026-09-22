@@ -36,9 +36,9 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   align: 'center',
   padding: 32,
   // 欧文フォントを先に並べ、欧文フォントに無い和文は後ろの和文フォントで描く（和欧の出し分け）。
-  // 同梱フォントは実装計画のフェーズ 8 で先頭に足す
+  // 和文は同梱フォント（media/fonts.css で登録）なので、どの OS でも同じ見た目になる
   fontFamily:
-    "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Yu Gothic UI', Meiryo, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif",
+    "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'BIZ UDPGothic', 'Noto Sans JP', sans-serif",
   codeFontFamily: '',
   fontSize: 15,
   lineHeight: 1.8,

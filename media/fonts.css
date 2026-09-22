@@ -1,0 +1,31 @@
+/*
+ * 同梱フォント（SIL Open Font License）。ファイルとライセンスは fonts/ にある（要件定義 4.2 節）。
+ * url() は この CSS の Webview URI を基準に解決される。
+ * 設定 yomu.font.family に書体名を書けば使える。
+ */
+
+/* BIZ UDPGothic（モリサワ）。読みやすさを重視した UD 書体。Regular と Bold */
+@font-face {
+  font-family: 'BIZ UDPGothic';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/BIZUDPGothic-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'BIZ UDPGothic';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/BIZUDPGothic-Bold.woff2') format('woff2');
+}
+
+/* Noto Sans JP（Google）。可変フォントで、太さ 100〜900 を 1 ファイルで持つ */
+@font-face {
+  font-family: 'Noto Sans JP';
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  src: url('../fonts/NotoSansJP-VF.woff2') format('woff2');
+}

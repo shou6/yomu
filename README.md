@@ -10,7 +10,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 ## Features
 
 - **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the book icon in the editor title bar, the Command Palette, or "Reopen Editor With...".
-- **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. No web fonts are bundled; system fonts are used.
+- **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Two Japanese fonts are bundled, so the text looks the same on every OS.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, heading anchors, local and remote images. Raw HTML is disabled.
 - **Paper-like look**: a white page with clear heading levels, tables with horizontal rules, and soft code blocks, regardless of your color theme. High-contrast themes use the theme colors.
 - **Live update**: editing and saving the file in the text editor updates the reader tab.
@@ -37,6 +37,19 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | `yomu.font.size` | `15` | Font size in pixels. |
 | `yomu.font.lineHeight` | `1.8` | Line height as a multiple of the font size. |
 | `yomu.customCss` | (empty) | Path to a CSS file loaded after the theme. Absolute, or starting with `${workspaceFolder}`. Saved changes apply immediately. |
+
+### Bundled fonts
+
+Two Japanese fonts ship with the extension, under the SIL Open Font License. Use their names in `yomu.font.family`:
+
+- `BIZ UDPGothic` (Morisawa): a universal-design gothic made for legibility. Regular and Bold.
+- `Noto Sans JP` (Google): a variable font with weights 100 to 900.
+
+The default puts Latin fonts first and `BIZ UDPGothic` after them. To use a bundled font for everything, put it first:
+
+```json
+"yomu.font.family": "'BIZ UDPGothic', sans-serif"
+```
 
 ### Custom CSS
 

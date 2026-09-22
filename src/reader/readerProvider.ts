@@ -27,6 +27,7 @@ const CONFIG_SECTION = 'yomu';
 
 /** Webview に配る CSS。テーマは全部読み込み、body の data-theme で切り替える。vscode.css は最後（ハイコントラストの上書きのため） */
 const STYLE_FILES = [
+  'fonts.css',
   'reader.css',
   'highlight.css',
   'themes/paper.css',
@@ -93,6 +94,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       baseRoots: [
         vscode.Uri.joinPath(this.extensionUri, 'media'),
         vscode.Uri.joinPath(this.extensionUri, 'dist'),
+        vscode.Uri.joinPath(this.extensionUri, 'fonts'),
         ...this.documentResourceRoots(documentDir),
       ],
     };

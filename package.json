@@ -33,6 +33,7 @@
     "dist/extension.js",
     "dist/webview.js",
     "media/**",
+    "fonts/**",
     "resources/**",
     "l10n/**",
     "package.nls.json",
@@ -120,7 +121,7 @@
         },
         "yomu.font.family": {
           "type": "string",
-          "default": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'Yu Gothic UI', Meiryo, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif",
+          "default": "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, 'BIZ UDPGothic', 'Noto Sans JP', sans-serif",
           "description": "%config.font.family%"
         },
         "yomu.font.codeFamily": {

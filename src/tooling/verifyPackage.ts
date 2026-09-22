@@ -50,7 +50,10 @@ export function checkPackageFiles(
     allowed.push(
       new RegExp('^' + escapeRegExp(main) + '$'),
       /^dist\/webview\.js$/,
-      /^media\/(themes\/)?[\w.-]+\.css$/
+      /^media\/(themes\/)?[\w.-]+\.css$/,
+      // 同梱フォントとそのライセンス
+      /^fonts\/[\w.-]+\.woff2$/,
+      /^fonts\/OFL-[\w.-]+\.txt$/
     );
     required.push(main, 'dist/webview.js');
   }
