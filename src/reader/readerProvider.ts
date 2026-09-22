@@ -99,6 +99,12 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       ],
     };
 
+    // タブの表示名とアイコンを標準エディタと変え、どちらのタブか一目で分かるようにする
+    panel.title = 'Yomu: ' + path.basename(document.fileName);
+    panel.iconPath = {
+      light: vscode.Uri.joinPath(this.extensionUri, 'resources', 'reader-light.svg'),
+      dark: vscode.Uri.joinPath(this.extensionUri, 'resources', 'reader-dark.svg'),
+    };
     webview.options = { enableScripts: true, localResourceRoots: entry.baseRoots };
     webview.html = webviewHtml({
       nonce: crypto.randomBytes(16).toString('base64'),

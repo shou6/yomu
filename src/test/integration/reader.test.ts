@@ -92,6 +92,11 @@ suite('Reader', () => {
     assert.strictEqual(activeCustomViewType(), VIEW_TYPE);
   });
 
+  test('リーダータブの表示名は「Yomu: ファイル名」で、標準エディタのタブと見分けが付く', async () => {
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    assert.strictEqual(vscode.window.tabGroups.activeTabGroup.activeTab?.label, 'Yomu: sample.md');
+  });
+
   test('コマンドで、アクティブな .md をリーダータブで開ける', async () => {
     await vscode.window.showTextDocument(fixture('sample.md'));
     await vscode.commands.executeCommand('yomu.openInReader');
