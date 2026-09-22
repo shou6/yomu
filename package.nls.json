@@ -16,5 +16,5 @@
   "config.font.lineHeight": "Line height of the text, as a multiple of the font size.",
   "config.customCss": "Path to a CSS file loaded after the theme. Absolute, or starting with ${workspaceFolder}. Override any --yomu-* variable or rule.",
   "command.toggleFocusMode": "Toggle Focus Mode",
-  "config.focusMode": "Focus mode: dim everything except the block you are reading (about 40% down the screen). Toggle it with \"Yomu: Toggle Focus Mode\"."
+  "config.focusMode": "Focus mode: dim everything except the blocks you are reading (those between 30% and 55% down the screen). Toggle it with \"Yomu: Toggle Focus Mode\"."
 }

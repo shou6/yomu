@@ -1,8 +1,8 @@
 /**
- * 集中モード。読んでいるブロック（画面の上から 4 割の高さにあるもの）以外を薄く表示する。
+ * 集中モード。読んでいるブロック（画面の上から 3 割〜5.5 割の帯に掛かるもの）以外を薄く表示する。
  * どのブロックかの判定は reader/focus.ts（単体テスト済み）。
  */
-import { FOCUS_ANCHOR, focusedIndex } from '../reader/focus';
+import { FOCUS_BAND, focusedIndices } from '../reader/focus';
 
 let enabled = false;
 let frame: number | undefined;
@@ -24,17 +24,16 @@ export function updateFocus(root: HTMLElement): void {
     return;
   }
   const items = blocks(root);
-  const index = focusedIndex(
-    items.map((item) => {
-      const rect = item.getBoundingClientRect();
-      return { top: rect.top, bottom: rect.bottom };
-    }),
-    window.innerHeight * FOCUS_ANCHOR
+  const focused = new Set(
+    focusedIndices(
+      items.map((item) => {
+        const rect = item.getBoundingClientRect();
+        return { top: rect.top, bottom: rect.bottom };
+      }),
+      { top: window.innerHeight * FOCUS_BAND.top, bottom: window.innerHeight * FOCUS_BAND.bottom }
+    )
   );
-  root
-    .querySelectorAll('.yomu-focused')
-    .forEach((element) => element.classList.remove('yomu-focused'));
-  items[index]?.classList.add('yomu-focused');
+  items.forEach((item, index) => item.classList.toggle('yomu-focused', focused.has(index)));
 }
 
 export function setFocusMode(root: HTMLElement, on: boolean): void {
