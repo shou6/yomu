@@ -7,12 +7,14 @@
 Yomu opens a Markdown file in a dedicated reader tab, typeset for reading Japanese text.
 It is a viewer, not an editor: when you want to edit, open the file in the regular text editor.
 
+![A Markdown document in the Yomu reader tab with the paper theme](images/reader-paper.png)
+
 ## Features
 
 - **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the book icon in the editor title bar, the Command Palette, or "Reopen Editor With...".
 - **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Two Japanese fonts are bundled, so the text looks the same on every OS.
 - **Rendering**: CommonMark plus GFM tables, strikethrough and task lists, syntax highlighting for code blocks, heading anchors, local and remote images. Raw HTML is disabled.
-- **Paper-like look**: a white page with clear heading levels, tables with horizontal rules, and soft code blocks, regardless of your color theme. High-contrast themes use the theme colors.
+- **Themes**: `paper` (white page), `sepia`, `dark`, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
 - **Live update**: editing and saving the file in the text editor updates the reader tab.
 
 ## Usage
@@ -21,6 +23,8 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 2. Click the book icon in the editor title bar, or open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and run **Yomu: Open in Reader**.
    You can also use **Reopen Editor With...** and choose **Yomu Reader**.
 3. To edit, use **Reopen Editor With...** and choose **Text Editor**.
+
+![Syntax-highlighted code blocks with language labels](images/code-block.png)
 
 ## Settings
 
@@ -37,6 +41,12 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | `yomu.font.size` | `15` | Font size in pixels. |
 | `yomu.font.lineHeight` | `1.8` | Line height as a multiple of the font size. |
 | `yomu.customCss` | (empty) | Path to a CSS file loaded after the theme. Absolute, or starting with `${workspaceFolder}`. Saved changes apply immediately. |
+
+![Yomu settings in the VS Code settings editor](images/settings.png)
+
+### Themes
+
+![The paper, dark, and vscode themes side by side](images/themes.png)
 
 ### Bundled fonts
 
