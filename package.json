@@ -174,11 +174,13 @@
       "yomu": [
         {
           "id": "yomu.outline",
-          "name": "%view.outline%"
+          "name": "%view.outline%",
+          "icon": "resources/activitybar.svg"
         },
         {
           "id": "yomu.history",
-          "name": "%view.history%"
+          "name": "%view.history%",
+          "icon": "resources/activitybar.svg"
         }
       ]
     },
