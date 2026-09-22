@@ -278,4 +278,57 @@ suite('Reader', () => {
     assert.ok(registered.includes('yomu.openInBrowser'));
     await vscode.commands.executeCommand('yomu.openInBrowser');
   });
+
+  test('リーダータブの右上に、印刷・集中モード・標準エディタで開くのボタンを出す', () => {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    const items = manifest.contributes.menus['editor/title'];
+    const find = (command: string): { when: string; group?: string } => {
+      const item = items.find((m) => m.command === command);
+      assert.ok(item, 'editor/title に ' + command + ' が無い');
+      return item;
+    };
+    for (const command of [
+      'yomu.openInBrowser',
+      'yomu.enableFocusMode',
+      'yomu.disableFocusMode',
+      'yomu.openInTextEditor',
+    ]) {
+      const item = find(command);
+      assert.strictEqual(item.group, 'navigation', command);
+      assert.ok(
+        item.when.includes('activeCustomEditorId == yomu.reader'),
+        command + ': ' + item.when
+      );
+      const declared = manifest.contributes.commands.find((c) => c.command === command);
+      assert.ok(declared?.icon, command + ' にアイコンが無い');
+    }
+    // 集中モードは、今の状態に応じてどちらか一方だけを出す
+    assert.ok(find('yomu.enableFocusMode').when.includes('!config.yomu.focusMode'));
+    assert.ok(/(^|[^!])config\.yomu\.focusMode/.test(find('yomu.disableFocusMode').when));
+  });
+
+  test('集中モードをオンにするコマンドとオフにするコマンド', async () => {
+    const config = (): vscode.WorkspaceConfiguration => vscode.workspace.getConfiguration('yomu');
+    try {
+      await vscode.commands.executeCommand('yomu.enableFocusMode');
+      assert.strictEqual(config().get('focusMode'), true);
+      await vscode.commands.executeCommand('yomu.disableFocusMode');
+      assert.strictEqual(config().get('focusMode'), false);
+    } finally {
+      await config().update('focusMode', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
+
+  test('標準エディタで開くと、同じファイルがテキストエディタのタブで開く', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    await vscode.commands.executeCommand('yomu.openInTextEditor');
+    const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
+    assert.ok(input instanceof vscode.TabInputText, 'テキストエディタで開いていない');
+    assert.strictEqual(input.uri.fsPath, fixture('sample.md').fsPath);
+  });
 });
