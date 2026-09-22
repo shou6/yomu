@@ -64,7 +64,7 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 
 ### Themes
 
-![The paper, sepia, dark, and vscode themes](images/themes.png)
+![All 11 themes: paper, sepia, dark, Solarized, GitHub, Nord, Catppuccin, and vscode](images/themes.png)
 
 ### Bundled fonts
 

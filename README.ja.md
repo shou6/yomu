@@ -63,7 +63,7 @@ Yomu は Markdown を専用のリーダータブで開き、日本語を読む�
 
 ### テーマ
 
-![paper、sepia、dark、vscode の 4 テーマの比較](images/themes.png)
+![11 テーマの比較（paper、sepia、dark、Solarized、GitHub、Nord、Catppuccin、vscode）](images/themes.png)
 
 ### 同梱フォント
 
