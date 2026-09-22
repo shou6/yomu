@@ -29,6 +29,8 @@ interface YomuApi {
   recordProgress(uri: vscode.Uri, progress: number): Promise<void>;
   /** ステータスバーに出している文字。出していなければ undefined */
   statusBarText(): string | undefined;
+  /** リーダーでリンクをクリックした時と同じ処理（テスト用） */
+  followLink(from: vscode.Uri, href: string): Promise<void>;
 }
 
 async function api(): Promise<YomuApi> {
@@ -481,5 +483,50 @@ suite('Reader', () => {
     assert.strictEqual(editor.document.uri.fsPath, fixture('sample.md').fsPath);
     // 開いた直後は一番上を読んでいるので、先頭の見出しの行
     assert.strictEqual(editor.selection.active.line, 0);
+  });
+
+  test('相対リンクの先が .md なら、リーダーで開く', async () => {
+    const yomu = await api();
+    await yomu.followLink(fixture('links.md'), './sample.md');
+    const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
+    assert.ok(input instanceof vscode.TabInputCustom, 'リーダーで開いていない');
+    assert.strictEqual(input.viewType, VIEW_TYPE);
+    assert.strictEqual(input.uri.fsPath, fixture('sample.md').fsPath);
+  });
+
+  test('相対リンクの先が .md でなければ、標準エディタで開く', async () => {
+    const yomu = await api();
+    await yomu.followLink(fixture('links.md'), './plain.txt');
+    const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
+    assert.ok(input instanceof vscode.TabInputText, '標準エディタで開いていない');
+    assert.strictEqual(input.uri.fsPath, fixture('plain.txt').fsPath);
+  });
+
+  test('見出し付きのリンクは、開いた後にその見出しへ移動するよう伝える', async () => {
+    const yomu = await api();
+    const received = waitForMessage(
+      yomu.onDidPostMessage,
+      (m) =>
+        (m.type === 'update' && m.anchor === 'サンプル') ||
+        (m.type === 'scrollTo' && m.id === 'サンプル')
+    );
+    await yomu.followLink(fixture('links.md'), './sample.md#%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB');
+    await received;
+  });
+
+  test('既にリーダーで開いている文書へのリンクは、そのタブへ移って見出しへ移動する', async () => {
+    const yomu = await api();
+    const opened = waitForMessage(yomu.onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('sample.md'), VIEW_TYPE);
+    await opened;
+    const received = waitForMessage(
+      yomu.onDidPostMessage,
+      (m) => m.type === 'scrollTo' && m.id === 'サンプル'
+    );
+    await yomu.followLink(fixture('links.md'), './sample.md#サンプル');
+    await received;
+    const input = vscode.window.tabGroups.activeTabGroup.activeTab?.input;
+    assert.ok(input instanceof vscode.TabInputCustom);
+    assert.strictEqual(input.uri.fsPath, fixture('sample.md').fsPath);
   });
 });

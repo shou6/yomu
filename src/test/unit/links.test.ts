@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import { classifyLink } from '../../reader/links';
+import { classifyLink, isMarkdownPath } from '../../reader/links';
 
 suite('classifyLink', () => {
   test('# で始まるリンクは文書内。ID はデコードする', () => {
@@ -50,5 +50,19 @@ suite('classifyLink', () => {
 
   test('壊れたパーセントエンコードはそのまま使う', () => {
     assert.deepStrictEqual(classifyLink('#100%'), { kind: 'fragment', id: '100%' });
+  });
+});
+
+suite('isMarkdownPath', () => {
+  test('.md と .markdown は Markdown。大文字小文字は問わない', () => {
+    assert.strictEqual(isMarkdownPath('./other.md'), true);
+    assert.strictEqual(isMarkdownPath('../docs/README.MD'), true);
+    assert.strictEqual(isMarkdownPath('notes.markdown'), true);
+  });
+
+  test('それ以外は Markdown でない', () => {
+    assert.strictEqual(isMarkdownPath('./plain.txt'), false);
+    assert.strictEqual(isMarkdownPath('./image.png'), false);
+    assert.strictEqual(isMarkdownPath('./md'), false);
   });
 });
