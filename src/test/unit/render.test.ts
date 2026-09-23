@@ -338,3 +338,23 @@ suite('render: 許可した HTML のタグ', () => {
     assert.ok(!out.includes('<details>'), out);
   });
 });
+
+suite('render: 脚注', () => {
+  test('参照は定義へのリンクの上付き数字になり、定義は文書の末尾に並ぶ', () => {
+    const out = html('本文[^note]。\n\n[^note]: 脚注の説明。\n\n## 次の節\n');
+    assert.match(out, /<sup class="footnote-ref"><a href="#fn1" id="fnref1">1<\/a><\/sup>/);
+    assert.match(
+      out,
+      /<li id="fn1" class="footnote-item"><p>脚注の説明。 <a href="#fnref1" class="footnote-backref">/
+    );
+    assert.ok(!out.includes('[^note]'), out);
+    // 定義を書いた位置ではなく、文書の末尾に出す
+    assert.ok(out.indexOf('次の節') < out.indexOf('脚注の説明'), out);
+  });
+
+  test('番号は参照した順に振る', () => {
+    const out = html('A[^b] B[^a]\n\n[^a]: first\n[^b]: second\n');
+    assert.match(out, /<li id="fn1" class="footnote-item"><p>second /);
+    assert.match(out, /<li id="fn2" class="footnote-item"><p>first /);
+  });
+});
