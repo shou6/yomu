@@ -140,6 +140,28 @@ tbody tr:hover td {
   background-color: var(--yomu-row-hover);
 }
 
+/* front matter（render が先頭の --- の間を表にしたもの）。本文より控えめに出す */
+table.yomu-front-matter {
+  width: auto;
+  margin: 0 0 1.5em;
+  font-size: 0.85em;
+  color: var(--yomu-quote-fg);
+}
+
+.yomu-front-matter th {
+  border-bottom: 1px solid var(--yomu-td-border);
+  vertical-align: top;
+}
+
+.yomu-front-matter tbody tr:last-child th {
+  border-bottom: none;
+}
+
+.yomu-front-matter pre {
+  margin: 0;
+  padding: 0.3em 0.6em;
+}
+
 /* コード */
 code {
   letter-spacing: 0;

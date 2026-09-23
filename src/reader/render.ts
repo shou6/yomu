@@ -6,6 +6,7 @@ import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 import taskLists from 'markdown-it-task-lists';
+import { frontMatter } from './frontMatter';
 
 export interface RenderOptions {
   /** 相対パスの画像の src を、Webview で読める URI に変換する */
@@ -51,6 +52,7 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
   const md = new MarkdownIt({ html: false, linkify: false, typographer: false, highlight });
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
+  md.use(frontMatter);
 
   // ブロックの要素に元の行番号（0 始まり）を data-line で付ける。「標準エディタで開く」で読んでいる行へ移るため。
   // 見出しの id より後に付けるよう、anchor の後に足す。リストの項目は深さに関わらず、他は一番外側だけに付ける

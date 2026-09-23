@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Front matter: YAML front matter at the top of a file (between `---` lines) is shown as a small key and value table, as on GitHub. Before, it turned into a horizontal rule and a heading, and the heading appeared in the outline.
+
 ### Fixed
 
 - Tables: numbers and code in narrow columns no longer break in the middle (for example `9876543210` split over two lines). Japanese text in cells still wraps between characters as before.
