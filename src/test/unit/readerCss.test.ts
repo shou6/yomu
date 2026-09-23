@@ -31,3 +31,13 @@ suite('reader.css: ズーム表示', () => {
     assert.match(rule, /max-height:\s*none/);
   });
 });
+
+suite('reader.css: 表', () => {
+  test('セルは語の途中で折らない（数字やコードが縦に割れない）', () => {
+    // anywhere は最小幅の計算にも効き、狭い列が 1 文字幅まで縮んで数字やコードが途中で折れる。
+    // break-word は収まらない語だけを折るので、列は語の幅を保つ。和文は普段どおり文字の間で折り返す
+    const rule = readerCss().match(/(?:^|\n)td\s*{([^}]*)}/)?.[1];
+    assert.ok(rule, 'td の規則が無い');
+    assert.match(rule, /overflow-wrap:\s*break-word/);
+  });
+});

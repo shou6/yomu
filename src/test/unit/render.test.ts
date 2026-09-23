@@ -74,6 +74,11 @@ suite('render: 見出しの ID', () => {
     const href = out.match(/href="([^"]*)"/)?.[1] ?? '';
     assert.strictEqual(decodeURIComponent(href), '#はじめに', out);
   });
+
+  test('記号を落として空白が続いたら、GitHub と同じく空白の数だけハイフンにする', () => {
+    const out = html('## 設定 / API_v2.0 (sample)\n');
+    assert.ok(out.includes('<h2 id="設定--api_v20-sample"'), out);
+  });
 });
 
 suite('render: コードブロック', () => {
