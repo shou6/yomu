@@ -235,3 +235,53 @@ suite('render: 元の行番号', () => {
     assert.ok(!/<p data-line/.test(out), out);
   });
 });
+
+suite('render: front matter', () => {
+  test('ファイルの先頭の front matter を、キーと値の表にする', () => {
+    const out = html('---\ntitle: Hello\nauthor: Yomu\n---\n\n# Body\n');
+    assert.ok(out.includes('<table class="yomu-front-matter" data-line="0">'), out);
+    assert.ok(out.includes('<tr><th>title</th><td>Hello</td></tr>'), out);
+    assert.ok(out.includes('<tr><th>author</th><td>Yomu</td></tr>'), out);
+    assert.ok(!out.includes('<hr'), out);
+    assert.ok(!out.includes('<h2'), out);
+  });
+
+  test('front matter の後のブロックは、元の行番号を保つ', () => {
+    const out = html('---\ntitle: Hello\n---\n\n# Body\n');
+    assert.ok(out.includes('<h1 id="body" data-line="4">'), out);
+  });
+
+  test('値を囲む引用符は外す', () => {
+    const out = html('---\ntitle: "Hello: World"\nnote: \'single\'\n---\n');
+    assert.ok(out.includes('<td>Hello: World</td>'), out);
+    assert.ok(out.includes('<td>single</td>'), out);
+  });
+
+  test('複数行の値（リストや入れ子）は、書かれたままの形で表示する', () => {
+    const out = html('---\ntags:\n  - markdown\n  - vscode\ndraft: false\n---\n');
+    assert.ok(out.includes('<tr><th>tags</th><td><pre>- markdown\n- vscode</pre></td></tr>'), out);
+    assert.ok(out.includes('<tr><th>draft</th><td>false</td></tr>'), out);
+  });
+
+  test('キーと値はエスケープする', () => {
+    const out = html('---\ntitle: <b>x</b> & y\n---\n');
+    assert.ok(out.includes('<td>&lt;b&gt;x&lt;/b&gt; &amp; y</td>'), out);
+  });
+
+  test('ファイルの途中の --- で囲まれた部分は front matter にしない', () => {
+    const out = html('# Top\n\n---\ntitle: Hello\n---\n');
+    assert.ok(!out.includes('yomu-front-matter'), out);
+    assert.ok(out.includes('<hr'), out);
+  });
+
+  test('閉じる --- が無ければ front matter にしない', () => {
+    const out = html('---\ntitle: Hello\n\nText\n');
+    assert.ok(!out.includes('yomu-front-matter'), out);
+  });
+
+  test('中身が「キー: 値」の形でなければ front matter にしない（先頭の水平線として扱う）', () => {
+    const out = html('---\n\n# Title\n\n---\n');
+    assert.ok(!out.includes('yomu-front-matter'), out);
+    assert.ok(out.includes('<h1'), out);
+  });
+});

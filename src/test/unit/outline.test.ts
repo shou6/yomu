@@ -32,6 +32,13 @@ suite('extractHeadings', () => {
   });
 });
 
+suite('extractHeadings: front matter', () => {
+  test('front matter は目次に出さない', () => {
+    const markdown = '---\ntitle: Hello\n---\n\n# Body\n';
+    assert.deepStrictEqual(extractHeadings(markdown), [{ level: 1, text: 'Body', id: 'body' }]);
+  });
+});
+
 suite('buildOutline', () => {
   test('レベルで入れ子にする', () => {
     const outline = buildOutline([
