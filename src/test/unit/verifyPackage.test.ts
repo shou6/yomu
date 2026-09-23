@@ -51,6 +51,7 @@ suite('checkPackageFiles', () => {
           'dist/extension.js',
           'dist/webview.js',
           'dist/mermaid.min.js',
+          'dist/katex/katex.min.css',
           'media/reader.css',
           'media/themes/paper.css',
         ],
@@ -60,7 +61,23 @@ suite('checkPackageFiles', () => {
     );
     assert.deepStrictEqual(checkPackageFiles([...COMMON, 'dist/extension.js'], manifest), {
       unexpected: [],
-      missing: ['dist/webview.js', 'dist/mermaid.min.js'],
+      missing: ['dist/webview.js', 'dist/mermaid.min.js', 'dist/katex/katex.min.css'],
+    });
+  });
+
+  test('KaTeX のフォントは woff2 だけ入れてよい', () => {
+    const manifest = { main: './dist/extension.js' };
+    const required = ['dist/webview.js', 'dist/mermaid.min.js', 'dist/katex/katex.min.css'];
+    const files = [
+      ...COMMON,
+      'dist/extension.js',
+      ...required,
+      'dist/katex/fonts/KaTeX_Main-Regular.woff2',
+      'dist/katex/fonts/KaTeX_Main-Regular.ttf',
+    ];
+    assert.deepStrictEqual(checkPackageFiles(files, manifest), {
+      unexpected: ['dist/katex/fonts/KaTeX_Main-Regular.ttf'],
+      missing: [],
     });
   });
 

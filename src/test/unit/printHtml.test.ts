@@ -1,7 +1,12 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import { injectMermaid, printHtml, rewriteFontUrls } from '../../reader/printHtml';
+import {
+  injectMermaid,
+  printHtml,
+  rewriteFontUrls,
+  rewriteKatexFontUrls,
+} from '../../reader/printHtml';
 
 // out/test/unit から見たプロジェクトルート
 const ROOT = path.resolve(__dirname, '../../..');
@@ -12,6 +17,17 @@ suite('rewriteFontUrls', () => {
     assert.strictEqual(
       rewriteFontUrls(css, 'file:///ext/fonts'),
       "src: url('file:///ext/fonts/A.woff2') format('woff2'); src: url(\"file:///ext/fonts/B.woff2\");"
+    );
+  });
+});
+
+suite('rewriteKatexFontUrls', () => {
+  test('KaTeX の CSS の fonts/ を、KaTeX のフォントのフォルダの URI に書き換える', () => {
+    const css =
+      '@font-face{src:url(fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(fonts/KaTeX_AMS-Regular.woff) format("woff")}';
+    assert.strictEqual(
+      rewriteKatexFontUrls(css, 'file:///ext/dist/katex/fonts'),
+      '@font-face{src:url(file:///ext/dist/katex/fonts/KaTeX_AMS-Regular.woff2) format("woff2"),url(file:///ext/dist/katex/fonts/KaTeX_AMS-Regular.woff) format("woff")}'
     );
   });
 });

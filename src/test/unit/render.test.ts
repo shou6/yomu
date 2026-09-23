@@ -358,3 +358,34 @@ suite('render: 脚注', () => {
     assert.match(out, /<li id="fn2" class="footnote-item"><p>first /);
   });
 });
+
+suite('render: 数式', () => {
+  test('$ で囲んだ行内の数式を KaTeX で描く', () => {
+    const out = html('質量とエネルギー $E = mc^2$ の関係\n');
+    assert.ok(out.includes('class="katex"'), out);
+    assert.ok(!out.includes('$E'), out);
+  });
+
+  test('$$ で囲んだブロックの数式は、行番号付きの独立した行にする', () => {
+    const out = html('段落\n\n$$\n\sum_{i=1}^{n} i\n$$\n');
+    assert.match(out, /<p data-line="2" class="katex-block">/);
+    assert.ok(out.includes('katex-display'), out);
+  });
+
+  test('言語が math のコードブロックも数式として描く', () => {
+    const out = html('```math\n\frac{a}{b}\n```\n');
+    assert.match(out, /<p data-line="0" class="katex-block">/);
+    assert.ok(!out.includes('yomu-code'), out);
+  });
+
+  test('金額の $ は数式にしない', () => {
+    const out = html('It costs $100 and $200.\n');
+    assert.ok(!out.includes('katex'), out);
+    assert.ok(out.includes('$100 and $200.'), out);
+  });
+
+  test('書き方を誤った数式は、例外にせずエラーとして表示する', () => {
+    const out = html('$\frac{a}{$\n');
+    assert.ok(out.includes('katex-error'), out);
+  });
+});
