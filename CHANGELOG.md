@@ -3,6 +3,12 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.1]
+
+### Fixed
+
+- State diagrams: the two arrows between a pair of states (one each way) are drawn as smooth arcs again, instead of hooked lines that detour around their labels. Yomu now bundles Mermaid 11.17.0, the same version as VS Code's built-in Markdown preview, so diagrams look the same in both.
+
 ## [0.2.0]
 
 ### Added
