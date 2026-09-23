@@ -285,3 +285,56 @@ suite('render: front matter', () => {
     assert.ok(out.includes('<h1'), out);
   });
 });
+
+suite('render: 許可した HTML のタグ', () => {
+  test('details と summary はタグとして通し、中の文字はエスケープする', () => {
+    const out = html('<details>\n<summary>題名</summary>\n中身 & <b>x</b>\n</details>\n');
+    assert.ok(out.includes('<details>'), out);
+    assert.ok(out.includes('<summary>題名</summary>'), out);
+    assert.ok(out.includes('中身 &amp; &lt;b&gt;x&lt;/b&gt;'), out);
+    assert.ok(out.includes('</details>'), out);
+  });
+
+  test('空行を挟んだ details の中身は Markdown として変換する', () => {
+    const out = html('<details>\n<summary>題名</summary>\n\n**太字**\n\n</details>\n');
+    assert.ok(out.includes('<strong>太字</strong>'), out);
+  });
+
+  test('details の open だけを残し、ほかの属性は落とす', () => {
+    const out = html(
+      '<details open class="x" onclick="alert(1)">\n<summary onclick="y">t</summary>\n</details>\n'
+    );
+    assert.ok(out.includes('<details open>'), out);
+    assert.ok(out.includes('<summary>t</summary>'), out);
+    assert.ok(!out.includes('onclick'), out);
+    assert.ok(!out.includes('class="x"'), out);
+  });
+
+  test('行内の kbd、sub、sup、br はタグとして通す', () => {
+    const out = html('Press <kbd>Ctrl</kbd>, H<sub>2</sub>O, x<sup>2</sup><br>next\n');
+    assert.ok(out.includes('<kbd>Ctrl</kbd>'), out);
+    assert.ok(out.includes('H<sub>2</sub>O'), out);
+    assert.ok(out.includes('x<sup>2</sup>'), out);
+    assert.ok(out.includes('<br>next'), out);
+  });
+
+  test('許可していないブロックの HTML は、エスケープして段落として表示する', () => {
+    const out = html('<div class="a">\nhello\n</div>\n');
+    assert.match(
+      out,
+      /<p data-line="0">&lt;div class=&quot;a&quot;&gt;\nhello\n&lt;\/div&gt;<\/p>/
+    );
+  });
+
+  test('HTML のコメントは表示しない', () => {
+    const out = html('a\n\n<!-- secret block -->\n\nb <!-- secret inline --> c\n');
+    assert.ok(!out.includes('secret'), out);
+    assert.ok(out.includes('<p>a</p>'), out);
+  });
+
+  test('コードの中のタグはそのままエスケープする', () => {
+    const out = html('`<details>`\n\n```\n<details>\n```\n');
+    assert.ok(out.includes('<code>&lt;details&gt;</code>'), out);
+    assert.ok(!out.includes('<details>'), out);
+  });
+});
