@@ -29,14 +29,15 @@ const ABSOLUTE_URL = /^([a-z][a-z0-9+.-]*:|\/\/)/i;
 
 /**
  * 見出しの ID。GitHub と同じ規則で、日本語はそのまま残す。
- * 小文字にし、文字・数字・空白・ハイフン・アンダースコア以外を落とし、空白をハイフンにする
+ * 小文字にし、文字・数字・空白・ハイフン・アンダースコア以外を落とし、空白を 1 文字ずつハイフンにする
+ * （「A / B」は記号を落とした後に空白が 2 つ残るので「a--b」になる）
  */
 export function slugify(text: string): string {
   return text
     .trim()
     .toLowerCase()
     .replace(/[^\p{L}\p{N}\p{M}\s_-]/gu, '')
-    .replace(/\s+/g, '-');
+    .replace(/\s/g, '-');
 }
 
 function highlight(code: string, lang: string): string {

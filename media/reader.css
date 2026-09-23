@@ -125,8 +125,11 @@ td {
   border-bottom: 1px solid var(--yomu-td-border);
   min-width: 3em;
   text-align: left;
-  /* 和文は普通に折り返す。keep-all だと「v1公開後、要望が出たら」のような不自然な位置で折れる */
-  overflow-wrap: anywhere;
+  /*
+   * 和文は普通に折り返す。keep-all だと「v1公開後、要望が出たら」のような不自然な位置で折れる。
+   * anywhere は列の最小幅を 1 文字まで縮め、数字やコードが途中で折れるので break-word にする
+   */
+  overflow-wrap: break-word;
 }
 
 tbody tr:last-child td {

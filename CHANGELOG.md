@@ -3,6 +3,13 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+
+- Tables: numbers and code in narrow columns no longer break in the middle (for example `9876543210` split over two lines). Japanese text in cells still wraps between characters as before.
+- Heading anchors match GitHub when a heading has symbols between spaces: `## Setup / API` gets the ID `setup--api`, so links written for GitHub jump to the heading.
+
 ## [0.2.1]
 
 ### Fixed
