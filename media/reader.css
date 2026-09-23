@@ -266,6 +266,17 @@ kbd {
   color: var(--yomu-code-fg);
 }
 
+/* 数式（KaTeX が描いたもの）。横に長い式は、本文をはみ出さずに横スクロールする */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2em 0;
+}
+
+.katex {
+  letter-spacing: 0;
+}
+
 /* 脚注。上付きの番号で行の間隔が広がらないようにする */
 sup,
 sub {

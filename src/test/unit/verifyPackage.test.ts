@@ -30,6 +30,7 @@ suite('checkPackageFiles', () => {
           'dist/extension.js',
           'dist/webview.js',
           'dist/mermaid.min.js',
+          'dist/katex/katex.min.css',
           'l10n/bundle.l10n.ja.json',
         ],
         manifest
@@ -38,7 +39,12 @@ suite('checkPackageFiles', () => {
     );
     assert.deepStrictEqual(checkPackageFiles(COMMON, manifest), {
       unexpected: [],
-      missing: ['dist/extension.js', 'dist/webview.js', 'dist/mermaid.min.js'],
+      missing: [
+        'dist/extension.js',
+        'dist/webview.js',
+        'dist/mermaid.min.js',
+        'dist/katex/katex.min.css',
+      ],
     });
   });
 
@@ -88,6 +94,7 @@ suite('checkPackageFiles', () => {
       'dist/extension.js',
       'dist/webview.js',
       'dist/mermaid.min.js',
+      'dist/katex/katex.min.css',
       'fonts/A-Regular.woff2',
       'fonts/OFL-A.txt',
     ];

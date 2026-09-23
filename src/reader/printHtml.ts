@@ -16,6 +16,11 @@ export function rewriteFontUrls(css: string, fontsDirUri: string): string {
   return css.replace(/url\((['"]?)\.\.\/fonts\//g, `url($1${fontsDirUri}/`);
 }
 
+/** KaTeX の CSS の url(fonts/…) を、KaTeX のフォントのフォルダの URI に書き換える */
+export function rewriteKatexFontUrls(css: string, fontsDirUri: string): string {
+  return css.replace(/url\((['"]?)fonts\//g, `url($1${fontsDirUri}/`);
+}
+
 const MERMAID_BLOCK = /<div class="yomu-mermaid"([^>]*)>[\s\S]*?<\/div>/g;
 
 /**

@@ -63,8 +63,25 @@ function copyMermaid() {
   );
 }
 
+/**
+ * 数式の CSS とフォントを dist/katex に写す。数式は拡張機能の側で HTML にするので、KaTeX のスクリプトは要らない。
+ * フォントは woff2 だけ（CSS は woff2 を先に書いており、Webview の Chromium はそれを使う）
+ */
+function copyKatex() {
+  const from = path.join(__dirname, 'node_modules', 'katex', 'dist');
+  const to = path.join(__dirname, 'dist', 'katex');
+  fs.mkdirSync(path.join(to, 'fonts'), { recursive: true });
+  fs.copyFileSync(path.join(from, 'katex.min.css'), path.join(to, 'katex.min.css'));
+  for (const file of fs.readdirSync(path.join(from, 'fonts'))) {
+    if (file.endsWith('.woff2')) {
+      fs.copyFileSync(path.join(from, 'fonts', file), path.join(to, 'fonts', file));
+    }
+  }
+}
+
 async function main() {
   copyMermaid();
+  copyKatex();
   const contexts = await Promise.all(builds.map((options) => esbuild.context(options)));
   if (watch) {
     await Promise.all(contexts.map((ctx) => ctx.watch()));

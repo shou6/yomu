@@ -51,12 +51,15 @@ export function checkPackageFiles(
       new RegExp('^' + escapeRegExp(main) + '$'),
       /^dist\/webview\.js$/,
       /^dist\/mermaid\.min\.js$/,
+      // 数式の CSS とフォント（esbuild.js が katex から写す）
+      /^dist\/katex\/katex\.min\.css$/,
+      /^dist\/katex\/fonts\/KaTeX_[\w-]+\.woff2$/,
       /^media\/(themes\/)?[\w.-]+\.css$/,
       // 同梱フォントとそのライセンス
       /^fonts\/[\w.-]+\.woff2$/,
       /^fonts\/OFL-[\w.-]+\.txt$/
     );
-    required.push(main, 'dist/webview.js', 'dist/mermaid.min.js');
+    required.push(main, 'dist/webview.js', 'dist/mermaid.min.js', 'dist/katex/katex.min.css');
   }
   if (manifest.l10n) {
     const dir = normalize(manifest.l10n).replace(/\/$/, '');

@@ -2,6 +2,7 @@
  * Markdown を HTML に変換する（純粋関数）。
  * 生の HTML は決めたタグ（details など）だけを通し、相対パスの画像だけを Webview 用の URI に書き換える。
  */
+import katex from '@vscode/markdown-it-katex';
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
@@ -43,6 +44,11 @@ export function slugify(text: string): string {
     .replace(/\s/g, '-');
 }
 
+/** KaTeX が描いたブロックの数式（<p class="katex-block">）に、元の行番号を付ける */
+function withDataLine(html: string, dataLine: string): string {
+  return html.replace(/^<p /, `<p${dataLine} `);
+}
+
 function highlight(code: string, lang: string): string {
   if (lang === '' || !hljs.getLanguage(lang)) {
     return '';
@@ -55,6 +61,8 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
   md.use(footnote);
+  // 数式（$…$、$$…$$、言語が math のコードブロック）は KaTeX で描く。GitHub と同じ書き方
+  md.use(katex, { enableFencedBlocks: true, throwOnError: false });
   // 脚注の番号は GitHub と同じく角括弧を付けない（既定は [1]）
   md.renderer.rules.footnote_caption = (tokens, idx) => {
     const meta = tokens[idx].meta as { id: number; subId: number };
@@ -91,6 +99,9 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
       const source = md.utils.escapeHtml(tokens[idx].content);
       return `<div class="yomu-mermaid"${dataLine}><pre class="yomu-mermaid-source">${source}</pre></div>\n`;
     }
+    if (lang === 'math') {
+      return withDataLine(renderFence!(tokens, idx, opts, env, self), dataLine);
+    }
     // コードの行番号は、pre の中の code ではなく外側の要素に付ける
     tokens[idx].attrs = tokens[idx].attrs?.filter(([name]) => name !== 'data-line') ?? null;
     const html = renderFence
@@ -99,6 +110,13 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
     return lang === ''
       ? html.replace(/^<pre>/, `<pre${dataLine}>`)
       : `<div class="yomu-code" data-lang="${md.utils.escapeHtml(lang)}"${dataLine}>${html.trimEnd()}</div>\n`;
+  };
+
+  const renderMathBlock = md.renderer.rules.math_block;
+  md.renderer.rules.math_block = (tokens, idx, opts, env, self) => {
+    const line = tokens[idx].map?.[0];
+    const dataLine = line === undefined || tokens[idx].level !== 0 ? '' : ` data-line="${line}"`;
+    return withDataLine(renderMathBlock!(tokens, idx, opts, env, self), dataLine);
   };
 
   const renderImage = md.renderer.rules.image;

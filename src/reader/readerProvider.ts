@@ -17,7 +17,7 @@ import {
   type RawSettings,
   type ReaderSettings,
 } from './readerSettings';
-import { injectMermaid, printHtml, rewriteFontUrls } from './printHtml';
+import { injectMermaid, printHtml, rewriteFontUrls, rewriteKatexFontUrls } from './printHtml';
 import type { ReadingHistory } from './readingHistory';
 import { renderSafely } from './render';
 import { STYLE_FILES } from './styles';
@@ -151,9 +151,13 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     webview.html = webviewHtml({
       nonce: crypto.randomBytes(16).toString('base64'),
       cspSource: webview.cspSource,
-      styleUris: STYLE_FILES.map((file) =>
-        webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'media', file)).toString()
-      ),
+      // KaTeX の CSS は先に読み、組版の CSS で上書きできるようにする
+      styleUris: [
+        webview.asWebviewUri(this.katexCssUri()).toString(),
+        ...STYLE_FILES.map((file) =>
+          webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'media', file)).toString()
+        ),
+      ],
       scriptUri: webview
         .asWebviewUri(vscode.Uri.joinPath(this.extensionUri, 'dist', 'webview.js'))
         .toString(),
@@ -355,15 +359,29 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         )
       )
     );
+    const katexCss = rewriteKatexFontUrls(
+      new TextDecoder().decode(await vscode.workspace.fs.readFile(this.katexCssUri())),
+      vscode.Uri.joinPath(this.extensionUri, 'dist', 'katex', 'fonts').toString()
+    );
     const settings = this.readSettings();
     const title = path.basename(entry.document.fileName);
-    const html = printHtml({ title, body, css, cssVariables: cssVariables(settings) });
+    const html = printHtml({
+      title,
+      body,
+      css: [katexCss, ...css],
+      cssVariables: cssVariables(settings),
+    });
 
     const dir = path.join(os.tmpdir(), 'yomu-print');
     await fs.mkdir(dir, { recursive: true });
     const file = path.join(dir, title.replace(/\.md$/i, '') + '.html');
     await fs.writeFile(file, html, 'utf8');
     return file;
+  }
+
+  /** 数式の CSS（esbuild.js が dist/katex に写す） */
+  private katexCssUri(): vscode.Uri {
+    return vscode.Uri.joinPath(this.extensionUri, 'dist', 'katex', 'katex.min.css');
   }
 
   /** 設定を読み、検査して返す */
