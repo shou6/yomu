@@ -12,6 +12,7 @@ suite('normalizeSettings', () => {
     assert.strictEqual(DEFAULT_SETTINGS.lineHeight, 1.8);
     assert.strictEqual(DEFAULT_SETTINGS.codeFontFamily, '');
     assert.strictEqual(DEFAULT_SETTINGS.customCss, '');
+    assert.strictEqual(DEFAULT_SETTINGS.frontMatter, 'collapsed');
   });
 
   test('正しい値はそのまま通る', () => {
@@ -27,6 +28,7 @@ suite('normalizeSettings', () => {
       customCss: '${workspaceFolder}/style.css',
       focusMode: true,
       foldLines: 30,
+      frontMatter: 'hidden',
     });
     assert.deepStrictEqual(settings, {
       theme: 'dark',
@@ -40,6 +42,7 @@ suite('normalizeSettings', () => {
       customCss: '${workspaceFolder}/style.css',
       focusMode: true,
       foldLines: 30,
+      frontMatter: 'hidden',
     });
   });
 
@@ -55,6 +58,11 @@ suite('normalizeSettings', () => {
     ]) {
       assert.strictEqual(normalizeSettings({ theme }).theme, theme);
     }
+  });
+
+  test('front matter の表示は、collapsed、expanded、hidden のどれか', () => {
+    assert.strictEqual(normalizeSettings({ frontMatter: 'expanded' }).frontMatter, 'expanded');
+    assert.strictEqual(normalizeSettings({ frontMatter: 'show' }).frontMatter, 'collapsed');
   });
 
   test('列挙に無い値は既定値に戻す', () => {

@@ -237,9 +237,14 @@ suite('render: 元の行番号', () => {
 });
 
 suite('render: front matter', () => {
-  test('ファイルの先頭の front matter を、キーと値の表にする', () => {
+  test('ファイルの先頭の front matter を、既定では閉じた折りたたみの中の表にする', () => {
     const out = html('---\ntitle: Hello\nauthor: Yomu\n---\n\n# Body\n');
-    assert.ok(out.includes('<table class="yomu-front-matter" data-line="0">'), out);
+    assert.ok(
+      out.includes(
+        '<details class="yomu-front-matter" data-line="0"><summary>Front matter (2)</summary><table>'
+      ),
+      out
+    );
     assert.ok(out.includes('<tr><th>title</th><td>Hello</td></tr>'), out);
     assert.ok(out.includes('<tr><th>author</th><td>Yomu</td></tr>'), out);
     assert.ok(!out.includes('<hr'), out);
@@ -257,10 +262,61 @@ suite('render: front matter', () => {
     assert.ok(out.includes('<td>single</td>'), out);
   });
 
-  test('複数行の値（リストや入れ子）は、書かれたままの形で表示する', () => {
+  test('設定で、開いた状態にできる', () => {
+    const out = render('---\ntitle: Hello\n---\n', {
+      resolveImageSrc,
+      frontMatter: { display: 'expanded', label: 'Front matter' },
+    });
+    assert.ok(out.includes('<details class="yomu-front-matter" data-line="0" open>'), out);
+  });
+
+  test('設定で、表示しないようにできる。後のブロックの行番号は保つ', () => {
+    const out = render('---\ntitle: Hello\n---\n\n# Body\n', {
+      resolveImageSrc,
+      frontMatter: { display: 'hidden', label: 'Front matter' },
+    });
+    assert.ok(!out.includes('yomu-front-matter'), out);
+    assert.ok(!out.includes('Hello'), out);
+    assert.ok(!out.includes('<hr'), out);
+    assert.ok(out.includes('<h1 id="body" data-line="4">'), out);
+  });
+
+  test('折りたたみの見出しは、渡した文言と項目の数にする', () => {
+    const out = render('---\ntitle: Hello\n---\n', {
+      resolveImageSrc,
+      frontMatter: { display: 'collapsed', label: 'フロントマター' },
+    });
+    assert.ok(out.includes('<summary>フロントマター (1)</summary>'), out);
+  });
+
+  test('単純な値だけのリストは、タグのように横に並べる', () => {
     const out = html('---\ntags:\n  - markdown\n  - vscode\ndraft: false\n---\n');
-    assert.ok(out.includes('<tr><th>tags</th><td><pre>- markdown\n- vscode</pre></td></tr>'), out);
+    assert.ok(
+      out.includes(
+        '<tr><th>tags</th><td><span class="yomu-tag">markdown</span><span class="yomu-tag">vscode</span></td></tr>'
+      ),
+      out
+    );
     assert.ok(out.includes('<tr><th>draft</th><td>false</td></tr>'), out);
+  });
+
+  test('[a, b] の形のリストもタグのように並べ、引用符は外す', () => {
+    const out = html('---\ntags: [markdown, "vs code"]\nempty: []\n---\n');
+    assert.ok(
+      out.includes(
+        '<td><span class="yomu-tag">markdown</span><span class="yomu-tag">vs code</span></td>'
+      ),
+      out
+    );
+    assert.ok(out.includes('<tr><th>empty</th><td></td></tr>'), out);
+  });
+
+  test('入れ子の値は、書かれたままの形で表示する', () => {
+    const out = html(
+      '---\nauthor:\n  name: Yomu\n  url: https://example.com\nitems:\n  - name: a\n---\n'
+    );
+    assert.ok(out.includes('<td><pre>name: Yomu\nurl: https://example.com</pre></td>'), out);
+    assert.ok(out.includes('<td><pre>- name: a</pre></td>'), out);
   });
 
   test('キーと値はエスケープする', () => {
