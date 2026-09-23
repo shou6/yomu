@@ -140,15 +140,35 @@ tbody tr:hover td {
   background-color: var(--yomu-row-hover);
 }
 
-/* front matter（render が先頭の --- の間を表にしたもの）。本文より控えめに出す */
-table.yomu-front-matter {
-  width: auto;
+/*
+ * front matter（render が先頭の --- の間を折りたたみの表にしたもの）。
+ * 読むためのものではないので、本文より小さく控えめな色の枠にする
+ */
+details.yomu-front-matter {
   margin: 0 0 1.5em;
+  padding: 0.4em 0.9em;
+  border: 1px solid var(--yomu-td-border);
+  border-radius: 6px;
   font-size: 0.85em;
   color: var(--yomu-quote-fg);
 }
 
+.yomu-front-matter > summary {
+  font-weight: 400;
+}
+
+.yomu-front-matter[open] > summary {
+  margin-bottom: 0.2em;
+}
+
+.yomu-front-matter table {
+  width: auto;
+  margin: 0;
+  font-size: 1em;
+}
+
 .yomu-front-matter th {
+  padding-left: 0;
   border-bottom: 1px solid var(--yomu-td-border);
   vertical-align: top;
 }
@@ -160,6 +180,17 @@ table.yomu-front-matter {
 .yomu-front-matter pre {
   margin: 0;
   padding: 0.3em 0.6em;
+}
+
+/* リストの値（tags など）は小さな枠で横に並べる */
+.yomu-tag {
+  display: inline-block;
+  margin: 0.1em 0.4em 0.1em 0;
+  padding: 0 0.6em;
+  border-radius: 999px;
+  line-height: 1.7;
+  background: var(--yomu-code-bg);
+  color: var(--yomu-code-fg);
 }
 
 /* コード */

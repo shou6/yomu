@@ -8,12 +8,14 @@ import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 import footnote from 'markdown-it-footnote';
 import taskLists from 'markdown-it-task-lists';
-import { frontMatter } from './frontMatter';
+import { DEFAULT_FRONT_MATTER_OPTIONS, type FrontMatterOptions, frontMatter } from './frontMatter';
 import { htmlAllowlist } from './htmlAllowlist';
 
 export interface RenderOptions {
   /** 相対パスの画像の src を、Webview で読める URI に変換する */
   resolveImageSrc: (src: string) => string;
+  /** front matter の見せ方。無ければ閉じた折りたたみ */
+  frontMatter?: FrontMatterOptions;
 }
 
 /** 元の行番号を付ける、一番外側のブロックの要素 */
@@ -68,7 +70,7 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
     const meta = tokens[idx].meta as { id: number; subId: number };
     return meta.subId > 0 ? `${meta.id + 1}:${meta.subId}` : String(meta.id + 1);
   };
-  md.use(frontMatter);
+  md.use(frontMatter, options.frontMatter ?? DEFAULT_FRONT_MATTER_OPTIONS);
   // 生の HTML は決めたタグだけを通し、残りはエスケープする。タスクリストより後に use する（htmlAllowlist.ts）
   md.use(htmlAllowlist);
 

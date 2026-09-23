@@ -285,6 +285,21 @@
           "default": 20,
           "description": "%config.code.foldLines%"
         },
+        "yomu.frontMatter": {
+          "type": "string",
+          "enum": [
+            "collapsed",
+            "expanded",
+            "hidden"
+          ],
+          "enumDescriptions": [
+            "%config.frontMatter.collapsed%",
+            "%config.frontMatter.expanded%",
+            "%config.frontMatter.hidden%"
+          ],
+          "default": "collapsed",
+          "description": "%config.frontMatter%"
+        },
         "yomu.customCss": {
           "type": "string",
           "default": "",

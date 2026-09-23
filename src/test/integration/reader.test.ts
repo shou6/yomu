@@ -164,6 +164,7 @@ suite('Reader', () => {
       'yomu.font.family',
       'yomu.font.lineHeight',
       'yomu.font.size',
+      'yomu.frontMatter',
       'yomu.layout.align',
       'yomu.layout.maxWidth',
       'yomu.layout.padding',
@@ -261,6 +262,27 @@ suite('Reader', () => {
       assert.strictEqual(config().get('focusMode'), true);
     } finally {
       await config().update('focusMode', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
+
+  test('yomu.frontMatter を変えると、本文を変換し直し、front matter の開閉を設定に合わせる', async () => {
+    const { onDidPostMessage } = await api();
+    const config = (): vscode.WorkspaceConfiguration => vscode.workspace.getConfiguration('yomu');
+    const opened = waitForMessage(onDidPostMessage, (m) => m.type === 'update');
+    await vscode.commands.executeCommand('vscode.openWith', fixture('front-matter.md'), VIEW_TYPE);
+    const first = String((await opened).html);
+    assert.ok(first.includes('<details class="yomu-front-matter"'), first);
+    try {
+      const rerendered = waitForMessage(
+        onDidPostMessage,
+        (m) => m.type === 'update' && m.resetFrontMatter === true
+      );
+      await config().update('frontMatter', 'hidden', vscode.ConfigurationTarget.Global);
+      const html = String((await rerendered).html);
+      assert.ok(!html.includes('yomu-front-matter'), html);
+      assert.ok(html.includes('<h2'), html);
+    } finally {
+      await config().update('frontMatter', undefined, vscode.ConfigurationTarget.Global);
     }
   });
 

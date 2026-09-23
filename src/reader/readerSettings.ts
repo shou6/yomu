@@ -2,6 +2,7 @@
  * 設定（yomu.*）の値を検査し、Webview に渡す CSS 変数とテーマ名に変換する（純粋関数）。
  * 設定の読み取り（vscode.workspace.getConfiguration）は Provider が行い、ここには生の値だけを渡す。
  */
+import { FRONT_MATTER_DISPLAYS, type FrontMatterDisplay } from './frontMatter';
 
 export const THEMES = [
   'paper',
@@ -41,6 +42,8 @@ export interface ReaderSettings {
   focusMode: boolean;
   /** これより長いコードブロックを畳む（行）。0 なら畳まない */
   foldLines: number;
+  /** ファイルの先頭の front matter の見せ方 */
+  frontMatter: FrontMatterDisplay;
 }
 
 /** 設定から読んだままの値。型は信用しない */
@@ -62,6 +65,7 @@ export const DEFAULT_SETTINGS: ReaderSettings = {
   customCss: '',
   focusMode: false,
   foldLines: 20,
+  frontMatter: 'collapsed',
 };
 
 /**
@@ -111,6 +115,7 @@ export function normalizeSettings(raw: RawSettings): ReaderSettings {
       typeof raw.foldLines === 'number' && Number.isInteger(raw.foldLines)
         ? numberIn(raw.foldLines, 0, 10000, DEFAULT_SETTINGS.foldLines)
         : DEFAULT_SETTINGS.foldLines,
+    frontMatter: oneOf(raw.frontMatter, FRONT_MATTER_DISPLAYS, DEFAULT_SETTINGS.frontMatter),
   };
 }
 

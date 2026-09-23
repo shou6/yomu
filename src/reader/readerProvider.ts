@@ -19,6 +19,7 @@ import {
 } from './readerSettings';
 import { injectMermaid, printHtml, rewriteFontUrls, rewriteKatexFontUrls } from './printHtml';
 import type { ReadingHistory } from './readingHistory';
+import type { FrontMatterOptions } from './frontMatter';
 import { renderSafely } from './render';
 import { STYLE_FILES } from './styles';
 import { resourceRoots } from './resourceRoots';
@@ -56,6 +57,8 @@ interface Entry {
   onExported?: (mermaid: (string | null)[]) => void;
   /** カスタム CSS のフォルダを除いた localResourceRoots */
   baseRoots: vscode.Uri[];
+  /** 本文を変換し直して送る。変換に効く設定（yomu.frontMatter）が変わった時に使い、front matter の開閉も設定に合わせる */
+  update?: () => void;
 }
 
 export class ReaderProvider implements vscode.CustomTextEditorProvider {
@@ -106,6 +109,9 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
           // 通知はパスごとに一度だけ。設定を変えたら改めて知らせる
           provider.notified.clear();
           provider.broadcastSettings();
+          if (event.affectsConfiguration(`${CONFIG_SECTION}.frontMatter`)) {
+            provider.rerenderAll();
+          }
         }
       }),
       provider.postMessageEmitter,
@@ -168,14 +174,20 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
 
     const resolveImageSrc = (src: string): string =>
       webview.asWebviewUri(vscode.Uri.joinPath(documentDir, decodePath(src))).toString();
-    const update = (resume?: number, anchor?: string): void => {
+    const update = (resume?: number, anchor?: string, resetFrontMatter?: boolean): void => {
       this.post(panel, {
         type: 'update',
-        html: renderSafely(document.getText(), { resolveImageSrc }),
+        html: renderSafely(document.getText(), {
+          resolveImageSrc,
+          frontMatter: this.frontMatterOptions(),
+        }),
         ...(resume === undefined ? {} : { resume }),
         ...(anchor === undefined ? {} : { anchor }),
+        ...(resetFrontMatter === true ? { resetFrontMatter } : {}),
       });
     };
+
+    entry.update = () => update(undefined, undefined, true);
 
     let timer: NodeJS.Timeout | undefined;
     const changeSubscription = vscode.workspace.onDidChangeTextDocument((event) => {
@@ -343,6 +355,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
     const body = injectMermaid(
       renderSafely(entry.document.getText(), {
         resolveImageSrc: (src) => vscode.Uri.joinPath(documentDir, decodePath(src)).toString(),
+        frontMatter: this.frontMatterOptions(),
       }),
       mermaid
     );
@@ -399,6 +412,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       customCss: config.get('customCss'),
       focusMode: config.get('focusMode'),
       foldLines: config.get('code.foldLines'),
+      frontMatter: config.get('frontMatter'),
     };
     return normalizeSettings(raw);
   }
@@ -419,6 +433,20 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       },
       ...(customCss === undefined ? {} : { customCssUri: customCss }),
     });
+  }
+
+  /** front matter の見せ方。折りたたみの見出しは翻訳して渡す */
+  private frontMatterOptions(): FrontMatterOptions {
+    return { display: this.readSettings().frontMatter, label: vscode.l10n.t('Front matter') };
+  }
+
+  /** 開いているすべてのリーダータブの本文を、変換し直して送る */
+  private rerenderAll(): void {
+    for (const entry of this.entries) {
+      if (entry.ready) {
+        entry.update?.();
+      }
+    }
   }
 
   /** 設定が変わった時に、開いているすべてのリーダータブへ配る */

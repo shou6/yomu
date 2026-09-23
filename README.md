@@ -13,7 +13,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 
 - **Reader tab**: opens `.md` files as a custom editor tab. The default editor stays untouched; open the reader explicitly from the book icon in the editor title bar, the Command Palette, or "Reopen Editor With...".
 - **Japanese typography**: separate fonts for Japanese and Latin text, comfortable line height, and tighter spacing around Japanese punctuation. Japanese gothic and mincho fonts are bundled, so the text looks the same on every OS.
-- **Rendering**: CommonMark plus GFM tables, strikethrough, task lists and footnotes, syntax highlighting for code blocks, Mermaid diagrams, math with KaTeX (`$...$`, `$$...$$` and `math` code blocks), heading anchors, local and remote images, and YAML front matter shown as a table. Raw HTML is limited to `<details>`, `<summary>`, `<kbd>`, `<sub>`, `<sup>` and `<br>`; other tags are shown as text and comments are hidden.
+- **Rendering**: CommonMark plus GFM tables, strikethrough, task lists and footnotes, syntax highlighting for code blocks, Mermaid diagrams, math with KaTeX (`$...$`, `$$...$$` and `math` code blocks), heading anchors, local and remote images, and YAML front matter in a collapsible section. Raw HTML is limited to `<details>`, `<summary>`, `<kbd>`, `<sub>`, `<sup>` and `<br>`; other tags are shown as text and comments are hidden.
 - **Themes**: `paper` (white page), `sepia`, `dark`, Solarized, GitHub, Nord, Catppuccin, and `vscode` (follows your color theme). All share the same structure: clear heading levels, tables with horizontal rules, and soft code blocks.
 - **Outline**: click the Yomu (book) icon in the activity bar to see the headings of the document you are reading. Click to jump; the current heading follows your scrolling.
 - **Links between documents**: relative links to other Markdown files open in the reader (with `#heading` support). Go back with **Alt+Left**.
@@ -56,6 +56,7 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | `yomu.font.size` | `16` | Font size in pixels. |
 | `yomu.font.lineHeight` | `1.8` | Line height as a multiple of the font size. |
 | `yomu.code.foldLines` | `20` | Fold code blocks longer than this many lines. `0` never folds. |
+| `yomu.frontMatter` | `collapsed` | How to show the YAML front matter: `collapsed`, `expanded` or `hidden`. |
 | `yomu.focusMode` | `false` | Dim everything except the block you are reading. Also toggled by **Yomu: Toggle Focus Mode**. |
 | `yomu.outline.revealOnOpen` | `false` | Open the Outline view automatically when you open a reader tab. |
 | `yomu.customCss` | (empty) | Path to a CSS file loaded after the theme. Absolute, or starting with `${workspaceFolder}`. Saved changes apply immediately. |

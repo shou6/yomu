@@ -12,6 +12,8 @@ export type ToWebview =
       resume?: number;
       /** 新しく開いた時に、この見出しへ移動する（見出し付きのリンクで開いた時）。resume より優先 */
       anchor?: string;
+      /** front matter の開閉を、変換した HTML のとおりにする（設定を変えた時）。無ければ今の開閉を保つ */
+      resetFrontMatter?: boolean;
     }
   /** 印刷用に、描いた Mermaid の SVG を返してほしい */
   | { type: 'export' }

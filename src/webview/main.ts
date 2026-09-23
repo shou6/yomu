@@ -78,12 +78,24 @@ function drawMermaid(): void {
   });
 }
 
-function applyUpdate(html: string, resume: number | undefined, anchor: string | undefined): void {
+function applyUpdate(
+  html: string,
+  resume: number | undefined,
+  anchor: string | undefined,
+  resetFrontMatter: boolean
+): void {
   // 再描画でスクロール位置が失われないよう、差し替えの前後で位置を保つ。
   // 開いた直後は、タブを隠して戻した時の位置を優先し、無ければ読書の記録の割合から再開する
   const opening = content.childElementCount === 0;
   const saved = vscode.getState()?.scrollY;
+  // 文書を編集するたびに front matter が閉じないよう、読者が開け閉めした状態を保つ
+  const frontMatterSelector = 'details.yomu-front-matter';
+  const frontMatterOpen = content.querySelector<HTMLDetailsElement>(frontMatterSelector)?.open;
   content.innerHTML = html;
+  const frontMatter = content.querySelector<HTMLDetailsElement>(frontMatterSelector);
+  if (frontMatter !== null && frontMatterOpen !== undefined && !resetFrontMatter) {
+    frontMatter.open = frontMatterOpen;
+  }
   // 見出し付きのリンクで開いた時は、その見出しを一番に優先する
   const anchorTop =
     opening && anchor !== undefined
@@ -144,7 +156,7 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
   const message = event.data;
   if (message.type === 'update') {
-    applyUpdate(message.html, message.resume, message.anchor);
+    applyUpdate(message.html, message.resume, message.anchor, message.resetFrontMatter === true);
     checkProgress();
   } else if (message.type === 'settings') {
     applySettings(message);
