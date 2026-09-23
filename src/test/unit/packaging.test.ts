@@ -27,6 +27,14 @@ suite('公開パッケージの中身', () => {
     assert.ok((pkg.files ?? []).includes('dist/mermaid.min.js'));
   });
 
+  test('mermaid は 11 系を使う（12 は状態遷移図の往復の矢印が回り込んで読みにくい）', () => {
+    // VS Code 本体の Markdown プレビューも 11 系を同梱している。見た目をそれに揃える
+    const deps = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')) as {
+      dependencies: Record<string, string>;
+    };
+    assert.match(deps.dependencies.mermaid, /^\^?11\./);
+  });
+
   test('.vscodeignore を置かない（files と併用できず、除外リスト方式に戻ってしまう）', () => {
     assert.ok(!fs.existsSync(path.join(ROOT, '.vscodeignore')));
   });
