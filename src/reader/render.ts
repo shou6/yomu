@@ -1,12 +1,13 @@
 /**
  * Markdown を HTML に変換する（純粋関数）。
- * 生の HTML は無効にし、相対パスの画像だけを Webview 用の URI に書き換える。
+ * 生の HTML は決めたタグ（details など）だけを通し、相対パスの画像だけを Webview 用の URI に書き換える。
  */
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
 import taskLists from 'markdown-it-task-lists';
 import { frontMatter } from './frontMatter';
+import { htmlAllowlist } from './htmlAllowlist';
 
 export interface RenderOptions {
   /** 相対パスの画像の src を、Webview で読める URI に変換する */
@@ -49,10 +50,12 @@ function highlight(code: string, lang: string): string {
 }
 
 export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt {
-  const md = new MarkdownIt({ html: false, linkify: false, typographer: false, highlight });
+  const md = new MarkdownIt({ html: true, linkify: false, typographer: false, highlight });
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
   md.use(frontMatter);
+  // 生の HTML は決めたタグだけを通し、残りはエスケープする。タスクリストより後に use する（htmlAllowlist.ts）
+  md.use(htmlAllowlist);
 
   // ブロックの要素に元の行番号（0 始まり）を data-line で付ける。「標準エディタで開く」で読んでいる行へ移るため。
   // 見出しの id より後に付けるよう、anchor の後に足す。リストの項目は深さに関わらず、他は一番外側だけに付ける

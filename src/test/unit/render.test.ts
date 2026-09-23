@@ -329,7 +329,7 @@ suite('render: 許可した HTML のタグ', () => {
   test('HTML のコメントは表示しない', () => {
     const out = html('a\n\n<!-- secret block -->\n\nb <!-- secret inline --> c\n');
     assert.ok(!out.includes('secret'), out);
-    assert.ok(out.includes('<p>a</p>'), out);
+    assert.match(out, /<p[^>]*>a<\/p>/);
   });
 
   test('コードの中のタグはそのままエスケープする', () => {
