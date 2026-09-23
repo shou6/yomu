@@ -9,6 +9,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Front matter: YAML front matter at the top of a file (between `---` lines) is shown as a small key and value table, as on GitHub. Before, it turned into a horizontal rule and a heading, and the heading appeared in the outline.
 - Collapsible sections and a few inline tags from raw HTML: `<details>` and `<summary>` fold content as on GitHub, and `<kbd>`, `<sub>`, `<sup>` and `<br>` work in text. Attributes are dropped except `open` on `<details>`. Other tags are still shown as text, and HTML comments are hidden.
+- Footnotes: `[^1]` references become superscript links, and the notes are listed at the end of the document with links back.
 
 ### Fixed
 

@@ -5,6 +5,7 @@
 import hljs from 'highlight.js';
 import MarkdownIt from 'markdown-it';
 import anchor from 'markdown-it-anchor';
+import footnote from 'markdown-it-footnote';
 import taskLists from 'markdown-it-task-lists';
 import { frontMatter } from './frontMatter';
 import { htmlAllowlist } from './htmlAllowlist';
@@ -53,6 +54,12 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
   const md = new MarkdownIt({ html: true, linkify: false, typographer: false, highlight });
   md.use(anchor, { slugify, tabIndex: false });
   md.use(taskLists, { enabled: false });
+  md.use(footnote);
+  // 脚注の番号は GitHub と同じく角括弧を付けない（既定は [1]）
+  md.renderer.rules.footnote_caption = (tokens, idx) => {
+    const meta = tokens[idx].meta as { id: number; subId: number };
+    return meta.subId > 0 ? `${meta.id + 1}:${meta.subId}` : String(meta.id + 1);
+  };
   md.use(frontMatter);
   // 生の HTML は決めたタグだけを通し、残りはエスケープする。タスクリストより後に use する（htmlAllowlist.ts）
   md.use(htmlAllowlist);

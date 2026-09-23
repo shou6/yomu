@@ -266,6 +266,21 @@ kbd {
   color: var(--yomu-code-fg);
 }
 
+/* 脚注。上付きの番号で行の間隔が広がらないようにする */
+sup,
+sub {
+  line-height: 0;
+}
+
+.footnote-ref a {
+  padding: 0 0.1em;
+}
+
+.footnotes {
+  font-size: 0.9em;
+  color: var(--yomu-quote-fg);
+}
+
 /* リスト */
 ul,
 ol {
