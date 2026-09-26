@@ -2,7 +2,7 @@
   "name": "yomu",
   "displayName": "Yomu - Markdown Reader with Japanese Typography",
   "description": "%description%",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "shou6",
   "license": "MIT",
   "icon": "resources/icon.png",
@@ -23,14 +23,32 @@
     "vscode": "^1.138.0"
   },
   "categories": [
+    "Visualization",
     "Other"
   ],
   "keywords": [
     "markdown",
     "reader",
+    "viewer",
+    "preview",
     "japanese",
     "typography",
-    "viewer"
+    "reading",
+    "mermaid",
+    "katex",
+    "math",
+    "footnotes",
+    "front matter",
+    "outline",
+    "focus mode",
+    "pdf",
+    "print",
+    "themes",
+    "sepia",
+    "日本語",
+    "マークダウン",
+    "プレビュー",
+    "読書"
   ],
   "activationEvents": [],
   "main": "./dist/extension.js",

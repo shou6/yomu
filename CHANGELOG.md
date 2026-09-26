@@ -3,6 +3,12 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.3.1]
+
+### Changed
+
+- Marketplace: added the Visualization category and more search keywords (Mermaid, KaTeX, math, outline, focus mode, PDF, Japanese terms and others). This release does not change the extension itself.
+
 ## [0.3.0]
 
 ### Added
