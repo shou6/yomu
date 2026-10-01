@@ -3,6 +3,12 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Inline decoration tags from raw HTML: `<span>`, `<b>`, `<i>`, `<u>`, `<s>`, `<strike>`, `<em>`, `<strong>`, `<mark>`, `<ins>`, `<del>` and `<small>` work in text. On these and the other inline tags (`<kbd>`, `<sub>`, `<sup>`), the `style` attribute keeps text color and decoration only: `color`, `background-color`, `font-weight`, `font-style`, `text-decoration` and `font-size`, with plain values such as `red`, `#ff0000` or `rgb(…)`. Other properties, other attributes and block tags such as `<div>` are still dropped or shown as text.
+
 ## [0.3.1]
 
 ### Changed
