@@ -26,10 +26,10 @@ suite('render: 基本の変換', () => {
   });
 
   test('生の HTML は表示せず、エスケープする', () => {
-    const out = html('<script>alert(1)</script>\n\n<b>bold</b> text\n');
+    const out = html('<script>alert(1)</script>\n\n<font>bold</font> text\n');
     assert.ok(!out.includes('<script>'), out);
     assert.ok(out.includes('&lt;script&gt;'), out);
-    assert.ok(out.includes('&lt;b&gt;bold&lt;/b&gt;'), out);
+    assert.ok(out.includes('&lt;font&gt;bold&lt;/font&gt;'), out);
   });
 
   test('http(s) のリンクはそのまま', () => {
@@ -344,10 +344,10 @@ suite('render: front matter', () => {
 
 suite('render: 許可した HTML のタグ', () => {
   test('details と summary はタグとして通し、中の文字はエスケープする', () => {
-    const out = html('<details>\n<summary>題名</summary>\n中身 & <b>x</b>\n</details>\n');
+    const out = html('<details>\n<summary>題名</summary>\n中身 & <font>x</font>\n</details>\n');
     assert.ok(out.includes('<details>'), out);
     assert.ok(out.includes('<summary>題名</summary>'), out);
-    assert.ok(out.includes('中身 &amp; &lt;b&gt;x&lt;/b&gt;'), out);
+    assert.ok(out.includes('中身 &amp; &lt;font&gt;x&lt;/font&gt;'), out);
     assert.ok(out.includes('</details>'), out);
   });
 
@@ -392,6 +392,70 @@ suite('render: 許可した HTML のタグ', () => {
     const out = html('`<details>`\n\n```\n<details>\n```\n');
     assert.ok(out.includes('<code>&lt;details&gt;</code>'), out);
     assert.ok(!out.includes('<details>'), out);
+  });
+
+  test('span と行内の装飾タグはタグとして通す', () => {
+    const out = html(
+      '<span>s</span> <b>b</b> <i>i</i> <u>u</u> <s>s</s> <strike>k</strike> <em>e</em> <strong>t</strong> <mark>m</mark> <ins>n</ins> <del>d</del> <small>l</small>\n'
+    );
+    const tags = [
+      'span',
+      'b',
+      'i',
+      'u',
+      's',
+      'strike',
+      'em',
+      'strong',
+      'mark',
+      'ins',
+      'del',
+      'small',
+    ];
+    for (const tag of tags) {
+      assert.ok(out.includes(`<${tag}>`) && out.includes(`</${tag}>`), `${tag}: ${out}`);
+    }
+  });
+
+  test('行内のタグの style は、色と文字装飾のプロパティだけを通す', () => {
+    const out = html(
+      '<span style="color: red; background-color: #ff0; font-weight: bold; font-style: italic; text-decoration: underline; font-size: 1.2em">x</span>\n'
+    );
+    assert.ok(
+      out.includes(
+        '<span style="color:red;background-color:#ff0;font-weight:bold;font-style:italic;text-decoration:underline;font-size:1.2em">x</span>'
+      ),
+      out
+    );
+    const mark = html('<mark style="color: rgb(255, 0, 0)">x</mark>\n');
+    assert.ok(mark.includes('<mark style="color:rgb(255, 0, 0)">x</mark>'), mark);
+    const sup = html('x<sup style="color:red">2</sup>\n');
+    assert.ok(sup.includes('<sup style="color:red">2</sup>'), sup);
+  });
+
+  test('style のうち許可していないプロパティと危ない値は落とす', () => {
+    const out = html(
+      '<span style="color:red;display:none;background-image:url(x.png);position:fixed">x</span>\n'
+    );
+    assert.ok(out.includes('<span style="color:red">x</span>'), out);
+    const none = html('<span style="display:none">x</span>\n');
+    assert.ok(none.includes('<span>x</span>'), none);
+    const expression = html('<span style="color: expression(alert(1))">x</span>\n');
+    assert.ok(expression.includes('<span>x</span>'), expression);
+    const url = html('<span style="color: url(javascript:alert(1))">x</span>\n');
+    assert.ok(url.includes('<span>x</span>'), url);
+  });
+
+  test('行内のタグの style 以外の属性は落とし、details と summary には style も通さない', () => {
+    const out = html('<span class="a" onclick="alert(1)" style="color:red">x</span>\n');
+    assert.ok(out.includes('<span style="color:red">x</span>'), out);
+    assert.ok(!out.includes('onclick'), out);
+    assert.ok(!out.includes('class="a"'), out);
+    const details = html(
+      '<details style="color:red">\n<summary style="color:red">t</summary>\n</details>\n'
+    );
+    assert.ok(details.includes('<details>'), details);
+    assert.ok(details.includes('<summary>t</summary>'), details);
   });
 });
 
