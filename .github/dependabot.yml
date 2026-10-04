@@ -16,6 +16,10 @@ updates:
       # typescript-eslint の peerDependencies が新しいメジャーを含んでから手で上げる
       - dependency-name: 'typescript'
         update-types: ['version-update:semver-major']
+      # mermaid 12 は ELK が既定のレイアウトになり、状態遷移図の往復の矢印が回り込んで読みにくい。
+      # VS Code 本体のプレビューと同じ 11 系に揃える（packaging.test.ts で固定している）
+      - dependency-name: 'mermaid'
+        update-types: ['version-update:semver-major']
     commit-message:
       prefix: chore
       prefix-development: chore
