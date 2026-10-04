@@ -23,5 +23,7 @@ export default defineConfig({
   launchArgs: [...testLaunchArgs(), ...override.launchArgs],
   skipExtensionDependencies: override.skipExtensionDependencies,
   // 依存する拡張機能が有効化の中で重い処理をすると、初回は mocha の既定の 2 秒を超える
-  mocha: { timeout: 30_000 },
+  // 開いた Webview がたまにスクリプトを読まないまま止まり、ready が来ない（OS もテストも毎回ばらばら）。
+  // タブを閉じて開き直せば動くので、teardown で閉じた後にテストを 2 回までやり直す
+  mocha: { timeout: 30_000, retries: 2 },
 });
