@@ -59,9 +59,11 @@ jobs:
           cache: npm
       - run: npm ci
       # VS Code を実際に起動してバンドルを読み込む。Linux は画面が無いので xvfb を使う
+      # CI では Webview が起動しないまま止まることがたまにあり、OS もテストも毎回ばらばらに落ちる。
+      # VS Code を起動し直せば通るので、失敗した時は 1 回だけやり直す
       - name: Integration tests (Linux)
         if: runner.os == 'Linux'
-        run: xvfb-run -a npm test
+        run: xvfb-run -a npm test || xvfb-run -a npm test
       - name: Integration tests
         if: runner.os != 'Linux'
-        run: npm test
+        run: npm test || npm test
