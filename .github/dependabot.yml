@@ -20,6 +20,11 @@ updates:
       # VS Code 本体のプレビューと同じ 11 系に揃える（packaging.test.ts で固定している）
       - dependency-name: 'mermaid'
         update-types: ['version-update:semver-major']
+      # katex は数式の CSS とフォントを写すためだけに入れている。HTML を作る @vscode/markdown-it-katex が
+      # 依存する 0.16 系と揃える（0.18 で CSS のクラス名が変わり、版がずれると数式が崩れる）。
+      # 0.x では minor が破壊的変更にあたる。@vscode/markdown-it-katex が上げてから手で上げる
+      - dependency-name: 'katex'
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
     commit-message:
       prefix: chore
       prefix-development: chore
