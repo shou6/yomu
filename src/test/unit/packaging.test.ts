@@ -35,6 +35,21 @@ suite('公開パッケージの中身', () => {
     assert.match(deps.dependencies.mermaid, /^\^?11\./);
   });
 
+  test('数式の CSS（katex）は、HTML を作る @vscode/markdown-it-katex と同じ版の KaTeX から写す', () => {
+    // KaTeX は 0.18 で CSS のクラス名を変えた（.base → .katex-base など）。版がずれると、
+    // 0.16 が作る HTML に CSS が当たらず、数式の折り返しや \hline の罫線が崩れる
+    const versionOf = (from: string): string =>
+      (
+        JSON.parse(
+          fs.readFileSync(require.resolve('katex/package.json', { paths: [from] }), 'utf8')
+        ) as { version: string }
+      ).version;
+    const renderer = path.dirname(
+      require.resolve('@vscode/markdown-it-katex/package.json', { paths: [ROOT] })
+    );
+    assert.strictEqual(versionOf(ROOT), versionOf(renderer));
+  });
+
   test('.vscodeignore を置かない（files と併用できず、除外リスト方式に戻ってしまう）', () => {
     assert.ok(!fs.existsSync(path.join(ROOT, '.vscodeignore')));
   });
