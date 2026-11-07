@@ -1,5 +1,5 @@
 # PR の auto-merge を自動で有効にし、マージ後の後片付けをする。
-# - 通常の PR を作ったとき、ドラフトを Ready for review にしたとき: auto-merge（スカッシュ）を有効にする。
+# - 通常の PR を作ったとき、push したとき、ドラフトを Ready for review にしたとき: auto-merge（スカッシュ）を有効にする。
 #   ruleset の必須チェック（CI の 4 つのジョブ）が通ると、GitHub がマージする
 # - マージされたとき: PR が閉じる対象の Issue を閉じ、作業ブランチを消す。
 #   GITHUB_TOKEN で有効にした auto-merge のマージでは、Closes #番号 による Issue のクローズと
@@ -9,7 +9,7 @@ name: Auto-merge
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review, closed]
+    types: [opened, reopened, synchronize, ready_for_review, closed]
 
 permissions:
   contents: read
