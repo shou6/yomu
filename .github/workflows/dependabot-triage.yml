@@ -1,7 +1,7 @@
-# Dependabot の PR を振り分ける。
-# - devDependencies と GitHub Actions のメジャーでない更新: auto-merge を有効にする。
-#   ruleset の必須チェック（CI の 4 つのジョブ）が通ると、GitHub がスカッシュマージする
-# - それ以外（dependencies、メジャー更新）: deps:review ラベルを付けて止める。
+# Dependabot の PR のうち、自動マージしないものに印を付ける。
+# - devDependencies と GitHub Actions のメジャーでない更新: 何もしない。
+#   ci.yml の merge ジョブが、CI の成功後にマージする（判定の条件はそちらと揃える）
+# - それ以外（dependencies、メジャー更新）: deps:review ラベルとコメントを付ける。
 #   dependencies は VSIX に入り、利用者の環境での動きと Marketplace への更新に関わるため、
 #   dependabot-review スキルで影響を調べてから取り込む
 name: Dependabot triage
@@ -19,23 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
     steps:
       - id: meta
         uses: dependabot/fetch-metadata@v3
-
-      - name: 自動マージの対象なら auto-merge を有効にする
-        if: >-
-          steps.meta.outputs.update-type != '' &&
-          steps.meta.outputs.update-type != 'version-update:semver-major' &&
-          (steps.meta.outputs.dependency-type == 'direct:development' ||
-           steps.meta.outputs.package-ecosystem == 'github_actions')
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: gh pr merge "$PR_NUMBER" --auto --squash
 
       - name: 対象外なら deps:review ラベルを付ける
         if: >-
