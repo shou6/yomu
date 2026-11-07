@@ -1,0 +1,71 @@
+# PR の auto-merge を自動で有効にし、マージ後の後片付けをする。
+# - 通常の PR を作ったとき、ドラフトを Ready for review にしたとき: auto-merge（スカッシュ）を有効にする。
+#   ruleset の必須チェック（CI の 4 つのジョブ）が通ると、GitHub がマージする
+# - マージされたとき: PR が閉じる対象の Issue を閉じ、作業ブランチを消す。
+#   GITHUB_TOKEN で有効にした auto-merge のマージでは、Closes #番号 による Issue のクローズと
+#   「Automatically delete head branches」が働かないため
+# Dependabot の PR は dependabot-triage.yml が扱う。
+name: Auto-merge
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+
+permissions:
+  contents: read
+
+jobs:
+  enable:
+    if: >-
+      github.event.action != 'closed' &&
+      !github.event.pull_request.draft &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: auto-merge を有効にする
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: gh pr merge "$PR_NUMBER" --auto --squash
+
+  cleanup:
+    if: >-
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+      pull-requests: read
+      issues: write
+    steps:
+      - name: PR が閉じる対象の Issue を閉じる
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # このリポジトリの Issue だけを対象にする
+          issues=$(gh pr view "$PR_NUMBER" --json closingIssuesReferences \
+            --jq '.closingIssuesReferences[] | select(.url | startswith("https://github.com/" + env.GH_REPO + "/issues/")) | .number')
+          for issue in $issues; do
+            if [ "$(gh issue view "$issue" --json state --jq .state)" = "OPEN" ]; then
+              gh issue close "$issue" --reason completed --comment "#$PR_NUMBER のマージで完了しました。"
+            fi
+          done
+      - name: 作業ブランチを削除する
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          # リポジトリの設定で既に消えていることがある。失敗してもジョブは失敗させない
+          gh api -X DELETE "repos/$GH_REPO/git/refs/heads/$HEAD_REF" \
+            || echo "::notice::ブランチ $HEAD_REF は削除済みか、削除できませんでした。"

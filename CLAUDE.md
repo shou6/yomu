@@ -18,23 +18,23 @@ VS Code 拡張機能。TypeScript + esbuild。Marketplace 公開を目指す。
 3. Issue の範囲だけを TDD で実装する。仕様で分からない点は推測せず、Issue にコメントして `needs:user` ラベルを付けて止まる
 4. `npm run check` と `npm test` を通す
 5. コミットして push し、PR を作る。本文は `.github/pull_request_template.md` に従い、`Closes #<Issue番号>` と検証の結果を書く
-6. 通常の PR なら `gh pr merge <番号> --auto --squash` で auto-merge を有効にする。ドラフトにするかは下記「PR の種類」で決める
+6. ドラフトにするかは下記「PR の種類」で決める。通常の PR は `.github/workflows/auto-merge.yml` が auto-merge を有効にする
 7. CI の結果を見届ける。失敗したら原因を直して同じブランチに push する。テストを消す、スキップするなどで通さない。原因が PR の範囲外にあるときや判断が要るときは、PR にコメントして止まる
 8. 作業中に見つけた範囲外の問題は直さず、新しい Issue を作って PR の本文に番号を書く
 
-main への直接の push はしない。マージは auto-merge に任せ、`gh pr merge` を `--auto` なしで実行しない。
+main への直接の push はしない。マージは auto-merge に任せ、Claude は `gh pr merge` を実行しない（dependabot-review スキルで、ユーザーが取り込みを了承したときを除く）。
 
 ### PR の種類
 
-main の ruleset は CI の 4 つのジョブ（`Lint, unit tests and package` と 3 つの OS の `Integration tests`）を必須にしている。auto-merge を有効にした PR は、全部が通ると GitHub がスカッシュマージし、Issue を閉じてブランチを消す。
+main の ruleset は CI の 4 つのジョブ（`Lint, unit tests and package` と 3 つの OS の `Integration tests`）を必須にしている。`.github/workflows/auto-merge.yml` は、通常の PR の作成時と、ドラフトから Ready for review への切り替え時に auto-merge を有効にする。全部のチェックが通ると GitHub がスカッシュマージし、同じ workflow が Issue を閉じてブランチを消す。
 
-**ドラフトで作る PR**（ユーザーの確認が要るもの。auto-merge は有効にしない）
+**ドラフトで作る PR**（ユーザーの確認が要るもの。ドラフトの間はマージされない）
 
 - 見た目に関わる変更（組版、テーマ、CSS、Webview の表示）。Claude は画面を見られないため、ユーザーが `npm run try` か F5 で確かめる
 - 方針の判断が要る変更（依存の追加、CLAUDE.md・`.claude/`・CI・ruleset の変更など）。ユーザーが直接指示したものは除く
 - リリース（バージョンを上げる PR）
 
-ドラフトにしたときは、PR 本文の「手元で確認してほしい点」に手順と見るポイントを書く。ユーザーが確かめて Ready for review にし、auto-merge を有効にする。
+ドラフトにしたときは、PR 本文の「手元で確認してほしい点」に手順と見るポイントを書く。ユーザーが確かめて Ready for review にすると、auto-merge が有効になる。
 
 **通常の PR で作るもの**：ロジック、テスト、ドキュメントの変更など、`npm run check` と `npm test` で確かめきれるもの。
 
