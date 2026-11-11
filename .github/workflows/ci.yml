@@ -70,7 +70,8 @@ jobs:
         if: runner.os != 'Linux'
         run: npm test || npm test
 
-  # 全ジョブが通った PR をスカッシュマージし、Issue を閉じてブランチを消す。
+  # 全ジョブが通った PR をマージコミットでマージし、Issue を閉じてブランチを消す。
+  # スカッシュしないのは、リポジトリ設定でスカッシュマージを無効にしているため。
   # GITHUB_TOKEN で行ったマージは新しい workflow を起動せず、Closes #番号 による Issue のクローズと
   # 「Automatically delete head branches」も働かないため、後片付けまでこのジョブで行う（#22）
   merge:
@@ -114,7 +115,7 @@ jobs:
             echo "merge=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: スカッシュマージする
+      - name: マージコミットでマージする
         if: steps.decide.outputs.merge == 'true'
         env:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -125,7 +126,7 @@ jobs:
             exit 0
           fi
           # 検査した commit から変わっていればマージしない（新しい push の実行に任せる）
-          gh pr merge "$PR_NUMBER" --squash --match-head-commit "$HEAD_SHA"
+          gh pr merge "$PR_NUMBER" --merge --match-head-commit "$HEAD_SHA"
 
       - name: PR が閉じる対象の Issue を閉じる
         if: steps.decide.outputs.merge == 'true'

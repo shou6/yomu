@@ -26,7 +26,7 @@ main への直接の push はしない。マージは CI に任せ、Claude は 
 
 ### PR の種類
 
-main の ruleset は CI の 4 つのジョブ（`Lint, unit tests and package` と 3 つの OS の `Integration tests`）を必須にしている。`.github/workflows/ci.yml` の merge ジョブは、ドラフトでない PR で全部のジョブが通るとスカッシュマージし、`Closes #` の Issue を閉じてブランチを消す。
+main の ruleset は CI の 4 つのジョブ（`Lint, unit tests and package` と 3 つの OS の `Integration tests`）を必須にしている。`.github/workflows/ci.yml` の merge ジョブは、ドラフトでない PR で全部のジョブが通るとマージコミットでマージし（スカッシュはしない。リポジトリ設定でも無効にしてある）、`Closes #` の Issue を閉じてブランチを消す。
 
 **ドラフトで作る PR**（ユーザーの確認が要るもの。ドラフトの間はマージされない）
 
@@ -35,6 +35,8 @@ main の ruleset は CI の 4 つのジョブ（`Lint, unit tests and package` �
 - リリース（バージョンを上げる PR）
 
 ドラフトにしたときは、PR 本文の「手元で確認してほしい点」に手順と見るポイントを書く。ユーザーが確かめて Ready for review にすると、CI が動き、通ればマージされる。
+
+**クラウドでは実行できない作業が残るドラフトには `needs:user` ラベルを付ける。**Windows でしか再現しない手順（`npm run test:integration:local` など）や、手元のファイル・認証情報が要る操作など、環境の都合で実行できなかったコマンドがあるときにあたる。「手元で確認してほしい点」に、実行するコマンドと期待する結果を書く。見た目や操作を確かめてもらうだけのドラフトには付けない。ユーザーは手元での作業を済ませたらラベルを外し、Ready for review にする。
 
 **通常の PR で作るもの**：ロジック、テスト、ドキュメントの変更など、`npm run check` と `npm test` で確かめきれるもの。
 
