@@ -170,8 +170,8 @@ suite('Reader', () => {
       'yomu.font.size',
       'yomu.frontMatter',
       'yomu.layout.align',
-      'yomu.layout.maxWidth',
       'yomu.layout.margin',
+      'yomu.layout.maxWidth',
       'yomu.outline.revealOnOpen',
       'yomu.theme',
     ]);
