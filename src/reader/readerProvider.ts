@@ -406,7 +406,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       theme: config.get('theme'),
       maxWidth: config.get('layout.maxWidth'),
       align: config.get('layout.align'),
-      padding: config.get('layout.padding'),
+      margin: config.get('layout.margin'),
       fontFamily: config.get('font.family'),
       codeFontFamily: config.get('font.codeFamily'),
       fontSize: config.get('font.size'),

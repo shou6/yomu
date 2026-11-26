@@ -171,7 +171,7 @@ suite('Reader', () => {
       'yomu.frontMatter',
       'yomu.layout.align',
       'yomu.layout.maxWidth',
-      'yomu.layout.padding',
+      'yomu.layout.margin',
       'yomu.outline.revealOnOpen',
       'yomu.theme',
     ]);
@@ -303,16 +303,17 @@ suite('Reader', () => {
     assert.ok(buttons.copy.length > 0 && buttons.copied.length > 0 && buttons.close.length > 0);
   });
 
-  test('本文を広げる・狭めるコマンドで、yomu.layout.maxWidth をユーザー設定に書き込む', async () => {
+  test('本文を広げる・狭めるコマンドで、左右の余白（yomu.layout.margin）をユーザー設定に書き込む', async () => {
     const config = (): vscode.WorkspaceConfiguration => vscode.workspace.getConfiguration('yomu');
     try {
+      // 既定は 10%。広げると余白が 1 段階小さく、狭めると大きくなる
       await vscode.commands.executeCommand('yomu.widenBody');
-      assert.strictEqual(config().inspect('layout.maxWidth')?.globalValue, 1000);
+      assert.strictEqual(config().inspect('layout.margin')?.globalValue, 5);
       await vscode.commands.executeCommand('yomu.narrowBody');
       await vscode.commands.executeCommand('yomu.narrowBody');
-      assert.strictEqual(config().inspect('layout.maxWidth')?.globalValue, 680);
+      assert.strictEqual(config().inspect('layout.margin')?.globalValue, 15);
     } finally {
-      await config().update('layout.maxWidth', undefined, vscode.ConfigurationTarget.Global);
+      await config().update('layout.margin', undefined, vscode.ConfigurationTarget.Global);
     }
   });
 

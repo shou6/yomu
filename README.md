@@ -21,8 +21,8 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 - **Print and PDF**: run **Yomu: Open in Browser to Print** (or use the reader tab's `...` menu). The document opens in your browser with print styles, ready to print or save as PDF.
 - **Folding long code**: code blocks longer than 20 lines are folded, with a button to show the rest. Change the limit with `yomu.code.foldLines`.
 - **Focus mode**: dims everything except the block you are reading. Toggle it with **Yomu: Toggle Focus Mode** (`Ctrl+Alt+F` / `Cmd+Alt+F`) or `yomu.focusMode`.
-- **Body width and margins**: change them from the reader with the title bar button, or widen and narrow the body with `Ctrl+Alt+]` and `Ctrl+Alt+[` (`Cmd+Alt+]` / `Cmd+Alt+[` on macOS). The values are saved to `yomu.layout.maxWidth` and `yomu.layout.padding`. In a narrow window, the margins shrink automatically.
-- **Wide tables**: a table that does not fit the body width spreads to the width of the window, and scrolls sideways on its own if it still does not fit. Short cells stay on one line.
+- **Body width and margins**: the body fills the window except for the left and right margins, which are a percentage of the window width, so the body grows and shrinks with the window. Change the margins and the maximum width from the reader with the title bar button, or widen and narrow the body with `Ctrl+Alt+]` and `Ctrl+Alt+[` (`Cmd+Alt+]` / `Cmd+Alt+[` on macOS). The values are saved to `yomu.layout.margin` and `yomu.layout.maxWidth`.
+- **Wide tables**: a table stays within the body width. If it has too many columns to fit, only the table scrolls sideways, with a shadow on the side that continues. Short cells stay on one line.
 - **Copy code**: hover over a code block and click **Copy**.
 - **Zoom**: click an image or a Mermaid diagram to view it full screen. Scroll to zoom, drag to pan, double-click to fit, Esc to close.
 - **Live update**: editing and saving the file in the text editor updates the reader tab.
@@ -32,7 +32,7 @@ It is a viewer, not an editor: when you want to edit, open the file in the regul
 The reader tab shows four buttons at the top right:
 
 - **Focus mode**: an eye icon turns it on, a closed eye turns it off.
-- **Body width and margins**: choose the width of the body and the side margins. The choice is saved to your settings.
+- **Body width and margins**: choose the side margins and the maximum width of the body. The choice is saved to your settings.
 - **Print**: opens the document in your browser to print or save as PDF.
 - **Open in Text Editor**: switches back to the text editor to edit, with the cursor on the line you were reading.
 
@@ -52,9 +52,9 @@ All settings start with `yomu.` and apply to open reader tabs immediately.
 | Setting | Default | What it does |
 | --- | --- | --- |
 | `yomu.theme` | `paper` | Color theme: `paper` (white page), `sepia` (warm page), `dark`, `solarized-light`, `solarized-dark`, `github-light`, `github-dark`, `nord`, `catppuccin-latte`, `catppuccin-mocha`, or `vscode` (follows your VS Code theme). High-contrast VS Code themes always use the VS Code colors. |
-| `yomu.layout.maxWidth` | `820` | Maximum width of the text in pixels. `0` means no limit. |
+| `yomu.layout.maxWidth` | `0` | Maximum width of the text in pixels. `0` means no limit: the text follows the window width. |
 | `yomu.layout.align` | `center` | Where the text sits when the window is wider: `left`, `center`, or `right`. |
-| `yomu.layout.padding` | `32` | Horizontal padding around the text in pixels. In a narrow window, the padding shrinks below this value. |
+| `yomu.layout.margin` | `10` | Left and right margin of the text, as a percentage of the window width. At least 16px. |
 | `yomu.font.family` | Latin fonts, then Japanese fonts | CSS `font-family` for the text. Put Latin fonts first and Japanese fonts after them so each script uses its own font. |
 | `yomu.font.codeFamily` | (empty) | Font for code. Empty means a Japanese monospace font with an exact 1:2 width ratio (BIZ UDGothic, Osaka-Mono, Noto Sans Mono CJK JP), with box-drawing characters narrowed to half width, so text diagrams line up even with Japanese in them. |
 | `yomu.font.size` | `16` | Font size in pixels. |

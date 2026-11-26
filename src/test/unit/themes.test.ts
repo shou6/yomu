@@ -54,7 +54,7 @@ suite('テーマの CSS', () => {
       '--yomu-max-width',
       '--yomu-margin-left',
       '--yomu-margin-right',
-      '--yomu-padding',
+      '--yomu-side-margin',
       '--yomu-font-family',
       '--yomu-code-font-family',
       '--yomu-font-size',

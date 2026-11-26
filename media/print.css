@@ -10,6 +10,8 @@
 
   body {
     min-height: auto;
+    /* 左右の余白は @page の margin で取る */
+    padding: 0;
     background: #ffffff;
     /* 背景色（コードブロックや引用）も印刷する */
     -webkit-print-color-adjust: exact;

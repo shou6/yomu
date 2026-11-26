@@ -1,21 +1,24 @@
 /**
- * 本文の幅と余白を、リーダーから変えるコマンド（vscode 依存）。
+ * 本文の左右の余白と最大幅を、リーダーから変えるコマンド（vscode 依存）。
  * 選んだ値は設定（yomu.layout.*）に書き込み、次に開いた時にも使う。判断は layout.ts（単体テスト済み）。
  */
 import * as vscode from 'vscode';
 import {
   configScope,
   layoutPickItems,
-  stepWidth,
+  stepMargin,
   validateLayoutNumber,
   type LayoutKey,
   type LayoutPickItem,
 } from './layout';
 
 const SETTING: Record<LayoutKey, string> = {
+  margin: 'layout.margin',
   maxWidth: 'layout.maxWidth',
-  padding: 'layout.padding',
 };
+
+/** 設定が無い時の値。package.json の default に合わせる */
+const DEFAULTS: Record<LayoutKey, number> = { margin: 10, maxWidth: 0 };
 
 const TARGET = {
   global: vscode.ConfigurationTarget.Global,
@@ -23,9 +26,9 @@ const TARGET = {
   workspaceFolder: vscode.ConfigurationTarget.WorkspaceFolder,
 } as const;
 
-function current(key: LayoutKey, fallback: number): number {
+function current(key: LayoutKey): number {
   const value = vscode.workspace.getConfiguration('yomu').get<unknown>(SETTING[key]);
-  return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
+  return typeof value === 'number' && Number.isFinite(value) ? value : DEFAULTS[key];
 }
 
 /** 設定に書き込む。ワークスペースやフォルダーで指定していればそちらを書き換える（layout.ts の configScope） */
@@ -37,20 +40,20 @@ export function writeLayout(key: LayoutKey, value: number): Thenable<void> {
 
 async function askNumber(key: LayoutKey, value: number): Promise<number | undefined> {
   const input = await vscode.window.showInputBox({
-    title: key === 'maxWidth' ? vscode.l10n.t('Body width') : vscode.l10n.t('Side margins'),
+    title: key === 'maxWidth' ? vscode.l10n.t('Maximum width') : vscode.l10n.t('Side margins'),
     prompt:
       key === 'maxWidth'
         ? vscode.l10n.t('Maximum width of the body in px. 0 means no limit.')
-        : vscode.l10n.t('Left and right margin of the body in px.'),
+        : vscode.l10n.t('Left and right margin of the body, as a percentage of the window width.'),
     value: String(value),
     validateInput: (text) => validateLayoutNumber(text, key, vscode.l10n.t),
   });
   return input === undefined ? undefined : Number(input.trim());
 }
 
-/** QuickPick で幅か余白を選ばせ、設定に書き込む */
+/** QuickPick で余白か最大幅を選ばせ、設定に書き込む */
 async function adjustLayout(): Promise<void> {
-  const now = { maxWidth: current('maxWidth', 820), padding: current('padding', 32) };
+  const now = { margin: current('margin'), maxWidth: current('maxWidth') };
   type Item = vscode.QuickPickItem & { source: LayoutPickItem };
   const items: Item[] = layoutPickItems(now, vscode.l10n.t).map((source) =>
     source.separator === true
@@ -75,11 +78,12 @@ async function adjustLayout(): Promise<void> {
   }
 }
 
+/** 本文を広げる・狭める。本文の幅はウィンドウから余白を引いた幅なので、余白の割合を変える */
 async function step(direction: 'wider' | 'narrower'): Promise<void> {
-  const now = current('maxWidth', 820);
-  const next = stepWidth(now, direction);
+  const now = current('margin');
+  const next = stepMargin(now, direction);
   if (next !== now) {
-    await writeLayout('maxWidth', next);
+    await writeLayout('margin', next);
   }
 }
 

@@ -49,10 +49,17 @@ function rule(selector: string): string | undefined {
 }
 
 suite('reader.css: 本文の幅と余白', () => {
-  test('左右の余白は、設定の値を上限に、ウィンドウが狭いと縮める', () => {
+  test('左右の余白は、ウィンドウの幅に対する割合（設定）にし、狭くても縁から最低限は離す', () => {
+    const body = rule('body');
+    assert.ok(body, 'body の規則が無い');
+    assert.match(body, /padding:\s*0 max\(\d+px,\s*var\(--yomu-side-margin[^)]*\)\)/);
+  });
+
+  test('本文の左右の余白を px で固定しない（幅はウィンドウに合わせて伸び縮みさせる）', () => {
     const content = rule('#content');
     assert.ok(content, '#content の規則が無い');
-    assert.match(content, /padding:[^;]*min\(var\(--yomu-padding[^)]*\),\s*[\d.]+vw\)/);
+    assert.doesNotMatch(content, /--yomu-padding/);
+    assert.match(content, /padding:\s*2em 0/);
   });
 });
 
@@ -61,6 +68,24 @@ suite('reader.css: 列の多い表', () => {
     const wrapper = rule('.yomu-table');
     assert.ok(wrapper, '.yomu-table の規則が無い');
     assert.match(wrapper, /overflow-x:\s*auto/);
+  });
+
+  test('横に続きがある側の端に影を出し、表が切れているのではなく続いていると分かるようにする', () => {
+    // 影は scroll、それを隠す背景色の覆いは local で描く。端までスクロールすると覆いが影に重なって消える
+    const wrapper = rule('.yomu-table') ?? '';
+    assert.match(wrapper, /background:[^;]*\blocal\b[^;]*\bscroll\b/);
+  });
+
+  test('枠の横のスクロールバーは常に見せ、スクロールできることが分かるようにする', () => {
+    const bar = rule('.yomu-table::-webkit-scrollbar');
+    assert.ok(bar, 'スクロールバーの規則が無い');
+    assert.match(bar, /height:\s*\d+px/);
+    assert.ok(rule('.yomu-table::-webkit-scrollbar-thumb'), 'スクロールバーのつまみの規則が無い');
+  });
+
+  test('表は中身の幅にし、本文より狭い表を引き伸ばさない（数字の列の間が空きすぎない）', () => {
+    const table = readerCss().match(/(?:^|\n)table\s*{([^}]*)}/)?.[1] ?? '';
+    assert.doesNotMatch(table, /width:\s*100%/);
   });
 
   test('セルに最小幅を付け、和文の列が 1〜2 文字の幅まで縮まないようにする', () => {
@@ -83,10 +108,13 @@ suite('reader.css: リスト', () => {
     assert.doesNotMatch(list, /line-height/);
   });
 
-  test('子を持つ項目と次の項目の間は、グループ内より広く空ける', () => {
-    const next = rule('li:has(> ul, > ol) + li');
-    assert.ok(next, '子を持つ項目の次の項目の規則が無い');
-    assert.match(next, /margin-top:\s*[\d.]+em/);
+  test('子を持つ項目と次の項目の間は、グループ内より見て分かるだけ広く空ける', () => {
+    const em = (selector: string): number =>
+      Number(rule(selector)?.match(/margin-top:\s*([\d.]+)em/)?.[1] ?? NaN);
+    const group = em('li:has(> ul, > ol) + li');
+    const sibling = em('li + li');
+    // 1em（16px）の差があれば、行間（1.8 で 29px）に埋もれず切れ目として見える
+    assert.ok(group - sibling >= 0.75, `グループの間 ${group}em、項目の間 ${sibling}em`);
   });
 
   test('入れ子のリストの前に少し間隔を空ける', () => {

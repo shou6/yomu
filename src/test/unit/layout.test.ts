@@ -2,8 +2,9 @@ import * as assert from 'assert';
 import {
   configScope,
   layoutPickItems,
-  stepWidth,
+  stepMargin,
   validateLayoutNumber,
+  type LayoutKey,
   type LayoutPickItem,
 } from '../../reader/layout';
 
@@ -12,31 +13,27 @@ function t(message: string, ...args: string[]): string {
   return message.replace(/\{(\d+)\}/g, (_, index: string) => args[Number(index)] ?? '');
 }
 
-function choices(items: LayoutPickItem[], key: 'maxWidth' | 'padding'): LayoutPickItem[] {
+function choices(items: LayoutPickItem[], key: LayoutKey): LayoutPickItem[] {
   return items.filter((item) => item.key === key);
 }
 
-suite('stepWidth', () => {
-  test('広げると、今より広い次の段階になる', () => {
-    assert.strictEqual(stepWidth(820, 'wider'), 1000);
-    assert.strictEqual(stepWidth(700, 'wider'), 820);
+suite('stepMargin', () => {
+  test('本文を広げると、左右の余白の割合が 1 段階小さくなる', () => {
+    assert.strictEqual(stepMargin(10, 'wider'), 5);
+    assert.strictEqual(stepMargin(12, 'wider'), 10);
+    assert.strictEqual(stepMargin(5, 'wider'), 0);
   });
 
-  test('一番広い段階より広げると制限なし（0）になり、制限なしはそのまま', () => {
-    assert.strictEqual(stepWidth(1200, 'wider'), 0);
-    assert.strictEqual(stepWidth(5000, 'wider'), 0);
-    assert.strictEqual(stepWidth(0, 'wider'), 0);
+  test('本文を狭めると、左右の余白の割合が 1 段階大きくなる', () => {
+    assert.strictEqual(stepMargin(10, 'narrower'), 15);
+    assert.strictEqual(stepMargin(12, 'narrower'), 15);
+    assert.strictEqual(stepMargin(0, 'narrower'), 5);
   });
 
-  test('狭めると、今より狭い次の段階になる。制限なしからは一番広い段階になる', () => {
-    assert.strictEqual(stepWidth(820, 'narrower'), 680);
-    assert.strictEqual(stepWidth(900, 'narrower'), 820);
-    assert.strictEqual(stepWidth(0, 'narrower'), 1200);
-  });
-
-  test('一番狭い段階より狭くはしない', () => {
-    assert.strictEqual(stepWidth(560, 'narrower'), 560);
-    assert.strictEqual(stepWidth(400, 'narrower'), 400);
+  test('0 より小さく、一番大きい段階（30%）より大きくはしない', () => {
+    assert.strictEqual(stepMargin(0, 'wider'), 0);
+    assert.strictEqual(stepMargin(30, 'narrower'), 30);
+    assert.strictEqual(stepMargin(35, 'narrower'), 35);
   });
 });
 
@@ -58,58 +55,64 @@ suite('configScope', () => {
 });
 
 suite('layoutPickItems', () => {
-  test('幅と余白の見出しと選択肢を並べる', () => {
-    const items = layoutPickItems({ maxWidth: 820, padding: 32 }, t);
+  test('左右の余白と最大幅の見出しと選択肢を並べる', () => {
+    const items = layoutPickItems({ margin: 10, maxWidth: 0 }, t);
     const separators = items.filter((item) => item.separator === true).map((item) => item.label);
-    assert.deepStrictEqual(separators, ['Body width', 'Side margins']);
+    assert.deepStrictEqual(separators, ['Side margins', 'Maximum width']);
     assert.deepStrictEqual(
-      choices(items, 'maxWidth').map((item) => item.value),
-      [680, 820, 1000, 1200, 0, 'custom']
+      choices(items, 'margin').map((item) => item.value),
+      [0, 5, 10, 15, 20, 'custom']
     );
     assert.deepStrictEqual(
-      choices(items, 'padding').map((item) => item.value),
-      [0, 16, 32, 64, 'custom']
+      choices(items, 'maxWidth').map((item) => item.value),
+      [0, 820, 1000, 1200, 1600, 'custom']
+    );
+  });
+
+  test('余白は割合で、最大幅は px で説明する', () => {
+    const items = layoutPickItems({ margin: 10, maxWidth: 0 }, t);
+    assert.strictEqual(choices(items, 'margin').find((i) => i.value === 15)?.description, '15%');
+    assert.strictEqual(
+      choices(items, 'maxWidth').find((i) => i.value === 1000)?.description,
+      '1000px'
     );
   });
 
   test('今の値に印を付ける', () => {
-    const items = layoutPickItems({ maxWidth: 820, padding: 16 }, t);
+    const items = layoutPickItems({ margin: 5, maxWidth: 1200 }, t);
     assert.deepStrictEqual(
       items.filter((item) => item.current === true).map((item) => [item.key, item.value]),
       [
-        ['maxWidth', 820],
-        ['padding', 16],
+        ['margin', 5],
+        ['maxWidth', 1200],
       ]
     );
   });
 
   test('段階に無い値の時は、数値の入力に印を付けて今の値を見せる', () => {
-    const items = layoutPickItems({ maxWidth: 900, padding: 32 }, t);
-    const custom = choices(items, 'maxWidth').find((item) => item.value === 'custom');
-    assert.strictEqual(custom?.current, true);
-    assert.strictEqual(custom?.description, '900px');
-  });
-
-  test('制限なしの説明は px で出さない', () => {
-    const items = layoutPickItems({ maxWidth: 0, padding: 32 }, t);
-    const none = choices(items, 'maxWidth').find((item) => item.value === 0);
-    assert.strictEqual(none?.current, true);
-    assert.strictEqual(none?.label, 'No limit');
+    const items = layoutPickItems({ margin: 12, maxWidth: 900 }, t);
+    const margin = choices(items, 'margin').find((item) => item.value === 'custom');
+    assert.strictEqual(margin?.current, true);
+    assert.strictEqual(margin?.description, '12%');
+    const width = choices(items, 'maxWidth').find((item) => item.value === 'custom');
+    assert.strictEqual(width?.current, true);
+    assert.strictEqual(width?.description, '900px');
   });
 });
 
 suite('validateLayoutNumber', () => {
   test('範囲内の整数なら undefined（受け付ける）', () => {
     assert.strictEqual(validateLayoutNumber('960', 'maxWidth', t), undefined);
-    assert.strictEqual(validateLayoutNumber(' 0 ', 'padding', t), undefined);
+    assert.strictEqual(validateLayoutNumber(' 0 ', 'margin', t), undefined);
+    assert.strictEqual(validateLayoutNumber('40', 'margin', t), undefined);
   });
 
   test('数でない、小数、範囲外は理由を返す', () => {
     assert.ok(validateLayoutNumber('abc', 'maxWidth', t));
     assert.ok(validateLayoutNumber('', 'maxWidth', t));
-    assert.ok(validateLayoutNumber('12.5', 'padding', t));
+    assert.ok(validateLayoutNumber('12.5', 'margin', t));
     assert.ok(validateLayoutNumber('10001', 'maxWidth', t));
-    assert.ok(validateLayoutNumber('1001', 'padding', t));
-    assert.ok(validateLayoutNumber('-1', 'padding', t));
+    assert.ok(validateLayoutNumber('41', 'margin', t));
+    assert.ok(validateLayoutNumber('-1', 'margin', t));
   });
 });

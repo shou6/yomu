@@ -11,7 +11,7 @@ import { openZoom, zoomTarget } from './zoom';
 import { setFocusMode, updateFocus, watchFocus } from './focus';
 import { applyFolding } from './fold';
 import { applyCopyButtons } from './copy';
-import { layoutTables, watchTables } from './table';
+import { markTableCells } from './table';
 import { watchPosition } from './position';
 import { watchProgress } from './progress';
 import { resumeScrollY } from '../reader/reading';
@@ -118,7 +118,7 @@ function applyUpdate(
   if (opening && scrollY > 0) {
     restoreScrollY = scrollY;
   }
-  layoutTables(content);
+  markTableCells(content);
   copyButtons();
   applyFolding(content);
   window.scrollTo(0, scrollY);
@@ -164,8 +164,6 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
   labels = message.labels;
   copyButtons(labels);
   applyFolding(content, { foldLines: message.foldLines, labels: message.foldLabels });
-  // 本文の幅や余白が変わると、表を広げる量も変わる
-  layoutTables(content);
 }
 
 window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
@@ -200,7 +198,6 @@ window.addEventListener('message', (event: MessageEvent<ToWebview>) => {
 
 window.addEventListener('scroll', saveScroll, { passive: true });
 watchFocus(content);
-watchTables(content);
 // 読んだ位置の割合を拡張機能に知らせ、ステータスバーと読書の記録に使ってもらう
 const checkProgress = watchProgress((value) => vscode.postMessage({ type: 'progress', value }));
 // 今読んでいる見出しを拡張機能に知らせ、目次のビューで選んだ状態にしてもらう

@@ -13,18 +13,19 @@
   "Copied": "コピーしました",
   "Close": "閉じる",
   "Body width and margins": "本文の幅と余白",
-  "Body width": "本文の幅",
   "Side margins": "左右の余白",
   "Narrow": "狭い",
   "Standard": "標準",
   "Wide": "広い",
   "Extra wide": "とても広い",
   "No limit": "制限なし",
-  "Fill the window": "ウィンドウの幅いっぱい",
   "None": "なし",
   "Enter a number...": "数値を入力...",
   "{0}px": "{0}px",
   "Enter a whole number from {0} to {1}.": "{0} から {1} までの整数を入力してください。",
   "Maximum width of the body in px. 0 means no limit.": "本文の最大幅（px）。0 で制限なし。",
-  "Left and right margin of the body in px.": "本文の左右の余白（px）。"
+  "Maximum width": "最大幅",
+  "Follow the window width": "ウィンドウの幅に合わせる",
+  "{0}%": "{0}%",
+  "Left and right margin of the body, as a percentage of the window width.": "本文の左右の余白。ウィンドウの幅に対する割合（%）。"
 }

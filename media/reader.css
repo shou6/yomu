@@ -5,7 +5,11 @@
 
 body {
   margin: 0;
-  padding: 0;
+  /*
+   * 左右の余白は、ウィンドウの幅に対する割合（設定 yomu.layout.margin）。本文はその内側いっぱいに広がり、
+   * ウィンドウの幅に合わせて伸び縮みする。割合が小さくても、縁から最低 16px は離す
+   */
+  padding: 0 max(16px, var(--yomu-side-margin, 10%));
   min-height: 100vh;
   /* 値は設定（yomu.*）から CSS 変数で受ける。既定値は readerSettings.ts と合わせる */
   font-family: var(--yomu-font-family, sans-serif);
@@ -24,10 +28,10 @@ body {
 
 #content {
   box-sizing: border-box;
-  max-width: var(--yomu-max-width, 820px);
+  max-width: var(--yomu-max-width, none);
   margin: 0 var(--yomu-margin-right, auto) 0 var(--yomu-margin-left, auto);
-  /* 左右の余白は設定の値を上限にし、ウィンドウが狭い時は縮める（本文の幅を確保する） */
-  padding: 2em min(var(--yomu-padding, 32px), 4vw);
+  /* 最大幅（設定 yomu.layout.maxWidth）は既定で制限なし。左右の余白は body が持つ */
+  padding: 2em 0;
 }
 
 #content > :first-child {
@@ -109,21 +113,56 @@ a:hover {
 }
 
 /*
- * テーブル（横線のみ）。render が枠（.yomu-table）で包む。列が多くて本文の幅に収まらない表は、
- * Webview のスクリプト（webview/table.ts）が枠の margin を負にしてウィンドウの空きまで広げ、残りは枠の中で横スクロールする
+ * テーブル（横線のみ）。render が枠（.yomu-table）で包む。表は本文の幅に収め、
+ * 列が多くて収まらない分は枠の中だけで横スクロールする（ページ全体はスクロールさせない）
  */
 .yomu-table {
   overflow-x: auto;
   margin: 1em 0;
+  /*
+   * 横に続きがある側の端に影を出す。影（scroll）は枠に固定し、背景色の覆い（local）は表と一緒に動く。
+   * 端までスクロールすると覆いが影に重なって消えるので、続きが無い側には影が出ない
+   */
+  background:
+    linear-gradient(to right, var(--yomu-bg) 40%, transparent) left / 3em 100% no-repeat local,
+    linear-gradient(to left, var(--yomu-bg) 40%, transparent) right / 3em 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, var(--table-shadow), transparent) left / 1.2em 100%
+      no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, var(--table-shadow), transparent) right / 1.2em 100%
+      no-repeat scroll;
+  /* テーマで上書きするものではないので --yomu- を付けない */
+  --table-shadow: color-mix(in srgb, var(--yomu-fg) 35%, transparent);
 }
 
 .yomu-table > table {
   margin: 0;
 }
 
+/* スクロールバーを常に出し、表が横に続いていることを見て分かるようにする */
+.yomu-table::-webkit-scrollbar {
+  height: 10px;
+}
+
+.yomu-table::-webkit-scrollbar-track {
+  background: var(--yomu-pre-bg);
+  border-radius: 5px;
+}
+
+.yomu-table::-webkit-scrollbar-thumb {
+  background: var(--yomu-td-border);
+  border-radius: 5px;
+}
+
+.yomu-table::-webkit-scrollbar-thumb:hover {
+  background: var(--yomu-th-border);
+}
+
+/*
+ * 表は中身の幅にする。本文より狭い表を 100% に引き伸ばすと、数字だけの列の間が空きすぎて行を目で追いにくい。
+ * 中身が本文より広い時は、本文の幅まで縮めて長い文のセルを折り返し、それでも収まらなければ横スクロールする
+ */
 table {
   border-collapse: collapse;
-  width: 100%;
   margin: 1em 0;
   font-size: 0.93em;
   border: none;
@@ -138,7 +177,6 @@ th {
   color: var(--yomu-th);
   background: transparent;
   white-space: nowrap;
-  min-width: 3em;
 }
 
 td {
@@ -410,16 +448,19 @@ ol[data-digits='3'] {
 
 li > ul,
 li > ol {
-  margin: 0.2em 0 0;
+  margin: 0.1em 0 0;
 }
 
 li + li {
-  margin-top: 0.15em;
+  margin-top: 0.1em;
 }
 
-/* 子を持つ項目の次は、グループの切れ目が見えるよう広く空ける */
+/*
+ * 子を持つ項目の次は、グループの切れ目が見えるよう広く空ける。
+ * 項目の間との差を 1em 近く取らないと、行間（1.8）に埋もれて切れ目に見えない
+ */
 li:has(> ul, > ol) + li {
-  margin-top: 0.6em;
+  margin-top: 0.9em;
 }
 
 /* 記号と番号は本文より薄くし、項目の文字を目立たせる */

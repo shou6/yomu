@@ -5,9 +5,10 @@ suite('normalizeSettings', () => {
   test('何も無ければ既定値', () => {
     assert.deepStrictEqual(normalizeSettings({}), DEFAULT_SETTINGS);
     assert.strictEqual(DEFAULT_SETTINGS.theme, 'paper');
-    assert.strictEqual(DEFAULT_SETTINGS.maxWidth, 820);
+    // 本文の幅はウィンドウの幅に合わせて伸び縮みさせる。最大幅は上限として使いたい人だけが決める
+    assert.strictEqual(DEFAULT_SETTINGS.maxWidth, 0);
     assert.strictEqual(DEFAULT_SETTINGS.align, 'center');
-    assert.strictEqual(DEFAULT_SETTINGS.padding, 32);
+    assert.strictEqual(DEFAULT_SETTINGS.margin, 10);
     assert.strictEqual(DEFAULT_SETTINGS.fontSize, 16);
     assert.strictEqual(DEFAULT_SETTINGS.lineHeight, 1.8);
     assert.strictEqual(DEFAULT_SETTINGS.codeFontFamily, '');
@@ -20,7 +21,7 @@ suite('normalizeSettings', () => {
       theme: 'dark',
       maxWidth: 720,
       align: 'left',
-      padding: 16,
+      margin: 5,
       fontFamily: '"Noto Sans JP", sans-serif',
       codeFontFamily: 'Consolas',
       fontSize: 18,
@@ -34,7 +35,7 @@ suite('normalizeSettings', () => {
       theme: 'dark',
       maxWidth: 720,
       align: 'left',
-      padding: 16,
+      margin: 5,
       fontFamily: '"Noto Sans JP", sans-serif',
       codeFontFamily: 'Consolas',
       fontSize: 18,
@@ -72,10 +73,12 @@ suite('normalizeSettings', () => {
   });
 
   test('範囲外の数値は既定値に戻す。maxWidth の 0 は「制限なし」として通す', () => {
-    assert.strictEqual(normalizeSettings({ maxWidth: -1 }).maxWidth, 820);
-    assert.strictEqual(normalizeSettings({ maxWidth: 0 }).maxWidth, 0);
-    assert.strictEqual(normalizeSettings({ maxWidth: '900' }).maxWidth, 820);
-    assert.strictEqual(normalizeSettings({ padding: -5 }).padding, 32);
+    assert.strictEqual(normalizeSettings({ maxWidth: -1 }).maxWidth, 0);
+    assert.strictEqual(normalizeSettings({ maxWidth: 900 }).maxWidth, 900);
+    assert.strictEqual(normalizeSettings({ maxWidth: '900' }).maxWidth, 0);
+    assert.strictEqual(normalizeSettings({ margin: -5 }).margin, 10);
+    assert.strictEqual(normalizeSettings({ margin: 41 }).margin, 10);
+    assert.strictEqual(normalizeSettings({ margin: 40 }).margin, 40);
     assert.strictEqual(normalizeSettings({ fontSize: 3 }).fontSize, 16);
     assert.strictEqual(normalizeSettings({ fontSize: 100 }).fontSize, 16);
     assert.strictEqual(normalizeSettings({ lineHeight: 0.5 }).lineHeight, 1.8);
@@ -124,10 +127,11 @@ suite('normalizeSettings', () => {
 suite('cssVariables', () => {
   test('既定値から CSS 変数を作る', () => {
     const vars = cssVariables(DEFAULT_SETTINGS);
-    assert.strictEqual(vars['--yomu-max-width'], '820px');
+    assert.strictEqual(vars['--yomu-max-width'], 'none');
     assert.strictEqual(vars['--yomu-margin-left'], 'auto');
     assert.strictEqual(vars['--yomu-margin-right'], 'auto');
-    assert.strictEqual(vars['--yomu-padding'], '32px');
+    // 左右の余白は、ウィンドウの幅に対する割合
+    assert.strictEqual(vars['--yomu-side-margin'], '10%');
     assert.strictEqual(vars['--yomu-font-family'], DEFAULT_SETTINGS.fontFamily);
     // コードの既定は、半角と全角が 1:2 の和文等幅フォントを土台にする。和文を含むテキストの図が揃う。
     // 罫線（─ │ ┌）や三角（▶ ▼）は和文等幅フォントだと全角の幅になるので、その範囲だけ先頭の
@@ -148,6 +152,10 @@ suite('cssVariables', () => {
     assert.strictEqual(
       cssVariables({ ...DEFAULT_SETTINGS, maxWidth: 0 })['--yomu-max-width'],
       'none'
+    );
+    assert.strictEqual(
+      cssVariables({ ...DEFAULT_SETTINGS, maxWidth: 900 })['--yomu-max-width'],
+      '900px'
     );
     const left = cssVariables({ ...DEFAULT_SETTINGS, align: 'left' });
     assert.strictEqual(left['--yomu-margin-left'], '0');

@@ -293,7 +293,7 @@
           "type": "number",
           "minimum": 0,
           "maximum": 10000,
-          "default": 820,
+          "default": 0,
           "description": "%config.layout.maxWidth%"
         },
         "yomu.layout.align": {
@@ -306,12 +306,12 @@
           "default": "center",
           "description": "%config.layout.align%"
         },
-        "yomu.layout.padding": {
+        "yomu.layout.margin": {
           "type": "number",
           "minimum": 0,
-          "maximum": 1000,
-          "default": 32,
-          "description": "%config.layout.padding%"
+          "maximum": 40,
+          "default": 10,
+          "description": "%config.layout.margin%"
         },
         "yomu.font.family": {
           "type": "string",

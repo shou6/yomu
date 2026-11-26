@@ -1,32 +1,32 @@
 /**
- * 本文の幅と左右の余白を、リーダーから変える操作の判断部分（純粋関数）。
- * 値は設定（yomu.layout.maxWidth と yomu.layout.padding）に書き込む。書き込みと QuickPick の表示は extension.ts が行う。
+ * 本文の左右の余白と最大幅を、リーダーから変える操作の判断部分（純粋関数）。
+ * 本文の幅はウィンドウの幅から左右の余白を引いた幅で、余白はウィンドウの幅に対する割合で決める。
+ * 値は設定（yomu.layout.margin と yomu.layout.maxWidth）に書き込む。書き込みと QuickPick の表示は layoutCommands.ts が行う。
  */
 import type { Translate } from './openInReader';
 
-export type LayoutKey = 'maxWidth' | 'padding';
+export type LayoutKey = 'margin' | 'maxWidth';
 
-/** 「本文を広げる／狭める」で順に移る幅（px）。一番広い段階より広げると制限なし（0） */
-const WIDTH_STEPS = [560, 680, 820, 1000, 1200] as const;
+/** 「本文を広げる／狭める」で順に移る、左右の余白の割合（%） */
+const MARGIN_STEPS = [0, 5, 10, 15, 20, 25, 30] as const;
+
+/** QuickPick に並べる値 */
+const MARGIN_PRESETS = [0, 5, 10, 15, 20] as const;
+/** 0 は制限なし */
+const MAX_WIDTH_PRESETS = [0, 820, 1000, 1200, 1600] as const;
 
 /** 設定で受け付ける範囲。package.json の minimum と maximum に合わせる */
 const LIMITS: Record<LayoutKey, { min: number; max: number }> = {
+  margin: { min: 0, max: 40 },
   maxWidth: { min: 0, max: 10000 },
-  padding: { min: 0, max: 1000 },
 };
 
-/** 幅を 1 段階広げる、または狭める。0 は制限なし */
-export function stepWidth(current: number, direction: 'wider' | 'narrower'): number {
+/** 本文を 1 段階広げる（余白を小さくする）、または狭める（余白を大きくする） */
+export function stepMargin(current: number, direction: 'wider' | 'narrower'): number {
   if (direction === 'wider') {
-    if (current === 0) {
-      return 0;
-    }
-    return WIDTH_STEPS.find((step) => step > current) ?? 0;
+    return [...MARGIN_STEPS].reverse().find((step) => step < current) ?? current;
   }
-  if (current === 0) {
-    return WIDTH_STEPS[WIDTH_STEPS.length - 1];
-  }
-  return [...WIDTH_STEPS].reverse().find((step) => step < current) ?? current;
+  return MARGIN_STEPS.find((step) => step > current) ?? current;
 }
 
 export type ConfigScope = 'global' | 'workspace' | 'workspaceFolder';
@@ -57,57 +57,45 @@ export interface LayoutPickItem {
   current?: boolean;
 }
 
-function choice(
-  key: LayoutKey,
-  value: number,
-  label: string,
-  description: string,
-  currentValue: number
-): LayoutPickItem {
-  return { key, value, label, description, current: value === currentValue };
-}
-
-function customChoice(
-  key: LayoutKey,
-  presets: readonly number[],
-  currentValue: number,
-  t: Translate
-): LayoutPickItem {
-  const current = !presets.includes(currentValue);
-  return {
-    key,
-    value: 'custom',
-    label: t('Enter a number...'),
-    ...(current ? { description: t('{0}px', String(currentValue)), current } : {}),
-  };
-}
-
 /** QuickPick「本文の幅と余白」の項目 */
 export function layoutPickItems(
-  current: { maxWidth: number; padding: number },
+  current: { margin: number; maxWidth: number },
   t: Translate
 ): LayoutPickItem[] {
+  const percent = (value: number): string => t('{0}%', String(value));
   const px = (value: number): string => t('{0}px', String(value));
-  const widths = [
-    choice('maxWidth', 680, t('Narrow'), px(680), current.maxWidth),
-    choice('maxWidth', 820, t('Standard'), px(820), current.maxWidth),
-    choice('maxWidth', 1000, t('Wide'), px(1000), current.maxWidth),
-    choice('maxWidth', 1200, t('Extra wide'), px(1200), current.maxWidth),
-    choice('maxWidth', 0, t('No limit'), t('Fill the window'), current.maxWidth),
-  ];
-  const paddings = [
-    choice('padding', 0, t('None'), px(0), current.padding),
-    choice('padding', 16, t('Narrow'), px(16), current.padding),
-    choice('padding', 32, t('Standard'), px(32), current.padding),
-    choice('padding', 64, t('Wide'), px(64), current.padding),
-  ];
+  const describe: Record<LayoutKey, (value: number) => string> = { margin: percent, maxWidth: px };
+  const choice = (key: LayoutKey, value: number, label: string, description: string) => ({
+    key,
+    value,
+    label,
+    description,
+    current: value === current[key],
+  });
+  const custom = (key: LayoutKey, presets: readonly number[]): LayoutPickItem => {
+    const isCurrent = !presets.includes(current[key]);
+    return {
+      key,
+      value: 'custom',
+      label: t('Enter a number...'),
+      ...(isCurrent ? { description: describe[key](current[key]), current: true } : {}),
+    };
+  };
   return [
-    { label: t('Body width'), separator: true },
-    ...widths,
-    customChoice('maxWidth', [680, 820, 1000, 1200, 0], current.maxWidth, t),
     { label: t('Side margins'), separator: true },
-    ...paddings,
-    customChoice('padding', [0, 16, 32, 64], current.padding, t),
+    choice('margin', 0, t('None'), percent(0)),
+    choice('margin', 5, t('Narrow'), percent(5)),
+    choice('margin', 10, t('Standard'), percent(10)),
+    choice('margin', 15, t('Wide'), percent(15)),
+    choice('margin', 20, t('Extra wide'), percent(20)),
+    custom('margin', MARGIN_PRESETS),
+    { label: t('Maximum width'), separator: true },
+    choice('maxWidth', 0, t('No limit'), t('Follow the window width')),
+    choice('maxWidth', 820, t('Narrow'), px(820)),
+    choice('maxWidth', 1000, t('Standard'), px(1000)),
+    choice('maxWidth', 1200, t('Wide'), px(1200)),
+    choice('maxWidth', 1600, t('Extra wide'), px(1600)),
+    custom('maxWidth', MAX_WIDTH_PRESETS),
   ];
 }
 
