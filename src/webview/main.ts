@@ -3,13 +3,15 @@
  * 拡張機能からの update で本文を差し替え、settings で見た目を変え、スクロール位置を保ち、リンクのクリックを振り分ける。
  */
 import { classifyLink } from '../reader/links';
-import type { FromWebview, ToWebview } from '../reader/messages';
+import type { FromWebview, ToWebview, WebviewLabels } from '../reader/messages';
 import { mermaidTheme } from '../reader/mermaidTheme';
 import type { Theme } from '../reader/readerSettings';
 import { renderMermaid, resetMermaid } from './mermaid';
 import { openZoom, zoomTarget } from './zoom';
 import { setFocusMode, updateFocus, watchFocus } from './focus';
 import { applyFolding } from './fold';
+import { applyCopyButtons } from './copy';
+import { markTableCells } from './table';
 import { watchPosition } from './position';
 import { watchProgress } from './progress';
 import { resumeScrollY } from '../reader/reading';
@@ -33,6 +35,8 @@ const content = requireContent();
 const nonce = (document.currentScript as HTMLScriptElement | null)?.nonce ?? '';
 /** 今のテーマ。settings が来るまでは既定の paper */
 let theme: Theme = 'paper';
+/** ボタンの文言。settings が来るまでは英語 */
+let labels: WebviewLabels = { copy: 'Copy', copied: 'Copied', close: 'Close' };
 /** 開いた直後に復元したいスクロール位置。図を描いて本文が伸びた後に、もう一度合わせる */
 let restoreScrollY: number | undefined;
 
@@ -114,11 +118,18 @@ function applyUpdate(
   if (opening && scrollY > 0) {
     restoreScrollY = scrollY;
   }
+  markTableCells(content);
+  copyButtons();
   applyFolding(content);
   window.scrollTo(0, scrollY);
   saveScroll();
   drawMermaid();
   updateFocus(content);
+}
+
+/** コードブロックにコピーのボタンを付け直す。クリップボードへの書き込みは拡張機能に頼む */
+function copyButtons(next?: WebviewLabels): void {
+  applyCopyButtons(content, (text) => vscode.postMessage({ type: 'copy', text }), next);
 }
 
 /** カスタム CSS。テーマの後（head の末尾）に <link> を置き、どのスタイルも上書きできるようにする */
@@ -150,6 +161,8 @@ function applySettings(message: Extract<ToWebview, { type: 'settings' }>): void 
   // 図の配色の描き直しは、data-theme の変化を見ている MutationObserver が行う
   theme = message.theme;
   setFocusMode(content, message.focusMode);
+  labels = message.labels;
+  copyButtons(labels);
   applyFolding(content, { foldLines: message.foldLines, labels: message.foldLabels });
 }
 
@@ -209,7 +222,7 @@ document.addEventListener('click', (event) => {
   const zoomable = zoomTarget(event.target as Element | null);
   if (zoomable !== undefined) {
     event.preventDefault();
-    openZoom(zoomable);
+    openZoom(zoomable, labels.close);
     return;
   }
   const anchor = (event.target as Element | null)?.closest('a[href]');

@@ -89,6 +89,36 @@ export function createMarkdownIt(options: RenderOptions): MarkdownIt.MarkdownIt 
     }
   });
 
+  // 番号付きリストに、一番大きい番号の桁数を付ける。2 桁以上の番号が本文の左端からはみ出さないよう、CSS で左の余白を広げる
+  md.core.ruler.push('yomu_list_digits', (state) => {
+    state.tokens.forEach((token, index) => {
+      if (token.type !== 'ordered_list_open') {
+        return;
+      }
+      let items = 0;
+      for (let i = index + 1; i < state.tokens.length; i++) {
+        const next = state.tokens[i];
+        if (next.type === 'ordered_list_close' && next.level === token.level) {
+          break;
+        }
+        if (next.type === 'list_item_open' && next.level === token.level + 1) {
+          items++;
+        }
+      }
+      const start = Number(token.attrGet('start') ?? 1);
+      const digits = String(start + Math.max(items, 1) - 1).length;
+      if (digits >= 2) {
+        token.attrSet('data-digits', String(digits));
+      }
+    });
+  });
+
+  // 表を横スクロールの枠で包む。列の多い表でページ全体が横にスクロールしないようにする
+  md.renderer.rules.table_open = (tokens, idx, opts, _env, self) =>
+    '<div class="yomu-table">' + self.renderToken(tokens, idx, opts);
+  md.renderer.rules.table_close = (tokens, idx, opts, _env, self) =>
+    self.renderToken(tokens, idx, opts) + '</div>\n';
+
   // 言語指定のあるコードブロックを data-lang 付きの枠で包み、CSS でラベルを出す。
   // ラベルは横スクロールする pre の中ではなく、スクロールしない枠に置く
   const renderFence = md.renderer.rules.fence;

@@ -7,9 +7,9 @@
   "config.theme.sepia": "Warm, low-glare page.",
   "config.theme.dark": "Dark background with light text.",
   "config.theme.vscode": "Follow the colors of the current VS Code theme.",
-  "config.layout.maxWidth": "Maximum width of the text in pixels. 0 means no limit.",
+  "config.layout.maxWidth": "Maximum width of the text in pixels. 0 (default) means no limit: the text follows the window width.",
   "config.layout.align": "Where to place the text when the window is wider than the maximum width.",
-  "config.layout.padding": "Horizontal padding around the text in pixels.",
+  "config.layout.margin": "Left and right margin of the text, as a percentage of the window width. The text fills the rest of the window. The margin is at least 16px.",
   "config.font.family": "Font family for the text, in CSS font-family syntax. Put Latin fonts first and Japanese fonts after them so each script uses its own font. Bundled Japanese fonts: \"Noto Sans JP\" and \"BIZ UDPGothic\" (gothic), and \"BIZ UDPMincho\" (mincho, serif).",
   "config.font.codeFamily": "Font family for code. Leave empty to use a Japanese monospace font whose Latin and Japanese widths are exactly 1:2 (BIZ UDGothic, Osaka-Mono, Noto Sans Mono CJK JP), with box-drawing characters narrowed to half width, so text diagrams line up even when they contain Japanese.",
   "config.font.size": "Font size of the text in pixels.",
@@ -38,5 +38,8 @@
   "config.theme.github-dark": "GitHub Dark: the dark look of GitHub.",
   "config.theme.nord": "Nord: a calm, bluish dark theme.",
   "config.theme.catppuccin-latte": "Catppuccin Latte: soft pastel light theme.",
-  "config.theme.catppuccin-mocha": "Catppuccin Mocha: soft pastel dark theme."
+  "config.theme.catppuccin-mocha": "Catppuccin Mocha: soft pastel dark theme.",
+  "command.adjustLayout": "Body Width and Margins",
+  "command.widenBody": "Widen Body",
+  "command.narrowBody": "Narrow Body"
 }

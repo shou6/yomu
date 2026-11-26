@@ -33,7 +33,19 @@ export type ToWebview =
       foldLines: number;
       /** 折りたたみのボタンの文言（翻訳済み）。expand の {0} は行数 */
       foldLabels: { expand: string; collapse: string };
+      /** Webview の中のボタンの文言（翻訳済み） */
+      labels: WebviewLabels;
     };
+
+/** Webview の中のボタンの文言。Webview では l10n が使えないので、拡張機能が翻訳して渡す */
+export interface WebviewLabels {
+  /** コードのコピーのボタン */
+  copy: string;
+  /** コピーした後に一時的に出す文言 */
+  copied: string;
+  /** ズーム表示の閉じるボタンの読み上げ名 */
+  close: string;
+}
 
 /** Webview → 拡張機能 */
 export type FromWebview =
@@ -47,4 +59,6 @@ export type FromWebview =
   /** 読んだ位置の割合（0〜1）が変わった */
   | { type: 'progress'; value: number }
   /** requestLine への返事 */
-  | { type: 'line'; line: number };
+  | { type: 'line'; line: number }
+  /** コードブロックのコピーのボタンが押された。クリップボードへの書き込みは拡張機能が行う */
+  | { type: 'copy'; text: string };

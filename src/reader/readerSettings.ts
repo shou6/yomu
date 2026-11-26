@@ -24,11 +24,11 @@ export type Align = (typeof ALIGNS)[number];
 
 export interface ReaderSettings {
   theme: Theme;
-  /** 本文の最大幅（px）。0 で制限なし */
+  /** 本文の最大幅（px）。0 で制限なし（ウィンドウの幅に合わせる） */
   maxWidth: number;
   align: Align;
-  /** 本文の左右の余白（px） */
-  padding: number;
+  /** 本文の左右の余白。ウィンドウの幅に対する割合（%） */
+  margin: number;
   /** CSS の font-family の値 */
   fontFamily: string;
   /** コードの font-family。空なら半角と全角が 1:2 の和文等幅フォント（CODE_FONT_FALLBACK） */
@@ -51,9 +51,10 @@ export type RawSettings = Partial<Record<keyof ReaderSettings, unknown>>;
 
 export const DEFAULT_SETTINGS: ReaderSettings = {
   theme: 'paper',
-  maxWidth: 820,
+  // 本文の幅はウィンドウの幅から左右の余白を引いた幅にし、ウィンドウに合わせて伸び縮みさせる
+  maxWidth: 0,
   align: 'center',
-  padding: 32,
+  margin: 10,
   // 欧文フォントを先に並べ、欧文フォントに無い和文は後ろの和文フォントで描く（和欧の出し分け）。
   // 和文は同梱フォント（media/fonts.css で登録）なので、どの OS でも同じ見た目になる。
   // 既定値（幅 820、16px、Noto Sans JP）は開発者が設定で比べて決めた（実装計画のフェーズ 9.5）
@@ -104,7 +105,7 @@ export function normalizeSettings(raw: RawSettings): ReaderSettings {
     theme: oneOf(raw.theme, THEMES, DEFAULT_SETTINGS.theme),
     maxWidth: numberIn(raw.maxWidth, 0, 10000, DEFAULT_SETTINGS.maxWidth),
     align: oneOf(raw.align, ALIGNS, DEFAULT_SETTINGS.align),
-    padding: numberIn(raw.padding, 0, 1000, DEFAULT_SETTINGS.padding),
+    margin: numberIn(raw.margin, 0, 40, DEFAULT_SETTINGS.margin),
     fontFamily: cssValue(raw.fontFamily, DEFAULT_SETTINGS.fontFamily),
     codeFontFamily: cssValue(raw.codeFontFamily, DEFAULT_SETTINGS.codeFontFamily),
     fontSize: numberIn(raw.fontSize, 8, 72, DEFAULT_SETTINGS.fontSize),
@@ -125,7 +126,7 @@ export function cssVariables(settings: ReaderSettings): Record<string, string> {
     '--yomu-max-width': settings.maxWidth === 0 ? 'none' : `${settings.maxWidth}px`,
     '--yomu-margin-left': settings.align === 'left' ? '0' : 'auto',
     '--yomu-margin-right': settings.align === 'right' ? '0' : 'auto',
-    '--yomu-padding': `${settings.padding}px`,
+    '--yomu-side-margin': `${settings.margin}%`,
     '--yomu-font-family': settings.fontFamily,
     '--yomu-code-font-family':
       settings.codeFontFamily === '' ? CODE_FONT_FALLBACK : settings.codeFontFamily,

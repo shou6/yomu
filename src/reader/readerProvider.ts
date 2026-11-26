@@ -225,6 +225,8 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
         void this.history.record(document.uri, path.basename(document.fileName), message.value);
         // 出すかどうかは、受け手が今アクティブなリーダーを見て決める
         this.progressEmitter.fire(message.value);
+      } else if (message.type === 'copy') {
+        void vscode.env.clipboard.writeText(message.text);
       }
     });
     this.entries.add(entry);
@@ -404,7 +406,7 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       theme: config.get('theme'),
       maxWidth: config.get('layout.maxWidth'),
       align: config.get('layout.align'),
-      padding: config.get('layout.padding'),
+      margin: config.get('layout.margin'),
       fontFamily: config.get('font.family'),
       codeFontFamily: config.get('font.codeFamily'),
       fontSize: config.get('font.size'),
@@ -430,6 +432,11 @@ export class ReaderProvider implements vscode.CustomTextEditorProvider {
       foldLabels: {
         expand: vscode.l10n.t('Show all {0} lines'),
         collapse: vscode.l10n.t('Collapse'),
+      },
+      labels: {
+        copy: vscode.l10n.t('Copy'),
+        copied: vscode.l10n.t('Copied'),
+        close: vscode.l10n.t('Close'),
       },
       ...(customCss === undefined ? {} : { customCssUri: customCss }),
     });

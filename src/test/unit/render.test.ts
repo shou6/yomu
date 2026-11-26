@@ -25,6 +25,20 @@ suite('render: 基本の変換', () => {
     assert.ok(out.includes('<s>gone</s>'), out);
   });
 
+  test('表は横スクロールの枠（.yomu-table）で包む', () => {
+    const out = html('| a | b |\n| - | - |\n| 1 | 2 |\n');
+    assert.match(out, /^<div class="yomu-table"><table[^>]*>[\s\S]*<\/table>\n?<\/div>\n$/);
+  });
+
+  test('番号付きリストに、一番大きい番号の桁数を data-digits で付ける（2 桁以上の時だけ）', () => {
+    assert.ok(!html('1. a\n2. b\n').includes('data-digits'));
+    const items = Array.from({ length: 10 }, (_, i) => `${i + 1}. x`).join('\n');
+    assert.ok(html(items + '\n').includes('<ol data-line="0" data-digits="2">'), html(items));
+    assert.ok(html('99. a\n100. b\n').includes('data-digits="3"'));
+    // 入れ子の番号付きリストにも付ける
+    assert.ok(html('- a\n\n  9. x\n  10. y\n').includes('<ol start="9" data-digits="2">'));
+  });
+
   test('生の HTML は表示せず、エスケープする', () => {
     const out = html('<script>alert(1)</script>\n\n<font>bold</font> text\n');
     assert.ok(!out.includes('<script>'), out);
