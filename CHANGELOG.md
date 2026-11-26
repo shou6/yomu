@@ -3,6 +3,25 @@
 All notable changes to this extension are documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0]
+
+### Added
+
+- Body width and margins: the body fills the window except for the left and right margins, so it grows and shrinks with the window. The margins are a percentage of the window width, set with `yomu.layout.margin` (default `10`, at least 16px).
+- A **Body Width and Margins** button in the reader's title bar chooses the side margins and the maximum width. **Widen Body** and **Narrow Body** change the margins in steps of 5%. Yomu saves the values to your settings.
+- Keyboard shortcuts while the reader is active: `Ctrl+Alt+F` toggles focus mode, `Ctrl+Alt+]` and `Ctrl+Alt+[` widen and narrow the body (`Cmd` on macOS).
+- Code blocks have a **Copy** button, shown on hover and focus.
+
+### Changed
+
+- `yomu.layout.maxWidth` now defaults to `0` (no limit), so the body follows the window width. It still works as an upper limit.
+- `yomu.layout.margin` (percentage) replaces `yomu.layout.padding` (pixels). Set `yomu.layout.margin` if you had changed the padding.
+- Wide tables stay within the body width. The table itself scrolls sideways instead of the page, with a shadow on the side that continues. Tables are as wide as their content instead of the full body width, and short cells stay on one line.
+- Nested lists: more space before the next item after a nested group, the same line height as the body, and lighter bullets and numbers.
+- Nested task lists line up under the text of their parent task, and numbered lists with two or more digits get a wider left margin so the numbers stay inside the page.
+- Jumping to a heading leaves a little space above it.
+- Screen readers announce the close button of the zoom view in your display language.
+
 ## [0.4.0]
 
 ### Added
