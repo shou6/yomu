@@ -60,6 +60,29 @@
     overflow-wrap: anywhere;
   }
 
+  /*
+   * 表は紙の幅に収める。画面では収まらない分を枠（.yomu-table）の中で横スクロールするが、紙はスクロールできず
+   * 右側の列が切れる。枠のスクロールと端の影を外し、文字を小さくしてセルの左右の余白を詰め、セルの最小幅を外す
+   */
+  .yomu-table {
+    overflow: visible;
+    background: none;
+  }
+
+  .yomu-table > table {
+    font-size: 0.75em;
+  }
+
+  th,
+  td {
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+  }
+
+  td {
+    min-width: 0;
+  }
+
   /* 画面向けの操作は印刷しない */
   .yomu-fold-button,
   .yomu-zoom {
