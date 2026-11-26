@@ -103,6 +103,23 @@ suite('media/print.css', () => {
     assert.match(css, /break-inside:\s*avoid/);
   });
 
+  test('表は横スクロールの枠で切らず、端の影も印刷しない（紙はスクロールできない）', () => {
+    const frame = css.match(/\.yomu-table\s*{([^}]*)}/)?.[1];
+    assert.ok(frame, '.yomu-table の規則が無い');
+    assert.match(frame, /overflow:\s*visible/);
+    assert.match(frame, /background:\s*none/);
+  });
+
+  test('表が紙の幅に収まるよう、表の文字を小さくし、セルの最小幅を外す', () => {
+    const table = css.match(/\.yomu-table > table\s*{([^}]*)}/)?.[1];
+    assert.ok(table, '表の文字の大きさの規則が無い');
+    assert.match(table, /font-size:\s*0\.\d+em/);
+    // 「th, td」ではなく、td だけの規則
+    const td = css.match(/}\s*\n\s*td\s*{([^}]*)}/)?.[1];
+    assert.ok(td, 'td の規則が無い');
+    assert.match(td, /min-width:\s*0/);
+  });
+
   test('外部リンクの URL を併記する', () => {
     assert.match(css, /a\[href\^='http'\]::after/);
   });
