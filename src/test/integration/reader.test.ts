@@ -10,6 +10,7 @@ interface Manifest {
     viewsWelcome?: { view: string; contents: string; when?: string }[];
     commands: { command: string; icon?: string | { light: string; dark: string } }[];
     menus: { 'editor/title': { command: string; when: string; group?: string }[] };
+    keybindings: { command: string; key: string; mac?: string; when?: string }[];
     configuration: { properties: Record<string, { default?: unknown }> };
   };
 }
@@ -298,6 +299,33 @@ suite('Reader', () => {
     const labels = message.foldLabels as { expand: string; collapse: string };
     assert.ok(labels.expand.includes('{0}'), labels.expand);
     assert.ok(labels.collapse.length > 0);
+    const buttons = message.labels as { copy: string; copied: string; close: string };
+    assert.ok(buttons.copy.length > 0 && buttons.copied.length > 0 && buttons.close.length > 0);
+  });
+
+  test('本文を広げる・狭めるコマンドで、yomu.layout.maxWidth をユーザー設定に書き込む', async () => {
+    const config = (): vscode.WorkspaceConfiguration => vscode.workspace.getConfiguration('yomu');
+    try {
+      await vscode.commands.executeCommand('yomu.widenBody');
+      assert.strictEqual(config().inspect('layout.maxWidth')?.globalValue, 1000);
+      await vscode.commands.executeCommand('yomu.narrowBody');
+      await vscode.commands.executeCommand('yomu.narrowBody');
+      assert.strictEqual(config().inspect('layout.maxWidth')?.globalValue, 680);
+    } finally {
+      await config().update('layout.maxWidth', undefined, vscode.ConfigurationTarget.Global);
+    }
+  });
+
+  test('集中モードと本文の幅のショートカットは、リーダーがアクティブな時だけ効く', () => {
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
+    ) as Manifest;
+    for (const command of ['yomu.toggleFocusMode', 'yomu.widenBody', 'yomu.narrowBody']) {
+      const binding = manifest.contributes.keybindings.find((k) => k.command === command);
+      assert.ok(binding, command + ' のショートカットが無い');
+      assert.strictEqual(binding.when, 'activeCustomEditorId == yomu.reader', command);
+      assert.ok(binding.mac, command + ' に macOS のキーが無い');
+    }
   });
 
   test('印刷用の HTML を一時フォルダに書き出す。題名、本文、paper テーマ、印刷の CSS が入る', async () => {
@@ -320,7 +348,7 @@ suite('Reader', () => {
     await vscode.commands.executeCommand('yomu.openInBrowser');
   });
 
-  test('リーダータブの右上に、印刷・集中モード・標準エディタで開くのボタンを出す', () => {
+  test('リーダータブの右上に、本文の幅と余白・印刷・集中モード・標準エディタで開くのボタンを出す', () => {
     const manifest = JSON.parse(
       fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8')
     ) as Manifest;
@@ -331,6 +359,7 @@ suite('Reader', () => {
       return item;
     };
     for (const command of [
+      'yomu.adjustLayout',
       'yomu.openInBrowser',
       'yomu.enableFocusMode',
       'yomu.disableFocusMode',

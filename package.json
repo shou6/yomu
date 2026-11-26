@@ -127,6 +127,42 @@
         "command": "yomu.revealHeading",
         "title": "%command.revealHeading%",
         "category": "Yomu"
+      },
+      {
+        "command": "yomu.adjustLayout",
+        "title": "%command.adjustLayout%",
+        "category": "Yomu",
+        "icon": "$(arrow-both)"
+      },
+      {
+        "command": "yomu.widenBody",
+        "title": "%command.widenBody%",
+        "category": "Yomu"
+      },
+      {
+        "command": "yomu.narrowBody",
+        "title": "%command.narrowBody%",
+        "category": "Yomu"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "yomu.toggleFocusMode",
+        "key": "ctrl+alt+f",
+        "mac": "cmd+alt+f",
+        "when": "activeCustomEditorId == yomu.reader"
+      },
+      {
+        "command": "yomu.widenBody",
+        "key": "ctrl+alt+]",
+        "mac": "cmd+alt+]",
+        "when": "activeCustomEditorId == yomu.reader"
+      },
+      {
+        "command": "yomu.narrowBody",
+        "key": "ctrl+alt+[",
+        "mac": "cmd+alt+[",
+        "when": "activeCustomEditorId == yomu.reader"
       }
     ],
     "menus": {
@@ -144,6 +180,11 @@
         {
           "command": "yomu.disableFocusMode",
           "when": "activeCustomEditorId == yomu.reader && config.yomu.focusMode",
+          "group": "navigation"
+        },
+        {
+          "command": "yomu.adjustLayout",
+          "when": "activeCustomEditorId == yomu.reader",
           "group": "navigation"
         },
         {

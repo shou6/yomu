@@ -42,7 +42,10 @@ function isVector(element: HTMLImageElement | SVGSVGElement): boolean {
   return !(element instanceof HTMLImageElement) || /\.svg(\?|#|$)/i.test(element.src);
 }
 
-export function openZoom(source: HTMLImageElement | SVGSVGElement): void {
+/**
+ * @param closeLabel 閉じるボタンの読み上げ名（翻訳済み）
+ */
+export function openZoom(source: HTMLImageElement | SVGSVGElement, closeLabel: string): void {
   document.querySelector('.yomu-zoom')?.remove();
 
   const size = naturalSize(source);
@@ -64,7 +67,7 @@ export function openZoom(source: HTMLImageElement | SVGSVGElement): void {
   const closeButton = document.createElement('button');
   closeButton.className = 'yomu-zoom-close';
   closeButton.type = 'button';
-  closeButton.setAttribute('aria-label', 'Close');
+  closeButton.setAttribute('aria-label', closeLabel);
   closeButton.textContent = '×';
 
   overlay.append(content, closeButton);

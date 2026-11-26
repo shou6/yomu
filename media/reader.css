@@ -26,14 +26,24 @@ body {
   box-sizing: border-box;
   max-width: var(--yomu-max-width, 820px);
   margin: 0 var(--yomu-margin-right, auto) 0 var(--yomu-margin-left, auto);
-  padding: 2em var(--yomu-padding, 32px);
+  /* 左右の余白は設定の値を上限にし、ウィンドウが狭い時は縮める（本文の幅を確保する） */
+  padding: 2em min(var(--yomu-padding, 32px), 4vw);
 }
 
 #content > :first-child {
   margin-top: 0;
 }
 
-/* 見出し */
+/* 見出し。目次やリンクで移動した時に、画面の上端に貼り付かないよう間隔を空ける */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  scroll-margin-top: 1em;
+}
+
 h1 {
   font-size: 2em;
   font-weight: 700;
@@ -98,7 +108,19 @@ a:hover {
   text-decoration: underline;
 }
 
-/* テーブル（横線のみ） */
+/*
+ * テーブル（横線のみ）。render が枠（.yomu-table）で包む。列が多くて本文の幅に収まらない表は、
+ * Webview のスクリプト（webview/table.ts）が枠の margin を負にしてウィンドウの空きまで広げ、残りは枠の中で横スクロールする
+ */
+.yomu-table {
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.yomu-table > table {
+  margin: 0;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
@@ -123,13 +145,21 @@ td {
   padding: 0.45em 0.9em;
   border: none;
   border-bottom: 1px solid var(--yomu-td-border);
-  min-width: 3em;
+  /* 和文はどの文字の間でも折れるので、列が多いと 1〜2 文字の幅まで縮んで縦に並ぶ。最小幅で抑える */
+  min-width: 4em;
   text-align: left;
   /*
    * 和文は普通に折り返す。keep-all だと「v1公開後、要望が出たら」のような不自然な位置で折れる。
    * anywhere は列の最小幅を 1 文字まで縮め、数字やコードが途中で折れるので break-word にする
    */
   overflow-wrap: break-word;
+}
+
+/* 短いセルは折り返さない。印は Webview のスクリプト（webview/table.ts）が文字数を見て付ける */
+td.yomu-cell-short {
+  white-space: nowrap;
+  /* 1 行に収まるので、最小幅は要らない（数字の列が無駄に広がらないようにする） */
+  min-width: 0;
 }
 
 tbody tr:last-child td {
@@ -233,6 +263,41 @@ pre {
   margin: 0;
 }
 
+/* 言語の指定が無いコードは、コピーのボタンのために Webview のスクリプトが枠で包む。ラベルは出さない */
+.yomu-code:not([data-lang])::before {
+  content: none;
+}
+
+/*
+ * コピーのボタン。Webview のスクリプト（webview/copy.ts）が枠に足す。
+ * マウスを乗せた時とフォーカスした時だけ出し、その間は言語名のラベルを隠す（同じ右上に出すため）
+ */
+.yomu-copy-button {
+  position: absolute;
+  top: 0.4em;
+  right: 0.4em;
+  padding: 0.1em 0.7em;
+  border: 1px solid var(--yomu-pre-border);
+  border-radius: 4px;
+  font-family: var(--yomu-font-family, sans-serif);
+  font-size: 0.8em;
+  line-height: 1.6;
+  color: var(--yomu-code-label-fg);
+  background: var(--yomu-code-label-bg);
+  cursor: pointer;
+  opacity: 0;
+}
+
+.yomu-code:hover > .yomu-copy-button,
+.yomu-copy-button:focus-visible {
+  opacity: 1;
+}
+
+.yomu-code:hover::before,
+.yomu-code:focus-within::before {
+  visibility: hidden;
+}
+
 .yomu-code::before {
   content: attr(data-lang);
   position: absolute;
@@ -323,21 +388,43 @@ sub {
   color: var(--yomu-quote-fg);
 }
 
-/* リスト */
+/* リスト。行間は本文と揃える */
 ul,
 ol {
   padding-left: 1.6em;
   margin: 0.6em 0;
-  line-height: 1.9;
+}
+
+/* 番号が 2 桁以上の時は、番号が本文の左端からはみ出さないよう左の余白を広げる（data-digits は render が付ける） */
+ol[data-digits] {
+  padding-left: 3.4em;
+}
+
+ol[data-digits='2'] {
+  padding-left: 2.2em;
+}
+
+ol[data-digits='3'] {
+  padding-left: 2.8em;
 }
 
 li > ul,
 li > ol {
-  margin: 0;
+  margin: 0.2em 0 0;
 }
 
 li + li {
   margin-top: 0.15em;
+}
+
+/* 子を持つ項目の次は、グループの切れ目が見えるよう広く空ける */
+li:has(> ul, > ol) + li {
+  margin-top: 0.6em;
+}
+
+/* 記号と番号は本文より薄くし、項目の文字を目立たせる */
+li::marker {
+  color: color-mix(in srgb, var(--yomu-fg) 50%, transparent);
 }
 
 li > p {
@@ -347,6 +434,11 @@ li > p {
 /* GFM のタスクリスト。チェックボックスは表示だけ */
 ul.contains-task-list {
   padding-left: 0.4em;
+}
+
+/* 入れ子のタスクリストは、親のタスクの文字の位置まで字下げする */
+li > ul.contains-task-list {
+  padding-left: 1.6em;
 }
 
 li.task-list-item {

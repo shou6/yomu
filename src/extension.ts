@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import type { ToWebview } from './reader/messages';
 import { decideOpenInReader } from './reader/openInReader';
 import { HistoryView } from './reader/historyView';
+import { registerLayoutCommands } from './reader/layoutCommands';
 import { OutlineView } from './reader/outlineView';
 import { ProgressStatus } from './reader/progressStatus';
 import { ReadingHistory } from './reader/readingHistory';
@@ -34,6 +35,7 @@ export function activate(context: vscode.ExtensionContext): YomuApi {
   const outline = OutlineView.register(context, provider);
   HistoryView.register(context, history);
   const status = ProgressStatus.register(context, provider, history);
+  registerLayoutCommands(context);
   context.subscriptions.push(
     // タイトルバーのアイコンやエクスプローラーからは URI が渡る。コマンドパレットからは渡らない
     vscode.commands.registerCommand('yomu.openInReader', async (uri?: vscode.Uri) => {
